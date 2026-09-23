@@ -4,3 +4,6 @@
 
 # Tool logs
 .ai/
+
+# Python
+__pycache__/
