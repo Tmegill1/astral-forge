@@ -1,17 +1,15 @@
-[gd_resource type="Resource" script_class="RunDefinition" load_steps=22 format=3]
+[gd_resource type="Resource" script_class="RunDefinition" format=3 uid="uid://cadicjoi0g0d2"]
 
-[ext_resource type="Script" path="res://scripts/waves/run_definition.gd" id="1_run"]
-[ext_resource type="Script" path="res://scripts/waves/wave_group.gd" id="2_group"]
-[ext_resource type="Script" path="res://scripts/waves/wave_definition.gd" id="3_wave"]
+[ext_resource type="Script" uid="uid://bauwriv2tptlk" path="res://scripts/waves/run_definition.gd" id="1_run"]
+[ext_resource type="Script" uid="uid://bvfn28ev4r1vn" path="res://scripts/waves/wave_group.gd" id="2_group"]
+[ext_resource type="Script" uid="uid://dpbtycl0k7a1y" path="res://scripts/waves/wave_definition.gd" id="3_wave"]
 [ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="4_goblin"]
 
 [sub_resource type="Resource" id="WaveGroup_1"]
 script = ExtResource("2_group")
 enemy = ExtResource("4_goblin")
 count = 6
-sector = "west"
 interval = 2.0
-delay = 0.0
 
 [sub_resource type="Resource" id="WaveDefinition_1"]
 script = ExtResource("3_wave")
@@ -21,22 +19,17 @@ groups = Array[ExtResource("2_group")]([SubResource("WaveGroup_1")])
 [sub_resource type="Resource" id="WaveGroup_2"]
 script = ExtResource("2_group")
 enemy = ExtResource("4_goblin")
-count = 5
-sector = "west"
 interval = 1.8
-delay = 0.0
 
 [sub_resource type="Resource" id="WaveGroup_3"]
 script = ExtResource("2_group")
 enemy = ExtResource("4_goblin")
-count = 5
 sector = "north"
 interval = 1.8
 delay = 4.0
 
 [sub_resource type="Resource" id="WaveDefinition_2"]
 script = ExtResource("3_wave")
-prep_time = 30.0
 groups = Array[ExtResource("2_group")]([SubResource("WaveGroup_2"), SubResource("WaveGroup_3")])
 
 [sub_resource type="Resource" id="WaveGroup_4"]
@@ -44,20 +37,16 @@ script = ExtResource("2_group")
 enemy = ExtResource("4_goblin")
 count = 7
 sector = "east"
-interval = 1.5
-delay = 0.0
 
 [sub_resource type="Resource" id="WaveGroup_5"]
 script = ExtResource("2_group")
 enemy = ExtResource("4_goblin")
 count = 7
 sector = "south"
-interval = 1.5
 delay = 3.0
 
 [sub_resource type="Resource" id="WaveDefinition_3"]
 script = ExtResource("3_wave")
-prep_time = 30.0
 groups = Array[ExtResource("2_group")]([SubResource("WaveGroup_4"), SubResource("WaveGroup_5")])
 
 [sub_resource type="Resource" id="WaveGroup_6"]
@@ -66,13 +55,11 @@ enemy = ExtResource("4_goblin")
 count = 6
 sector = "north"
 interval = 1.4
-delay = 0.0
 
 [sub_resource type="Resource" id="WaveGroup_7"]
 script = ExtResource("2_group")
 enemy = ExtResource("4_goblin")
 count = 6
-sector = "west"
 interval = 1.4
 delay = 2.0
 
@@ -86,7 +73,6 @@ delay = 4.0
 
 [sub_resource type="Resource" id="WaveDefinition_4"]
 script = ExtResource("3_wave")
-prep_time = 30.0
 groups = Array[ExtResource("2_group")]([SubResource("WaveGroup_6"), SubResource("WaveGroup_7"), SubResource("WaveGroup_8")])
 
 [sub_resource type="Resource" id="WaveGroup_9"]
@@ -95,7 +81,6 @@ enemy = ExtResource("4_goblin")
 count = 7
 sector = "north"
 interval = 1.2
-delay = 0.0
 
 [sub_resource type="Resource" id="WaveGroup_10"]
 script = ExtResource("2_group")
@@ -117,7 +102,6 @@ delay = 4.0
 script = ExtResource("2_group")
 enemy = ExtResource("4_goblin")
 count = 7
-sector = "west"
 interval = 1.2
 delay = 6.0
 
@@ -129,4 +113,3 @@ groups = Array[ExtResource("2_group")]([SubResource("WaveGroup_9"), SubResource(
 [resource]
 script = ExtResource("1_run")
 waves = Array[ExtResource("3_wave")]([SubResource("WaveDefinition_1"), SubResource("WaveDefinition_2"), SubResource("WaveDefinition_3"), SubResource("WaveDefinition_4"), SubResource("WaveDefinition_5")])
-heaps_per_break = 4

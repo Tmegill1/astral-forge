@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=32 format=3]
+[gd_resource type="SpriteFrames" load_steps=32 format=3 uid="uid://dj8ebqumbyqy1"]
 
 [ext_resource type="Texture2D" path="res://assets/sprites/gearshot.png" id="1"]
 

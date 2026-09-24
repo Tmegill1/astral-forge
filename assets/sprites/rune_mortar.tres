@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=32 format=3]
+[gd_resource type="SpriteFrames" load_steps=32 format=3 uid="uid://dft028f70cysx"]
 
 [ext_resource type="Texture2D" path="res://assets/sprites/rune_mortar.png" id="1"]
 
