@@ -8,7 +8,9 @@ sometimes bridge neighbouring frames. For each sheet this:
    SHEETS (tiny sparkle fragments are merged, bridged frames are split at the
    emptiest column).
 2. Aligns each frame by its feet/base (bottom of the opaque pixels, horizontal
-   centre of the lowest quarter) so animations don't jitter.
+   centre of the lowest quarter) so animations don't jitter. Animations in
+   BODY_ALIGNED line up by the head and torso instead: in a run the feet swing,
+   so pinning them makes the body lurch back and forth.
 3. Writes assets/sprites/<name>.png (one animation per row, equal cells) and
    assets/sprites/<name>.tres (a SpriteFrames resource with named animations).
 
@@ -21,6 +23,7 @@ Run from the project root:
 Requires Pillow and NumPy.
 """
 import os
+import re
 import sys
 
 import numpy as np
@@ -72,6 +75,16 @@ SHEETS = {
 }
 
 # Individual static images: sheet -> rows of image names.
+# Extra sheets merged into a SHEETS entry, e.g. more directions drawn later.
+# A missing file is skipped with a note, so art can be added whenever it's ready.
+EXTRA_SHEETS = {
+    # Artificer runs in 5 directions; left-hand ones are mirrored in-game.
+    # Prompt for making this sheet: ~/Desktop/artificer_run_prompt.txt
+    "artificer": [("artificer_run.png", [
+        [("walk_down", 8)], [("walk_down_right", 8)], [("walk_right", 8)],
+        [("walk_up_right", 8)], [("walk_up", 8)]])],
+}
+
 STATICS = {
     "fortress": ("image-gen-3.png", [
         ["core_intact", "core_damaged", "core_ruined"],
@@ -84,6 +97,9 @@ STATICS = {
 }
 
 FPS = {"idle": 6, "walk": 10, "death": 8, "destroyed": 1, "destroy": 10}
+# Per sheet: animations whose frames line up by the upper body (see body_x), not the feet.
+BODY_ALIGNED = {"artificer": {"walk", "walk_down", "walk_down_right", "walk_right",
+                              "walk_up_right", "walk_up"}}
 NO_LOOP = ("death", "destroy", "destroyed", "hurt", "attack", "cast", "fire", "build")
 
 
@@ -216,14 +232,44 @@ def anchor(frame):
     return int(np.median(low)), int(bottom)
 
 
+def body_x(frame):
+    """Horizontal centre of the frame's head and torso (its top 45%)."""
+    solid = np.array(frame.getchannel("A")) >= SOLID
+    ys, xs = np.nonzero(solid)
+    top, bottom = ys.min(), ys.max() + 1
+    return float(np.median(xs[ys < top + (bottom - top) * 0.45]))
+
+
+def body_offset(frames):
+    """Average distance from the feet anchor to the upper body, in pixels."""
+    return sum(body_x(f) - ax for f, (ax, _ay) in frames) / len(frames)
+
+
+def body_aligned(frames, offset):
+    """Re-anchor frames so the upper body holds still, sitting `offset` pixels
+    from the origin (pass the idle's body_offset so starting to walk doesn't
+    make the body jump)."""
+    return [(f, (round(body_x(f) - offset), ay)) for f, (_ax, ay) in frames]
+
+
 def build_animated(name, src, rows):
-    grid = slice_sheet(os.path.join(SRC_DIR, src), rows)
     anims = []  # (anim_name, [trimmed frames with anchors])
-    for row, frames in zip(rows, grid):
-        i = 0
-        for anim, n in row:
-            anims.append((anim, [(f, anchor(f)) for f in map(trim, frames[i:i + n])]))
-            i += n
+    for sheet_src, sheet_rows in [(src, rows)] + EXTRA_SHEETS.get(name, []):
+        path = os.path.join(SRC_DIR, sheet_src)
+        if not os.path.exists(path):
+            print(f"{name}: skipping {sheet_src} (not in {SRC_DIR}/ yet)")
+            continue
+        grid = slice_sheet(path, sheet_rows)
+        for row, frames in zip(sheet_rows, grid):
+            i = 0
+            for anim, n in row:
+                anims.append((anim, [(f, anchor(f)) for f in map(trim, frames[i:i + n])]))
+                i += n
+    body_anims = BODY_ALIGNED.get(name, ())
+    if body_anims:
+        idle = dict(anims).get("idle")
+        anims = [(anim, body_aligned(fs, body_offset(idle or fs)) if anim in body_anims else fs)
+                 for anim, fs in anims]
     # Cell size: fit every frame around a shared anchor point.
     left = max(ax for _, fs in anims for _, (ax, _ay) in fs)
     right = max(f.width - ax for _, fs in anims for f, (ax, _ay) in fs)
@@ -253,17 +299,25 @@ def write_sprite_frames(name, anims, cell_w, cell_h, foot):
                         f'atlas = ExtResource("1")\n'
                         f'region = Rect2({c * cell_w}, {r * cell_h}, {cell_w}, {cell_h})\n')
             refs.append(f'{{\n"duration": 1.0,\n"texture": SubResource("AtlasTexture_{sid}")\n}}')
-        base = anim.split("_")[-1]
+        # "lv2_fire" -> "fire", "walk_down_right" -> "walk".
+        base = next((w for w in anim.split("_") if w in FPS or w in NO_LOOP), anim)
         loop = "false" if base in NO_LOOP else "true"
         anim_defs.append(f'{{\n"frames": [{", ".join(refs)}],\n"loop": {loop},\n'
                          f'"name": &"{anim}",\n"speed": {FPS.get(base, 8)}.0\n}}')
-    text = (f'[gd_resource type="SpriteFrames" load_steps={sid + 2} format=3]\n\n'
+    path = os.path.join(OUT_DIR, name + ".tres")
+    # Keep the uid Godot gave the file, so resources that point at it by uid stay valid.
+    uid = ""
+    if os.path.exists(path):
+        with open(path) as fh:
+            found = re.search(r' uid="([^"]+)"', fh.readline())
+        uid = f' uid="{found.group(1)}"' if found else ""
+    text = (f'[gd_resource type="SpriteFrames" load_steps={sid + 2} format=3{uid}]\n\n'
             f'[ext_resource type="Texture2D" path="res://{OUT_DIR}/{name}.png" id="1"]\n\n'
             + "\n".join(subs)
             + f'\n[resource]\nanimations = [{", ".join(anim_defs)}]\n'
             # Feet position relative to the cell centre; nodes use it to stand on their origin.
             + f'metadata/foot_offset = Vector2({foot[0] - cell_w / 2}, {foot[1] - cell_h / 2})\n')
-    with open(os.path.join(OUT_DIR, name + ".tres"), "w") as fh:
+    with open(path, "w") as fh:
         fh.write(text)
 
 

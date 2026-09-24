@@ -214,6 +214,7 @@ My best guess from looking at them. Names marked **(placeholder)** are the ones 
 
 ### Art still needed ([You])
 
+- Artificer running in 5 directions (down, down-right, right, up-right, up) → `artificer_run.png`. Prompt: `~/Desktop/artificer_run_prompt.txt`. The code is ready: the slicer merges it and the hero picks the direction automatically
 - Ogre, Bat, Siege Troll, Burrower, Saboteur (if `image-gen-9` isn't it)
 - Elite enemy, final boss
 - Bullets / projectiles / hit effects (Claude can do simple placeholders)

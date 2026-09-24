@@ -20,6 +20,10 @@ signal interact_prompt_changed(text: String)
 signal operating_changed(tower: Tower)
 
 const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
+## Walk animations from straight up to straight down, 45 degrees apart.
+## Moving left plays these mirrored. Any the art doesn't have fall back to "walk".
+const WALK_BY_DIRECTION: Array[StringName] = [
+	&"walk_up", &"walk_up_right", &"walk_right", &"walk_down_right", &"walk_down"]
 
 ## When false, the hero only shoots while the "fire" action is held.
 @export var auto_fire := true
@@ -29,6 +33,17 @@ const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
 @export var operating_zoom := 0.8
 ## Right-click movement stops this close to the target, in pixels.
 @export var arrive_distance := 6.0
+
+@export_group("Body motion")
+## Seconds to turn around (the sprite squeezes to nothing and opens up
+## facing the other way). 0 = instant flip.
+@export var turn_time := 0.1
+## How far the hero tilts into the run, in degrees.
+@export var lean_degrees := 6.0
+## How quickly the lean and bob settle; higher = snappier.
+@export var lean_sharpness := 12.0
+## Extra up-and-down per step while walking, in pixels. 0 = off.
+@export var bob_height := 1.5
 
 var definition: HeroDefinition
 ## Final stats for this run: baseline x this hero's multipliers.
@@ -47,6 +62,9 @@ var _cooldown := 0.0
 var _prompt := ""
 ## Where right-click movement is heading; null when not click-moving.
 var _move_target: Variant = null
+var _facing_left := false
+## Horizontal sprite scale sign: 1 = facing right, -1 = left, between while turning.
+var _facing := 1.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var muzzle: Marker2D = $Muzzle
@@ -82,8 +100,9 @@ func _physics_process(delta: float) -> void:
 	if health.is_dead:
 		return
 	if operating:
-		sprite.flip_h = get_global_mouse_position().x < global_position.x
+		_facing_left = get_global_mouse_position().x < global_position.x
 		sprite.play(&"idle")
+		_animate_body(Vector2.ZERO, delta)
 		_update_prompt()
 		return
 	var input := _movement_input()
@@ -99,20 +118,82 @@ func _physics_process(delta: float) -> void:
 
 	# Face where you're walking; when standing still, face the mouse.
 	# Walking straight up/down keeps the current facing.
-	var facing_left := sprite.flip_h
 	if input.x != 0.0:
-		facing_left = input.x < 0.0
+		_facing_left = input.x < 0.0
 	elif input == Vector2.ZERO:
-		facing_left = get_global_mouse_position().x < global_position.x
-	sprite.flip_h = facing_left
-	muzzle.position.x = -absf(muzzle.position.x) if facing_left else absf(muzzle.position.x)
-	sprite.play(&"walk" if input else &"idle")
+		_facing_left = get_global_mouse_position().x < global_position.x
+	muzzle.position.x = -absf(muzzle.position.x) if _facing_left else absf(muzzle.position.x)
+	if input:
+		_play_walk(_walk_animation(input))
+	else:
+		sprite.play(&"idle")
+	# Step in time with the actual speed so the feet don't skate.
+	sprite.speed_scale = clampf(get_real_velocity().length() / stats.move_speed, 0.4, 1.5) \
+			if input else 1.0
+	_animate_body(input, delta)
 	_update_prompt()
 
 	_cooldown -= delta
 	if _cooldown <= 0.0 and (auto_fire or Input.is_action_pressed(&"fire")):
 		_fire()
 		_cooldown = 1.0 / stats.attacks_per_second
+
+
+## The walk animation for moving along `move`, or plain "walk" if the art
+## doesn't have that direction.
+func _walk_animation(move: Vector2) -> StringName:
+	# Fold left onto right, then round to the nearest 45 degrees (-2 = up, 2 = down).
+	var step := roundi(Vector2(absf(move.x), move.y).angle() / (PI / 4.0))
+	var anim := WALK_BY_DIRECTION[step + 2]
+	return anim if sprite.sprite_frames.has_animation(anim) else &"walk"
+
+
+## Plays a walk animation; changing direction mid-stride keeps the step
+## cycle going instead of restarting it.
+func _play_walk(anim: StringName) -> void:
+	if sprite.animation == anim:
+		sprite.play(anim)
+		return
+	var mid_stride := String(sprite.animation).begins_with("walk")
+	var frame := sprite.frame
+	var progress := sprite.frame_progress
+	sprite.play(anim)
+	if mid_stride:
+		sprite.set_frame_and_progress(frame % sprite.sprite_frames.get_frame_count(anim), progress)
+
+
+## Turning, leaning and bobbing on top of the sprite's own frames.
+## `move` is this frame's movement input (zero when standing still).
+func _animate_body(move: Vector2, delta: float) -> void:
+	var facing_sign := -1.0 if _facing_left else 1.0
+	_facing = move_toward(_facing, facing_sign, 2.0 * delta / turn_time) \
+			if turn_time > 0.0 else facing_sign
+	sprite.scale = Vector2(_facing, 1.0) * definition.sprite_scale
+	var walking := move != Vector2.ZERO and String(sprite.animation).begins_with("walk")
+	# Lean into the sideways part of the run. With only the side-on "walk" art,
+	# also lean forward running up the screen and back running down, to hint
+	# at the direction the art can't show.
+	var forward := absf(move.x)
+	if sprite.animation == &"walk":
+		forward = clampf(forward - move.y * 0.5, -1.0, 1.0)
+	var blend := 1.0 - exp(-lean_sharpness * delta)
+	sprite.rotation = lerpf(sprite.rotation, deg_to_rad(lean_degrees) * forward * facing_sign, blend)
+	# Two bobs per walk cycle, one per step.
+	var bob := 0.0
+	if walking:
+		var cycle := (sprite.frame + sprite.frame_progress) \
+				/ sprite.sprite_frames.get_frame_count(sprite.animation)
+		bob = -absf(sin(cycle * TAU)) * bob_height
+	sprite.position.y = lerpf(sprite.position.y, bob, blend)
+
+
+## Drops any turn, lean or bob in progress (for death).
+func _reset_body() -> void:
+	_facing = -1.0 if _facing_left else 1.0
+	sprite.scale = Vector2(_facing, 1.0) * definition.sprite_scale
+	sprite.rotation = 0.0
+	sprite.position = Vector2.ZERO
+	sprite.speed_scale = 1.0
 
 
 ## WASD wins; otherwise head for the right-click target. Holding right-click
@@ -252,7 +333,7 @@ func revive(at: Vector2) -> void:
 func _fire() -> void:
 	var aim := get_global_mouse_position() - muzzle.global_position
 	if aim.is_zero_approx():
-		aim = Vector2.LEFT if sprite.flip_h else Vector2.RIGHT
+		aim = Vector2.LEFT if _facing_left else Vector2.RIGHT
 	var bolt: Projectile = BOLT_SCENE.instantiate()
 	bolt.global_position = muzzle.global_position
 	bolt.direction = aim.normalized()
@@ -267,6 +348,7 @@ func _on_died() -> void:
 	_move_target = null
 	queue_redraw()
 	velocity = Vector2.ZERO
+	_reset_body()
 	sprite.play(&"death")
 	_update_prompt()
 	died.emit()
