@@ -30,6 +30,14 @@ static func display_name(type: StringName) -> String:
 	return NAMES.get(type, String(type).capitalize())
 
 
+## e.g. {"scrap": 10} -> "10 Scrap".
+static func describe(amounts: Dictionary[StringName, int]) -> String:
+	var parts: PackedStringArray = []
+	for type in amounts:
+		parts.append("%d %s" % [amounts[type], display_name(type)])
+	return ", ".join(parts)
+
+
 static func icon(type: StringName) -> Texture2D:
 	return ICONS[type][0]
 
@@ -37,6 +45,14 @@ static func icon(type: StringName) -> Texture2D:
 ## Scatters `amount` of a resource around `at` as pickups under `parent`.
 static func drop(parent: Node, at: Vector2, type: StringName, amount: int) -> void:
 	if amount <= 0:
+		return
+	# Drops usually happen inside a physics callback (a bolt landing a kill),
+	# where Godot won't let new areas be added, so add them after the step.
+	_drop_now.call_deferred(parent, at, type, amount)
+
+
+static func _drop_now(parent: Node, at: Vector2, type: StringName, amount: int) -> void:
+	if not is_instance_valid(parent):
 		return
 	var piles := mini(amount, MAX_PILES)
 	for i in piles:

@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/tower.gd" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/ui/health_bar.gd" id="3_health_bar"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 20.0
+
+[node name="Tower" type="StaticBody2D" groups=["towers"]]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_tower")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+
+[node name="HealthBar" type="Node2D" parent="."]
+script = ExtResource("3_health_bar")
+width = 40.0
+height = 4.0
+hide_when_full = true
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("CircleShape2D_body")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")

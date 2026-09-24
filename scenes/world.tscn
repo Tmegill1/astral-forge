@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/enemies/enemy_spawner.gd" id="5_spawner"]
 [ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="6_goblin"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_over.tscn" id="7_game_over"]
+[ext_resource type="PackedScene" path="res://scenes/towers/build_slot.tscn" id="8_build_slot"]
 
 [node name="World" type="Node2D" unique_id=164071451]
 script = ExtResource("2_world")
@@ -20,6 +21,12 @@ y_sort_enabled = true
 
 [node name="CommandCore" parent="Units" instance=ExtResource("4_core")]
 position = Vector2(640, 384)
+
+[node name="BuildSlotWest" parent="Units" instance=ExtResource("8_build_slot")]
+position = Vector2(430, 400)
+
+[node name="BuildSlotEast" parent="Units" instance=ExtResource("8_build_slot")]
+position = Vector2(850, 400)
 
 [node name="HeroSpawn" type="Marker2D" parent="."]
 position = Vector2(640, 540)

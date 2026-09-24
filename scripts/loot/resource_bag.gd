@@ -35,6 +35,33 @@ func spend(type: StringName, amount: int) -> bool:
 	return true
 
 
+func can_afford(cost: Dictionary[StringName, int]) -> bool:
+	for type in cost:
+		if get_amount(type) < cost[type]:
+			return false
+	return true
+
+
+## Pays a multi-resource cost if every part is affordable; otherwise pays
+## nothing and returns false.
+func spend_all(cost: Dictionary[StringName, int]) -> bool:
+	if not can_afford(cost):
+		return false
+	for type in cost:
+		_amounts[type] = get_amount(type) - cost[type]
+	changed.emit()
+	return true
+
+
+## What's still needed to afford a cost, e.g. {"scrap": 4}; empty if affordable.
+func shortfall(cost: Dictionary[StringName, int]) -> Dictionary[StringName, int]:
+	var missing: Dictionary[StringName, int] = {}
+	for type in cost:
+		if get_amount(type) < cost[type]:
+			missing[type] = cost[type] - get_amount(type)
+	return missing
+
+
 ## Empties the bag and returns what was in it.
 func take_all() -> Dictionary[StringName, int]:
 	var taken: Dictionary[StringName, int] = {}

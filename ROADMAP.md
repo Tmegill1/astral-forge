@@ -75,10 +75,13 @@ Tuning knobs: respawn time and loss share are on the `World` node (`hero_respawn
 
 ## Phase 4 — Build a tower
 
-- [ ] **[AI]** Build slots around the Core (start with 1–2, not 16)
-- [ ] **[AI]** Stand on a slot + press E → spend Scrap → Gearshot Turret appears
-- [ ] **[AI]** Gearshot automatically aims and shoots at goblins
-- [ ] **[Both]** Play it — is the turret too strong or too weak?
+- [x] **[AI]** Build slots around the Core (2 for now: left and right; they glow when you stand on one)
+- [x] **[AI]** Stand on a slot + press E → spend 10 stored Scrap → Gearshot Turret appears (prompt says how much you're short)
+- [x] **[AI]** Gearshot automatically aims at and shoots the nearest goblin within ~4 tiles (8 dmg, 1.5 shots/sec)
+- [ ] **[Both]** Play it — is the turret too strong or too weak? Is 10 Scrap the right price?
+- [ ] **[You]** Art wish: turret frames aiming **down** (current art only aims up/sideways; enemies below get the nearest pose)
+
+**How towers work:** same idea as heroes and enemies. Every tower shares `scripts/towers/tower.gd`; each type is a data file in `data/towers/` (art, cost, damage, fire rate, range, and which way each frame's barrel points). Each `BuildSlot` in the world scene has a `tower` it offers.
 
 **Done when:** you can buy a turret and watch it defend on its own.
 

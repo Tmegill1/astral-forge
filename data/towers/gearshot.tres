@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/tower_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/gearshot.tres" id="2_frames"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"gearshot"
+display_name = "Gearshot Turret"
+sprite_frames = ExtResource("2_frames")
+sprite_scale = 0.55
+cost = Dictionary[StringName, int]({
+&"scrap": 10
+})
+max_health = 150.0
+attack_damage = 8.0
+attacks_per_second = 1.5
+attack_range = 260.0
+projectile_speed = 650.0
+aim_angles = PackedFloat32Array(-63, -45, -90, -149)
+muzzle_height = 50.0
+barrel_length = 30.0
