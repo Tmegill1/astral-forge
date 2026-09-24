@@ -6,7 +6,7 @@ extends Control
 
 var director: WaveDirector
 
-const LABELS := {&"north": "NORTH", &"east": "EAST", &"south": "SOUTH", &"west": "WEST"}
+const LABEL := "ENEMIES"
 
 
 func _process(_delta: float) -> void:
@@ -39,7 +39,7 @@ func _draw() -> void:
 		var back := tip - dir * 26.0
 		var side := dir.orthogonal() * 18.0
 		draw_colored_polygon(PackedVector2Array([tip, back + side, back - side]), color)
-		var text: String = LABELS[sector]
+		var text := LABEL
 		var text_size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 		var at := back - dir * 10.0 - Vector2(text_size.x / 2.0, -5.0)
 		if dir == Vector2.LEFT:
