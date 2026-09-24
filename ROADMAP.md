@@ -37,6 +37,8 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 - [x] **[You]** Decide: aim with the **mouse**, shooting is **automatic** for now (`auto_fire` on the Hero can be turned off → hold left click to shoot)
 - [x] **[Both]** Play it — does moving feel good? (hero shrunk 30%, faces the way it walks, HUD + health bars added)
 
+- [x] **[Both]** Running in 8 directions: `assets/source/artificer_run.png` (5 directions, left ones mirrored); the hero picks the walk art by direction, leans into turns, and lines frames up by the body so the run doesn't jitter
+
 **How heroes work:** every hero shares `scripts/heroes/hero.gd`. Baseline stats are the defaults in `scripts/heroes/hero_stats.gd`. Each hero is a data file in `data/heroes/` (art, size, and stat multipliers, e.g. Artificer = 0.9× health). `Game.selected_hero` picks who spawns; a hero-select screen will set it later. New hero = new `.tres` file, no code.
 
 **Done when:** you can walk around the map and swing/shoot at nothing.
@@ -214,7 +216,6 @@ My best guess from looking at them. Names marked **(placeholder)** are the ones 
 
 ### Art still needed ([You])
 
-- Artificer running in 5 directions (down, down-right, right, up-right, up) → `artificer_run.png`. Prompt: `~/Desktop/artificer_run_prompt.txt`. The code is ready: the slicer merges it and the hero picks the direction automatically
 - Ogre, Bat, Siege Troll, Burrower, Saboteur (if `image-gen-9` isn't it)
 - Elite enemy, final boss
 - Bullets / projectiles / hit effects (Claude can do simple placeholders)

@@ -75,14 +75,18 @@ SHEETS = {
 }
 
 # Individual static images: sheet -> rows of image names.
-# Extra sheets merged into a SHEETS entry, e.g. more directions drawn later.
-# A missing file is skipped with a note, so art can be added whenever it's ready.
+# Extra sheets merged into a SHEETS entry, e.g. more directions drawn later:
+# (file, rows, scale). Scale resizes the frames to match the main sheet when
+# the art was drawn at a different size. A missing file is skipped with a
+# note, so art can be added whenever it's ready.
 EXTRA_SHEETS = {
     # Artificer runs in 5 directions; left-hand ones are mirrored in-game.
     # Prompt for making this sheet: ~/Desktop/artificer_run_prompt.txt
     "artificer": [("artificer_run.png", [
         [("walk_down", 8)], [("walk_down_right", 8)], [("walk_right", 8)],
-        [("walk_up_right", 8)], [("walk_up", 8)]])],
+        [("walk_up_right", 8)], [("walk_up", 8)]],
+        # Drawn ~25% bigger: its side-view run is 213px tall vs 171px for "walk".
+        0.8)],
 }
 
 STATICS = {
@@ -255,7 +259,7 @@ def body_aligned(frames, offset):
 
 def build_animated(name, src, rows):
     anims = []  # (anim_name, [trimmed frames with anchors])
-    for sheet_src, sheet_rows in [(src, rows)] + EXTRA_SHEETS.get(name, []):
+    for sheet_src, sheet_rows, scale in [(src, rows, 1.0)] + EXTRA_SHEETS.get(name, []):
         path = os.path.join(SRC_DIR, sheet_src)
         if not os.path.exists(path):
             print(f"{name}: skipping {sheet_src} (not in {SRC_DIR}/ yet)")
@@ -264,7 +268,11 @@ def build_animated(name, src, rows):
         for row, frames in zip(sheet_rows, grid):
             i = 0
             for anim, n in row:
-                anims.append((anim, [(f, anchor(f)) for f in map(trim, frames[i:i + n])]))
+                fs = [trim(f) for f in frames[i:i + n]]
+                if scale != 1.0:
+                    fs = [f.resize((round(f.width * scale), round(f.height * scale)),
+                                   Image.LANCZOS) for f in fs]
+                anims.append((anim, [(f, anchor(f)) for f in fs]))
                 i += n
     body_anims = BODY_ALIGNED.get(name, ())
     if body_anims:
