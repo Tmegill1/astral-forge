@@ -18,6 +18,12 @@ func _ready() -> void:
 		health.died.connect(queue_redraw)
 
 
+## Moves the bar to just above the top of an animated sprite's cell.
+func place_above(sprite: AnimatedSprite2D) -> void:
+	var cell_height := sprite.sprite_frames.get_frame_texture(sprite.animation, 0).get_height()
+	position.y = (sprite.offset.y - cell_height / 2.0) * sprite.scale.y - 4.0
+
+
 func _draw() -> void:
 	if health == null or health.is_dead:
 		return

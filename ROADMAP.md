@@ -36,7 +36,7 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 - [x] **[You]** Decide: aim with the **mouse**, shooting is **automatic** for now (`auto_fire` on the Hero can be turned off → hold left click to shoot)
 - [x] **[Both]** Play it — does moving feel good? (hero shrunk 30%, faces the way it walks, HUD + health bars added)
 
-**How heroes work:** every hero shares `scripts/heroes/hero.gd`. Baseline stats are the defaults in `scripts/heroes/hero_stats.gd`. Each hero is a data file in `data/heroes/` (art, size, and stat multipliers, e.g. Artificer = 0.9× health, 1.2× fire rate). `Game.selected_hero` picks who spawns; a hero-select screen will set it later. New hero = new `.tres` file, no code.
+**How heroes work:** every hero shares `scripts/heroes/hero.gd`. Baseline stats are the defaults in `scripts/heroes/hero_stats.gd`. Each hero is a data file in `data/heroes/` (art, size, and stat multipliers, e.g. Artificer = 0.9× health). `Game.selected_hero` picks who spawns; a hero-select screen will set it later. New hero = new `.tres` file, no code.
 
 **Done when:** you can walk around the map and swing/shoot at nothing.
 
@@ -44,11 +44,16 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 
 ## Phase 2 — The Core and one Goblin
 
-- [ ] **[AI]** Command Core in the middle of the map, with health
-- [ ] **[AI]** Goblin walks toward the Core and attacks it
-- [ ] **[AI]** Hero can kill goblins
-- [ ] **[AI]** Core reaches 0 → "You Lose" screen
-- [ ] **[Both]** Play it
+- [x] **[AI]** Command Core in the middle of the map, with health (looks more broken at 66% and 33%)
+- [x] **[AI]** Goblin walks toward the Core and attacks it (turns on the hero if you get close)
+- [x] **[AI]** Hero can kill goblins
+- [x] **[AI]** Core reaches 0 → "You Lose" screen (Restart button or R)
+- [x] **[AI]** Placeholder: a fallen hero gets back up at the Core after 5 seconds
+- [ ] **[Both]** Play it — are goblins too fast/slow/tough? Is the Core too weak?
+- [x] **[AI]** Enemy hitboxes cover the whole visible sprite +25% (`hurtbox_padding` per enemy), so shots aimed at the body land
+- [x] **[You]** Decide: the hero starts at **1 shot per second**; upgrades raise it later (Phase 10)
+
+**How enemies work:** same idea as heroes. Every enemy shares `scripts/enemies/enemy.gd`; each type is a data file in `data/enemies/` with its art and stats (Goblin: 30 HP, speed 70, hits for 5 once a second). For now a test spawner (the `EnemySpawner` node in the world scene) drops goblins at the map edge, a bit faster each time; Phase 7 replaces it with real waves.
 
 **Done when:** goblins spawn, you fight them, and you can lose.
 
@@ -148,7 +153,7 @@ You can: leave the Core → kill goblins → carry Scrap home → choose wall or
 ## Phase 10 — A full run
 
 - [ ] **[AI]** Artificer abilities: passive, **Overclock** (boost your tower), **Full Steam** ultimate (share it with all towers)
-- [ ] **[AI]** Upgrade choices after waves (pick 1 of 3)
+- [ ] **[AI]** Upgrade choices after waves (pick 1 of 3) — include fire-rate upgrades (hero starts at 1 shot/sec)
 - [ ] **[AI]** One evolution per tower (e.g. Gearshot → Gatling Engine or Rune Cannon)
 - [ ] **[AI]** 10 waves, a mini-boss around wave 6, final boss
 - [ ] **[AI]** Win screen

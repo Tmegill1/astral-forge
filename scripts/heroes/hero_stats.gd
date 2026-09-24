@@ -8,7 +8,7 @@ extends Resource
 ## Pixels per second.
 @export var move_speed: float = 220.0
 @export var attack_damage: float = 10.0
-@export var attacks_per_second: float = 2.5
+@export var attacks_per_second: float = 1.0
 ## How far a shot travels, in pixels.
 @export var attack_range: float = 500.0
 ## Pixels per second.

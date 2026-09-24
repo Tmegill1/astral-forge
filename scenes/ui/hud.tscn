@@ -5,6 +5,55 @@
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
 
+[node name="CorePanel" type="PanelContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -170.0
+offset_top = 16.0
+offset_right = 170.0
+offset_bottom = 76.0
+grow_horizontal = 2
+
+[node name="Margin" type="MarginContainer" parent="CorePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Rows" type="VBoxContainer" parent="CorePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CoreName" type="Label" parent="CorePanel/Margin/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Command Core"
+horizontal_alignment = 1
+
+[node name="CoreHealthBar" type="ProgressBar" parent="CorePanel/Margin/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 20)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="CoreHealthText" type="Label" parent="CorePanel/Margin/Rows/CoreHealthBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 13
+text = "500 / 500"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="HeroPanel" type="PanelContainer" parent="."]
 offset_left = 16.0
 offset_top = 16.0

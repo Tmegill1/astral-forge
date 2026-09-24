@@ -1,7 +1,7 @@
 class_name Projectile
 extends Area2D
-## Flies in a straight line, damages the first thing with a Health child it
-## touches, and disappears after max_distance. Which things it can hit is set
+## Flies in a straight line, damages the first thing it touches that has a
+## Health child (on the hit body/area or its parent), and disappears after max_distance. Which things it can hit is set
 ## by the scene's collision mask.
 
 @export var color := Color(0.45, 0.85, 1.0)
@@ -13,6 +13,7 @@ var damage := 10.0
 var max_distance := 500.0
 
 var _travelled := 0.0
+var _spent := false
 
 
 func _ready() -> void:
@@ -30,9 +31,15 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_hit(target: Node) -> void:
-	var health := target.get_node_or_null("Health") as Health
+	if _spent:
+		return
+	var health := target.get_node_or_null(^"Health") as Health
+	if health == null:
+		health = target.get_parent().get_node_or_null(^"Health") as Health
 	if health == null or health.is_dead:
 		return
+	# Two overlaps can report in the same frame; only the first one counts.
+	_spent = true
 	health.take_damage(damage)
 	queue_free()
 

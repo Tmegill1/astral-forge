@@ -1,0 +1,35 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/structures/command_core.gd" id="1_core"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fortress/core_intact.png" id="2_intact"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fortress/core_damaged.png" id="3_damaged"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fortress/core_ruined.png" id="4_ruined"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="5_health"]
+[ext_resource type="Script" path="res://scripts/ui/health_bar.gd" id="6_health_bar"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_core"]
+radius = 85.0
+
+[node name="CommandCore" type="StaticBody2D" groups=["core"]]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_core")
+intact_texture = ExtResource("2_intact")
+damaged_texture = ExtResource("3_damaged")
+ruined_texture = ExtResource("4_ruined")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_intact")
+
+[node name="HealthBar" type="Node2D" parent="."]
+position = Vector2(0, -102)
+script = ExtResource("6_health_bar")
+width = 120.0
+height = 7.0
+
+[node name="Body" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_core")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("5_health")

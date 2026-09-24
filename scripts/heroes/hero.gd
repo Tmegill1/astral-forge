@@ -13,6 +13,8 @@ const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
 
 ## When false, the hero only shoots while the "fire" action is held.
 @export var auto_fire := true
+## How far from the hero's feet enemies can hit it from, in pixels.
+@export var hit_radius := 12.0
 
 var definition: HeroDefinition
 ## Final stats for this run: baseline x this hero's multipliers.
@@ -40,13 +42,10 @@ func _ready() -> void:
 	assert(definition != null, "Call Hero.setup() before adding the hero to the tree")
 	sprite.sprite_frames = definition.sprite_frames
 	sprite.scale = Vector2.ONE * definition.sprite_scale
-	var foot: Vector2 = definition.sprite_frames.get_meta("foot_offset", Vector2.ZERO)
-	sprite.offset = -foot
+	sprite.offset = -definition.sprite_frames.get_meta("foot_offset", Vector2.ZERO)
 	sprite.play(&"idle")
 	muzzle.position = definition.muzzle_offset * definition.sprite_scale
-	# Top of the sprite cell, measured up from the feet, scaled to screen size.
-	var cell_height := sprite.sprite_frames.get_frame_texture(&"idle", 0).get_height()
-	health_bar.position.y = -(cell_height / 2.0 + foot.y) * definition.sprite_scale - 4.0
+	health_bar.place_above(sprite)
 	health.reset(stats.max_health)
 	health.died.connect(_on_died)
 
@@ -97,6 +96,15 @@ func interact() -> void:
 			nearest_distance = distance
 	if nearest:
 		nearest.interact(self)
+
+
+## Brings a dead hero back at full health.
+func revive(at: Vector2) -> void:
+	global_position = at
+	velocity = Vector2.ZERO
+	_cooldown = 0.0
+	health.reset(stats.max_health)
+	sprite.play(&"idle")
 
 
 func _fire() -> void:

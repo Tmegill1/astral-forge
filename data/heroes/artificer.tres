@@ -10,6 +10,5 @@ display_name = "Artificer"
 sprite_frames = ExtResource("2_frames")
 sprite_scale = 0.385
 stat_multipliers = Dictionary[StringName, float]({
-&"max_health": 0.9,
-&"attacks_per_second": 1.2
+&"max_health": 0.9
 })
