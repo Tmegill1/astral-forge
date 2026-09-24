@@ -54,7 +54,7 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 - [x] **[AI]** Enemy hitboxes cover the whole visible sprite +25% (`hurtbox_padding` per enemy), so shots aimed at the body land
 - [x] **[You]** Decide: the hero starts at **1 shot per second**; upgrades raise it later (Phase 10)
 
-**How enemies work:** same idea as heroes. Every enemy shares `scripts/enemies/enemy.gd`; each type is a data file in `data/enemies/` with its art and stats (Goblin: 30 HP, speed 70, hits for 5 once a second). For now a test spawner (the `EnemySpawner` node in the world scene) drops goblins at the map edge, a bit faster each time; Phase 7 replaces it with real waves.
+**How enemies work:** same idea as heroes. Every enemy shares `scripts/enemies/enemy.gd`; each type is a data file in `data/enemies/` with its art and stats (Goblin: 30 HP, speed 70, hits for 5 once a second). Enemies now arrive in waves (the `WaveDirector` node, Phase 7).
 
 **Done when:** goblins spawn, you fight them, and you can lose.
 
@@ -122,16 +122,19 @@ All operated bonuses and the ability live in each tower's data file (`operated_*
 
 ## Phase 7 — Waves
 
-- [ ] **[AI]** Wave system: countdown → wave → break → next wave
-- [ ] **[AI]** 4 sectors (North/East/South/West); waves pick which sides attack
-- [ ] **[AI]** Warning arrows showing where the next attack comes from
-- [ ] **[AI]** Scrap piles out in the world to scavenge between waves
-- [ ] **[You]** Paint a bigger map (the current 20×12 tiles is smaller than the zoomed-out operating view, so a dark border shows)
-- [ ] **[AI]** A few waves that get harder
+- [x] **[AI]** Wave system: countdown → wave → break → next wave (5 waves; clear them all to win)
+- [x] **[AI]** 4 sectors (North/East/South/West); waves pick which sides attack (W → W+N → E+S → 3 sides → all 4)
+- [x] **[AI]** Warning arrows at the screen edge: amber = where the next wave comes from, red = attacking now
+- [x] **[AI]** Scrap heaps out in the world each break (E to salvage; farther from the Core = more Scrap; max 8 on the map)
+- [x] **[AI]** A few waves that get harder (6 → 10 → 14 → 18 → 28 goblins, arriving faster)
+- [x] **[AI]** Bigger map: 40×26 tiles with the Core in the middle
+- [x] **[AI]** [Enter] starts the next wave early
+
+The waves live in `data/waves/first_playtest.tres` (break length, and per group: enemy, count, side, spacing, delay).
 
 ### 🎯 FIRST PLAYTEST MILESTONE
 
-You can: leave the Core → kill goblins → carry Scrap home → choose wall or Gearshot → operate the turret → survive a few waves → lose when the Core dies.
+You can: leave the Core → kill goblins → carry Scrap home → build a Gearshot (with its walls) → operate the turret → survive 5 escalating waves → win, or lose when the Core dies.
 
 - [ ] **[You]** Play 5+ runs. Write down what's fun, boring, confusing.
 - [ ] **[Both]** Tune numbers (damage, costs, wave size) until it feels good

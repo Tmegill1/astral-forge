@@ -20,11 +20,16 @@ extends CanvasLayer
 @onready var operate_stats: Label = %OperateStats
 @onready var ability_text: Label = %AbilityText
 @onready var mastery_text: Label = %MasteryText
+@onready var wave_title: Label = %WaveTitle
+@onready var wave_status: Label = %WaveStatus
+@onready var sector_warnings: SectorWarnings = %SectorWarnings
 
 var _hero: Hero
+var _director: WaveDirector
 
 
 func _process(_delta: float) -> void:
+	_update_wave_panel()
 	var tower := _hero.operating if _hero else null
 	operate_panel.visible = tower != null
 	if tower == null:
@@ -40,6 +45,28 @@ func _process(_delta: float) -> void:
 	else:
 		ability_text.text = "[Q] %s ready" % def.ability_name
 	mastery_text.text = "Mastery %d XP" % floori(tower.mastery_xp)
+
+
+func bind_waves(director: WaveDirector) -> void:
+	_director = director
+	sector_warnings.director = director
+
+
+func _update_wave_panel() -> void:
+	if _director == null:
+		return
+	var total := _director.wave_count()
+	match _director.state:
+		WaveDirector.State.BREAK:
+			var left := ceili(_director.break_left)
+			wave_title.text = "Wave %d / %d" % [_director.wave_index + 1, total]
+			wave_status.text = "Arrives in %d:%02d  ·  [Enter] start now" % [left / 60, left % 60]
+		WaveDirector.State.WAVE:
+			wave_title.text = "Wave %d / %d" % [_director.wave_index + 1, total]
+			wave_status.text = "Goblins left: %d" % _director.enemies_left()
+		WaveDirector.State.WON:
+			wave_title.text = "All %d waves cleared" % total
+			wave_status.text = ""
 
 
 func bind_hero(hero: Hero) -> void:

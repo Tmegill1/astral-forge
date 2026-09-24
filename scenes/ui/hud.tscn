@@ -1,10 +1,56 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
 [ext_resource type="Texture2D" path="res://assets/sprites/fortress/scrap_1.png" id="2_scrap"]
+[ext_resource type="Script" path="res://scripts/ui/sector_warnings.gd" id="3_warnings"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
+
+[node name="SectorWarnings" type="Control" parent="."]
+unique_name_in_owner = true
+mouse_filter = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_warnings")
+
+[node name="WavePanel" type="PanelContainer" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -250.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 80.0
+grow_horizontal = 0
+
+[node name="Margin" type="MarginContainer" parent="WavePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Rows" type="VBoxContainer" parent="WavePanel/Margin"]
+layout_mode = 2
+
+[node name="WaveTitle" type="Label" parent="WavePanel/Margin/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Wave 1 / 5"
+horizontal_alignment = 1
+
+[node name="WaveStatus" type="Label" parent="WavePanel/Margin/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.55, 1)
+theme_override_font_sizes/font_size = 13
+text = "Next wave in 0:45"
+horizontal_alignment = 1
 
 [node name="CorePanel" type="PanelContainer" parent="."]
 anchors_preset = 5
