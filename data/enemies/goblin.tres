@@ -16,3 +16,6 @@ attacks_per_second = 1.0
 attack_range = 20.0
 aggro_range = 140.0
 attack_hit_frame = 3
+drops = Dictionary[StringName, Vector2i]({
+&"scrap": Vector2i(1, 2)
+})

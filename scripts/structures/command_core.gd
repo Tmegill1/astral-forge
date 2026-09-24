@@ -1,7 +1,8 @@
 class_name CommandCore
 extends StaticBody2D
 ## The heart of the fortress. Enemies march on it; when its health hits
-## zero the run is lost. Its look changes as it takes damage.
+## zero the run is lost. Its look changes as it takes damage. It also banks
+## resources: heroes deposit what they carry here with Interact.
 
 signal destroyed
 
@@ -12,6 +13,9 @@ signal destroyed
 @export var damaged_texture: Texture2D
 @export var ruined_texture: Texture2D
 
+## Deposited resources; this is what building spends.
+var stored := ResourceBag.new()
+
 @onready var sprite: Sprite2D = $Sprite
 @onready var health: Health = $Health
 
@@ -20,6 +24,16 @@ func _ready() -> void:
 	health.changed.connect(_on_health_changed)
 	health.died.connect(destroyed.emit)
 	health.reset(max_health)
+
+
+func interact(hero: Hero) -> void:
+	stored.add_all(hero.carried.take_all())
+
+
+func get_interact_prompt(hero: Hero) -> String:
+	if hero.carried.is_empty():
+		return ""
+	return "[E] Deposit %s" % hero.carried.describe()
 
 
 func _on_health_changed(current: float, maximum: float) -> void:

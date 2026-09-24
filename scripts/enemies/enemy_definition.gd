@@ -25,3 +25,7 @@ extends Resource
 @export var aggro_range := 140.0
 ## Frame of the attack animation where the hit lands.
 @export var attack_hit_frame := 3
+
+@export_group("Loot")
+## Resource type -> (min, max) dropped on death, e.g. {"scrap": (1, 2)}.
+@export var drops: Dictionary[StringName, Vector2i] = {}

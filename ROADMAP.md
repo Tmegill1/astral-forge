@@ -48,8 +48,8 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 - [x] **[AI]** Goblin walks toward the Core and attacks it (turns on the hero if you get close)
 - [x] **[AI]** Hero can kill goblins
 - [x] **[AI]** Core reaches 0 → "You Lose" screen (Restart button or R)
-- [x] **[AI]** Placeholder: a fallen hero gets back up at the Core after 5 seconds
-- [ ] **[Both]** Play it — are goblins too fast/slow/tough? Is the Core too weak?
+- [x] **[AI]** A fallen hero gets back up at the Core (15 seconds since Phase 3)
+- [x] **[Both]** Play it — are goblins too fast/slow/tough? Is the Core too weak?
 - [x] **[AI]** Enemy hitboxes cover the whole visible sprite +25% (`hurtbox_padding` per enemy), so shots aimed at the body land
 - [x] **[You]** Decide: the hero starts at **1 shot per second**; upgrades raise it later (Phase 10)
 
@@ -61,10 +61,13 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 
 ## Phase 3 — Pick up Scrap, bring it home
 
-- [ ] **[AI]** Goblins drop Scrap (gear pickups)
-- [ ] **[AI]** Scrap you're holding = **carried**; drop it at the Core = **stored** (only stored can be spent)
-- [ ] **[AI]** Simple HUD: Core health, hero health, carried vs. stored Scrap
-- [ ] **[You]** Decide: what happens to carried Scrap if the hero goes down? (lose all / lose half / keep)
+- [x] **[AI]** Goblins drop Scrap (1–2, gear pickups that drift toward you when close)
+- [x] **[AI]** Scrap you're holding = **carried**; press E at the Core = **stored** (only stored can be spent)
+- [x] **[AI]** Simple HUD: Core health, hero health, carried vs. stored Scrap, "[E] Deposit" prompt
+- [x] **[You]** Decide: if the hero goes down, **half the carried Scrap is lost and the other half drops where they fell** (never despawns). The hero respawns at the Core after **15 seconds** (countdown on screen) and can go back for it
+- [ ] **[Both]** Play it — is 15s the right respawn time? Do goblins drop enough?
+
+Tuning knobs: respawn time and loss share are on the `World` node (`hero_respawn_time`, `fall_loss`); drops per enemy are in its data file (`drops`).
 
 **Done when:** you can kill, collect, walk home, and see your bank go up.
 

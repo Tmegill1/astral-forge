@@ -1,18 +1,23 @@
 extends Node2D
 ## Runs one game: spawns the selected hero, keeps it and the camera inside
-## the painted map, feeds the test spawner, and ends the run when the
-## Command Core falls.
+## the painted map, feeds the test spawner, drops loot, handles the hero
+## falling and respawning, and ends the run when the Command Core falls.
 
 const HERO_SCENE := preload("res://scenes/heroes/hero.tscn")
 ## How far inside the map edge the hero's feet must stay, in pixels.
 const EDGE_MARGIN := 24.0
-## Seconds before a fallen hero gets back up at HeroSpawn.
-const HERO_RESPAWN_TIME := 5.0
+
+## Seconds before a fallen hero gets back up at HeroSpawn (by the Core).
+@export var hero_respawn_time := 15.0
+## Share of carried resources lost when the hero falls. The rest is dropped
+## where they fell, so they can go back for it.
+@export_range(0.0, 1.0) var fall_loss := 0.5
 
 var hero: Hero
 var kills := 0
 
 var _elapsed := 0.0
+var _respawn_left := 0.0
 
 @onready var terrain: TileMapLayer = $TerrainLayer
 @onready var units: Node2D = $Units
@@ -46,15 +51,28 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_elapsed += delta
+	if _respawn_left > 0.0:
+		_respawn_left -= delta
+		hud.show_respawn(_respawn_left)
+		if _respawn_left <= 0.0:
+			hero.revive(hero_spawn.position)
 
 
-func _on_enemy_killed(_enemy: Enemy) -> void:
+func _on_enemy_killed(enemy: Enemy) -> void:
 	kills += 1
+	var drops := enemy.definition.drops
+	for type in drops:
+		Loot.drop(units, enemy.global_position, type, randi_range(drops[type].x, drops[type].y))
 
 
 func _on_hero_died() -> void:
-	await get_tree().create_timer(HERO_RESPAWN_TIME, false).timeout
-	hero.revive(hero_spawn.position)
+	# Lose part of what was carried (rounded down); drop the rest here.
+	var carried := hero.carried.take_all()
+	for type in carried:
+		var kept := carried[type] - floori(carried[type] * fall_loss)
+		Loot.drop(units, hero.global_position, type, kept)
+	_respawn_left = hero_respawn_time
+	hud.show_respawn(_respawn_left)
 
 
 func _on_core_destroyed() -> void:

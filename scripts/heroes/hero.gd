@@ -4,10 +4,13 @@ extends CharacterBody2D
 ## comes from the HeroDefinition passed to setup() before the hero spawns.
 ##
 ## Controls: WASD to move (the hero faces the way it walks), mouse to aim,
-## E to interact. Shooting is automatic
-## toward the mouse unless auto_fire is off, then hold left mouse to shoot.
+## E to interact. Shooting is automatic toward the mouse unless auto_fire is
+## off, then hold left mouse to shoot. Picked-up resources go into `carried`
+## until deposited at the Core.
 
 signal died
+## Text for the nearest interactable ("[E] Deposit ..."), or "" for none.
+signal interact_prompt_changed(text: String)
 
 const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
 
@@ -21,8 +24,11 @@ var definition: HeroDefinition
 var stats: HeroStats
 ## World-space area the hero can't leave. Empty means no limit.
 var bounds := Rect2()
+## Resources picked up but not yet deposited; at risk if the hero falls.
+var carried := ResourceBag.new()
 
 var _cooldown := 0.0
+var _prompt := ""
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var muzzle: Marker2D = $Muzzle
@@ -69,6 +75,7 @@ func _physics_process(delta: float) -> void:
 	sprite.flip_h = facing_left
 	muzzle.position.x = -absf(muzzle.position.x) if facing_left else absf(muzzle.position.x)
 	sprite.play(&"walk" if input else &"idle")
+	_update_prompt()
 
 	_cooldown -= delta
 	if _cooldown <= 0.0 and (auto_fire or Input.is_action_pressed(&"fire")):
@@ -82,8 +89,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 ## Uses the nearest interactable in reach (towers, build slots, the Core...).
-## Anything in range with an interact(hero) method counts.
 func interact() -> void:
+	var target := _nearest_interactable()
+	if target:
+		target.interact(self)
+		_update_prompt()
+
+
+## Anything in reach with an interact(hero) method counts. It may also have
+## get_interact_prompt(hero) -> String to show a hint on screen.
+func _nearest_interactable() -> Node:
 	var nearest: Node = null
 	var nearest_distance := INF
 	for area in interact_area.get_overlapping_areas():
@@ -94,8 +109,17 @@ func interact() -> void:
 		if distance < nearest_distance:
 			nearest = target
 			nearest_distance = distance
-	if nearest:
-		nearest.interact(self)
+	return nearest
+
+
+func _update_prompt() -> void:
+	var text := ""
+	var target := _nearest_interactable()
+	if target and not health.is_dead and target.has_method(&"get_interact_prompt"):
+		text = target.get_interact_prompt(self)
+	if text != _prompt:
+		_prompt = text
+		interact_prompt_changed.emit(text)
 
 
 ## Brings a dead hero back at full health.
@@ -123,4 +147,5 @@ func _fire() -> void:
 func _on_died() -> void:
 	velocity = Vector2.ZERO
 	sprite.play(&"death")
+	_update_prompt()
 	died.emit()
