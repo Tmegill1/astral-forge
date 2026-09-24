@@ -221,3 +221,4 @@ animations = [{
 "name": &"destroyed",
 "speed": 1.0
 }]
+metadata/foot_offset = Vector2(0.0, 153.0)

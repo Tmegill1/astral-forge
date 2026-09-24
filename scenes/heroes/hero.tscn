@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/hero.gd" id="1_hero"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/ui/health_bar.gd" id="3_health_bar"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
+radius = 56.0
+
+[node name="Hero" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 9
+motion_mode = 1
+script = ExtResource("1_hero")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_body")
+
+[node name="HealthBar" type="Node2D" parent="."]
+script = ExtResource("3_health_bar")
+
+[node name="Muzzle" type="Marker2D" parent="."]
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+
+[node name="InteractArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 32
+monitorable = false
+
+[node name="Shape" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_interact")
+
+[node name="Camera" type="Camera2D" parent="."]
+position_smoothing_enabled = true

@@ -29,12 +29,14 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 
 ## Phase 1 — Hero walks around
 
-- [ ] **[AI]** Artificer hero: move with WASD, camera follows
-- [ ] **[AI]** Idle / walk / death animations hooked up
-- [ ] **[AI]** Hero health + a basic attack
-- [ ] **[AI]** An "Interact" button (E) — used later for towers, building, depositing
-- [ ] **[You]** Decide: does the hero attack **automatically**, **aim with the mouse**, or both?
-- [ ] **[Both]** Play it — does moving feel good?
+- [x] **[AI]** Artificer hero: move with WASD, camera follows
+- [x] **[AI]** Idle / walk / death animations hooked up
+- [x] **[AI]** Hero health + a basic attack (auto-fires bolts toward the mouse)
+- [x] **[AI]** An "Interact" button (E) — used later for towers, building, depositing
+- [x] **[You]** Decide: aim with the **mouse**, shooting is **automatic** for now (`auto_fire` on the Hero can be turned off → hold left click to shoot)
+- [x] **[Both]** Play it — does moving feel good? (hero shrunk 30%, faces the way it walks, HUD + health bars added)
+
+**How heroes work:** every hero shares `scripts/heroes/hero.gd`. Baseline stats are the defaults in `scripts/heroes/hero_stats.gd`. Each hero is a data file in `data/heroes/` (art, size, and stat multipliers, e.g. Artificer = 0.9× health, 1.2× fire rate). `Game.selected_hero` picks who spawns; a hero-select screen will set it later. New hero = new `.tres` file, no code.
 
 **Done when:** you can walk around the map and swing/shoot at nothing.
 
@@ -160,7 +162,7 @@ You can: leave the Core → kill goblins → carry Scrap home → choose wall or
 
 - [ ] **[You]** Sound effects + music (put them in `sound/`)
 - [ ] **[AI]** Hook up sounds
-- [ ] **[AI]** Main menu, pause menu, settings
+- [ ] **[AI]** Main menu, hero select screen, pause menu, settings
 - [ ] **[AI]** Controller support
 - [ ] **[Both]** Juice: screen shake, hit flashes, particles
 

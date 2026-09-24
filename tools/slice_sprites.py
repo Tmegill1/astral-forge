@@ -239,11 +239,11 @@ def build_animated(name, src, rows):
         for c, (f, (ax, ay)) in enumerate(fs):
             sheet.alpha_composite(f, (c * cell_w + foot_x - ax, r * cell_h + foot_y - ay))
     sheet.save(os.path.join(OUT_DIR, name + ".png"), optimize=True)
-    write_sprite_frames(name, anims, cell_w, cell_h)
+    write_sprite_frames(name, anims, cell_w, cell_h, (foot_x, foot_y))
     return sheet, (cell_w, cell_h), [(a, len(fs)) for a, fs in anims], (foot_x, foot_y)
 
 
-def write_sprite_frames(name, anims, cell_w, cell_h):
+def write_sprite_frames(name, anims, cell_w, cell_h, foot):
     subs, anim_defs, sid = [], [], 0
     for r, (anim, fs) in enumerate(anims):
         refs = []
@@ -260,7 +260,9 @@ def write_sprite_frames(name, anims, cell_w, cell_h):
     text = (f'[gd_resource type="SpriteFrames" load_steps={sid + 2} format=3]\n\n'
             f'[ext_resource type="Texture2D" path="res://{OUT_DIR}/{name}.png" id="1"]\n\n'
             + "\n".join(subs)
-            + f'\n[resource]\nanimations = [{", ".join(anim_defs)}]\n')
+            + f'\n[resource]\nanimations = [{", ".join(anim_defs)}]\n'
+            # Feet position relative to the cell centre; nodes use it to stand on their origin.
+            + f'metadata/foot_offset = Vector2({foot[0] - cell_w / 2}, {foot[1] - cell_h / 2})\n')
     with open(os.path.join(OUT_DIR, name + ".tres"), "w") as fh:
         fh.write(text)
 
