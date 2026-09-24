@@ -7,6 +7,8 @@ signal changed(current: float, maximum: float)
 signal died
 
 @export var max_health: float = 100.0
+## While true, damage is ignored (e.g. a hero safely operating a tower).
+var invulnerable := false
 
 var current: float
 var is_dead: bool:
@@ -26,7 +28,7 @@ func reset(new_max: float = max_health) -> void:
 
 
 func take_damage(amount: float) -> void:
-	if is_dead or amount <= 0.0:
+	if is_dead or invulnerable or amount <= 0.0:
 		return
 	current = maxf(current - amount, 0.0)
 	changed.emit(current, max_health)

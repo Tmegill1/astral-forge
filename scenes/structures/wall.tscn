@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/structures/wall.gd" id="1_wall"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/ui/health_bar.gd" id="3_health_bar"]
+
+[node name="Wall" type="StaticBody2D" groups=["nav_blockers", "walls", "breakables"]]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_wall")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+
+[node name="HealthBar" type="Node2D" parent="."]
+position = Vector2(0, -58)
+script = ExtResource("3_health_bar")
+width = 26.0
+height = 3.0
+hide_when_full = true
+
+[node name="Body" type="CollisionShape2D" parent="."]
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")

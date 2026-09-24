@@ -3,18 +3,34 @@ extends CharacterBody2D
 ## Every enemy uses this script; what differs (art, stats) comes from the
 ## EnemyDefinition passed to setup() before it spawns.
 ##
-## Walks straight at the Command Core and attacks it, but turns on the hero
-## when the hero comes within aggro range.
+## Paths around walls to the Command Core and attacks it, but turns on the
+## hero when the hero comes within aggro range (or on the tower the hero is
+## operating, since an operating hero can't be hurt). If walls cut it off
+## completely, it breaks through the nearest wall or tower.
 
 signal killed(enemy: Enemy)
 
 ## Seconds a body stays on the ground before fading out.
 const CORPSE_TIME := 1.5
+## Paths are recomputed at least this often, in seconds.
+const REPATH_TIME := 0.75
+## A waypoint counts as reached within this distance, in pixels.
+const WAYPOINT_REACHED := 8.0
+## Only walls/towers this close are considered for breaking through.
+const BREAK_SEARCH_RADIUS := 220.0
 
 var definition: EnemyDefinition
 
+## What it's attacking or walking to right now.
 var _target: Node2D
 var _cooldown := 0.0
+var _path := PackedVector2Array()
+var _path_index := 0
+var _path_goal: Node2D
+var _path_version := -1
+var _repath_left := 0.0
+## True when the last path couldn't get within reach of the goal.
+var _blocked := false
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var health: Health = $Health
@@ -46,25 +62,90 @@ func _physics_process(delta: float) -> void:
 	if health.is_dead:
 		return
 	_cooldown -= delta
-	_target = _pick_target()
-	if _target == null:
+	_repath_left -= delta
+	var goal := _pick_target()
+	if goal == null:
 		sprite.play(&"idle")
 		return
+	if _needs_repath(goal):
+		_repath(goal)
+	_target = goal
+	if _blocked and not _in_reach(goal):
+		var breakable := _nearest_breakable()
+		if breakable:
+			_target = breakable
 
-	var to_target := _target.global_position - global_position
-	sprite.flip_h = to_target.x < 0.0
 	if _in_reach(_target):
+		sprite.flip_h = _target.global_position.x < global_position.x
 		if _cooldown <= 0.0:
 			_cooldown = 1.0 / definition.attacks_per_second
 			sprite.play(&"attack")
 			sprite.frame = 0
 		elif not _is_attacking():
 			sprite.play(&"idle")
-	else:
-		velocity = to_target.normalized() * definition.move_speed
-		move_and_slide()
-		if not _is_attacking():
-			sprite.play(&"walk")
+		return
+
+	var step_to := _next_waypoint()
+	var direction := (step_to - global_position).normalized()
+	velocity = direction * definition.move_speed
+	move_and_slide()
+	if absf(direction.x) > 0.1:
+		sprite.flip_h = direction.x < 0.0
+	if not _is_attacking():
+		sprite.play(&"walk")
+
+
+func _needs_repath(goal: Node2D) -> bool:
+	var nav := get_tree().get_first_node_in_group(&"nav_grid") as NavGrid
+	return goal != _path_goal or _repath_left <= 0.0 or (nav and nav.version != _path_version)
+
+
+func _repath(goal: Node2D) -> void:
+	_path_goal = goal
+	_path_index = 0
+	_repath_left = REPATH_TIME
+	var nav := get_tree().get_first_node_in_group(&"nav_grid") as NavGrid
+	if nav == null:
+		_path = PackedVector2Array()
+		_blocked = false
+		return
+	# Aim for the goal's near edge, not its centre: a solid goal (the Core,
+	# a tower) has open ground on several sides, and the centre can be
+	# "closest" from the far side of a wall.
+	var hit_radius: float = goal.get(&"hit_radius")
+	var toward_me := (global_position - goal.global_position).limit_length(hit_radius)
+	var aim := goal.global_position + toward_me
+	_path = nav.find_path(global_position, aim)
+	_path_version = nav.version
+	var end := _path[-1] if not _path.is_empty() else global_position
+	_blocked = end.distance_to(aim) > definition.attack_range + nav.agent_radius + nav.cell_size
+
+
+## The next path point to walk to; straight at the target once the path runs out.
+func _next_waypoint() -> Vector2:
+	while _path_index < _path.size() and global_position.distance_to(_path[_path_index]) <= WAYPOINT_REACHED:
+		_path_index += 1
+	if _target == _path_goal and _path_index < _path.size():
+		return _path[_path_index]
+	if _target != _path_goal and _path_index < _path.size() - 1:
+		# Breaking through: follow the path up to the barrier first.
+		return _path[_path_index]
+	return _target.global_position
+
+
+## Closest wall or tower still standing, to smash when walled off.
+func _nearest_breakable() -> Node2D:
+	var best: Node2D = null
+	var best_distance := BREAK_SEARCH_RADIUS
+	for node in get_tree().get_nodes_in_group(&"breakables"):
+		var structure := node as Node2D
+		if structure.get_node(^"Health").is_dead:
+			continue
+		var distance := global_position.distance_to(structure.global_position)
+		if distance < best_distance:
+			best = structure
+			best_distance = distance
+	return best
 
 
 ## Sizes the hurtbox to the visible pixels of the first idle frame, padded.
@@ -83,6 +164,9 @@ func _pick_target() -> Node2D:
 	var hero := get_tree().get_first_node_in_group(&"hero") as Hero
 	if hero and not hero.health.is_dead \
 			and global_position.distance_to(hero.global_position) <= definition.aggro_range:
+		# An operating hero is untouchable; the tower takes the hits instead.
+		if hero.operating:
+			return hero.operating
 		return hero
 	var core := get_tree().get_first_node_in_group(&"core") as CommandCore
 	if core and not core.health.is_dead:

@@ -13,7 +13,7 @@ radius = 85.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
 radius = 110.0
 
-[node name="CommandCore" type="StaticBody2D" groups=["core"]]
+[node name="CommandCore" type="StaticBody2D" groups=["core", "nav_blockers"]]
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("1_core")

@@ -26,6 +26,12 @@ func _ready() -> void:
 	health.reset(max_health)
 
 
+## Solid area for enemy pathfinding: its body circle.
+func nav_footprint() -> Rect2:
+	var r: float = ($Body.shape as CircleShape2D).radius
+	return Rect2(global_position - Vector2(r, r), Vector2(r, r) * 2.0)
+
+
 func interact(hero: Hero) -> void:
 	stored.add_all(hero.carried.take_all())
 

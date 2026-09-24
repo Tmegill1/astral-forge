@@ -1,10 +1,28 @@
 class_name BuildSlot
 extends Node2D
-## A pad the hero can build on. Stand on it and press Interact to spend the
-## Core's stored resources on `tower`. Glows when the hero is close and it
-## can be built on.
+## A pad the hero can build on.
+##
+## Empty: Interact opens the build menu (game paused) listing `buildable`
+## towers. Building also raises walls on both sides of the tower: they run
+## out at right angles to the Core direction, then turn back toward the
+## middle, funnelling enemies around them.
+## Built: Interact operates the tower; Manage (F) opens repair / sell.
+## Destroyed: the wreckage clears after a few seconds; walls stay up.
 
-@export var tower: TowerDefinition
+const TOWER_SCENE := preload("res://scenes/towers/tower.tscn")
+const WALL_SCENE := preload("res://scenes/structures/wall.tscn")
+## Share of the tower's cost refunded when sold.
+const SELL_REFUND := 0.5
+## Repairs cost 1 Scrap per this much missing health (rounded up).
+const REPAIR_HP_PER_SCRAP := 25.0
+## Seconds a destroyed tower's wreckage stays before the pad is free again.
+const WRECKAGE_TIME := 4.0
+## Posts in walls that run up/down the screen are this far apart, in pixels.
+const POST_SPACING := 18.0
+## Walls that run across the screen use pieces about this wide, in pixels.
+const PANEL_WIDTH := 80.0
+
+@export var buildable: Array[TowerDefinition] = []
 @export var locked := false
 @export var empty_texture: Texture2D
 @export var active_texture: Texture2D
@@ -14,14 +32,32 @@ extends Node2D
 ## Where the tower's base sits relative to the pad's centre.
 @export var tower_offset := Vector2(0, 18)
 
-const TOWER_SCENE := preload("res://scenes/towers/tower.tscn")
+@export_group("Walls")
+## Gap between the tower's centre and the first wall post, in pixels.
+@export var wall_start := 26.0
+## How far each wall runs out from the tower, in pixels.
+@export var wall_length := 170.0
+## Length of the end piece turning back toward the middle, in pixels.
+@export var wall_return := 100.0
+@export var wall_texture: Texture2D
+@export var wall_damaged_texture: Texture2D
+@export var wall_scale := 0.4
 
 var built: Tower
+## One entry per planned wall piece; null where a piece was destroyed.
+var walls: Array[Wall] = []
+
+var _wall_plan: Array[Dictionary] = []
+var _wreckage_left := 0.0
 
 @onready var pad: Sprite2D = $Pad
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if _wreckage_left > 0.0:
+		_wreckage_left -= delta
+		if _wreckage_left <= 0.0:
+			_clear_tower()
 	if locked:
 		pad.texture = locked_texture
 		return
@@ -31,30 +67,172 @@ func _process(_delta: float) -> void:
 	pad.texture = active_texture if near and built == null else empty_texture
 
 
+# --- Interaction ---
+
 func interact(hero: Hero) -> void:
 	if built:
 		built.interact(hero)
-		return
-	if locked or tower == null:
-		return
-	var core := get_tree().get_first_node_in_group(&"core") as CommandCore
-	if core == null or not core.stored.spend_all(tower.cost):
-		return
+	elif not locked:
+		get_tree().call_group(&"build_menu", &"open", self)
+
+
+func manage(_hero: Hero) -> void:
+	if built and not built.is_destroyed():
+		get_tree().call_group(&"tower_menu", &"open", self)
+
+
+func get_interact_prompt(hero: Hero) -> String:
+	if locked:
+		return ""
+	if built == null:
+		return "[E] Build"
+	if built.is_destroyed():
+		return "%s destroyed — clearing in %ds" % [built.definition.display_name, ceili(_wreckage_left)]
+	var text := built.get_interact_prompt(hero)
+	if hero.operating == built:
+		return text
+	return text + "    [F] Repair / Sell"
+
+
+# --- Building, selling, repairing ---
+
+func core() -> CommandCore:
+	return get_tree().get_first_node_in_group(&"core") as CommandCore
+
+
+## Pays for and builds `tower`, plus any missing walls. False if it can't.
+func build(tower: TowerDefinition) -> bool:
+	if built or locked or not tower.available or not core().stored.spend_all(tower.cost):
+		return false
 	built = TOWER_SCENE.instantiate()
 	built.setup(tower)
 	built.position = tower_offset
 	built.projectile_parent = get_parent()
+	built.destroyed.connect(_on_tower_destroyed)
 	add_child(built)
+	_raise_walls()
+	get_tree().call_group(&"nav_grid", &"mark_dirty")
+	return true
 
 
-func get_interact_prompt(hero: Hero) -> String:
+func sell_value() -> Dictionary[StringName, int]:
+	var value: Dictionary[StringName, int] = {}
+	for type in built.definition.cost:
+		value[type] = floori(built.definition.cost[type] * SELL_REFUND)
+	return value
+
+
+## Removes the tower and its walls and refunds part of the cost.
+func sell() -> void:
+	if built == null or built.is_destroyed():
+		return
+	core().stored.add_all(sell_value())
+	if built.operator:
+		built.operator.stop_operating()
+	for wall in walls:
+		if is_instance_valid(wall):
+			wall.queue_free()
+	walls.clear()
+	_wall_plan.clear()
+	_clear_tower()
+
+
+## Scrap needed to bring the tower and every wall piece back to full.
+func repair_cost() -> int:
+	var missing := built.health.max_health - built.health.current
+	for wall in walls:
+		if is_instance_valid(wall):
+			missing += wall.health.max_health - wall.health.current
+		else:
+			missing += Wall.DEFAULT_MAX_HEALTH
+	return ceili(missing / REPAIR_HP_PER_SCRAP)
+
+
+func repair() -> bool:
+	var cost: Dictionary[StringName, int] = {Loot.SCRAP: repair_cost()}
+	if cost[Loot.SCRAP] <= 0 or not core().stored.spend_all(cost):
+		return false
+	built.health.heal(built.health.max_health)
+	for wall in walls:
+		if is_instance_valid(wall):
+			wall.health.heal(wall.health.max_health)
+	_raise_walls()
+	return true
+
+
+func _on_tower_destroyed(_tower: Tower) -> void:
+	_wreckage_left = WRECKAGE_TIME
+
+
+func _clear_tower() -> void:
+	_wreckage_left = 0.0
 	if built:
-		return built.get_interact_prompt(hero)
-	if locked or tower == null:
-		return ""
-	var core := get_tree().get_first_node_in_group(&"core") as CommandCore
-	var missing := core.stored.shortfall(tower.cost)
-	if missing.is_empty():
-		return "[E] Build %s (%s)" % [tower.display_name, Loot.describe(tower.cost)]
-	return "%s costs %s stored — need %s more" % [
-		tower.display_name, Loot.describe(tower.cost), Loot.describe(missing)]
+		built.queue_free()
+		built = null
+	get_tree().call_group(&"nav_grid", &"mark_dirty")
+
+
+# --- Walls ---
+
+## Builds every planned wall piece that isn't standing.
+func _raise_walls() -> void:
+	if _wall_plan.is_empty():
+		_wall_plan = _plan_walls()
+		walls.resize(_wall_plan.size())
+	var post_intact := _post_texture(wall_texture)
+	var post_damaged := _post_texture(wall_damaged_texture)
+	for i in _wall_plan.size():
+		if is_instance_valid(walls[i]):
+			continue
+		var piece: Dictionary = _wall_plan[i]
+		var wall: Wall = WALL_SCENE.instantiate()
+		if piece.post:
+			wall.setup(post_intact, post_damaged, Vector2(20, 14), wall_scale)
+		else:
+			wall.setup(wall_texture, wall_damaged_texture, Vector2(piece.width, 14), wall_scale)
+		wall.position = piece.position
+		get_parent().add_child(wall)
+		walls[i] = wall
+	get_tree().call_group(&"nav_grid", &"mark_dirty")
+
+
+## Where each wall piece goes (world positions): two runs out from the
+## tower at right angles to the Core direction, each ending in a piece
+## that turns back toward the middle.
+func _plan_walls() -> Array[Dictionary]:
+	var origin := global_position + tower_offset
+	var to_core := core().global_position - origin
+	var inward := Vector2(signf(to_core.x), 0) if absf(to_core.x) >= absf(to_core.y) \
+			else Vector2(0, signf(to_core.y))
+	var along := inward.orthogonal()
+	var plan: Array[Dictionary] = []
+	for side in [-1.0, 1.0]:
+		var start: Vector2 = origin + along * side * wall_start
+		var corner: Vector2 = origin + along * side * wall_length
+		plan.append_array(_plan_segment(start, corner))
+		plan.append_array(_plan_segment(corner, corner + inward * wall_return))
+	return plan
+
+
+## Up/down runs are rows of posts; across runs are wall pieces.
+func _plan_segment(from: Vector2, to: Vector2) -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	var length := from.distance_to(to)
+	var vertical := absf(to.y - from.y) > absf(to.x - from.x)
+	if vertical:
+		var count := maxi(1, ceili(length / POST_SPACING))
+		for i in count + 1:
+			plan.append({position = from.lerp(to, float(i) / count), post = true})
+	else:
+		var count := maxi(1, ceili(length / PANEL_WIDTH))
+		for i in count:
+			plan.append({position = from.lerp(to, (i + 0.5) / count), post = false, width = length / count})
+	return plan
+
+
+## The left pillar of a wall picture, used as a post.
+func _post_texture(texture: Texture2D) -> Texture2D:
+	var post := AtlasTexture.new()
+	post.atlas = texture
+	post.region = Rect2(0, 0, 52, texture.get_height())
+	return post

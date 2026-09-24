@@ -26,6 +26,7 @@ var _respawn_left := 0.0
 @onready var core: CommandCore = $Units/CommandCore
 @onready var hero_spawn: Marker2D = $HeroSpawn
 @onready var spawner: EnemySpawner = $EnemySpawner
+@onready var nav: NavGrid = $NavGrid
 @onready var hud: HUD = $HUD
 @onready var game_over: GameOverScreen = $GameOver
 
@@ -45,6 +46,7 @@ func _ready() -> void:
 	hud.bind_core(core)
 	core.destroyed.connect(_on_core_destroyed)
 
+	nav.setup(map)
 	spawner.area = map.grow(-8.0)
 	spawner.container = units
 	spawner.enemy_spawned.connect(func(e: Enemy) -> void: e.killed.connect(_on_enemy_killed))

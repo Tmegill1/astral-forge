@@ -6,15 +6,22 @@ extends StaticBody2D
 ## Automatic: shoots the nearest enemy in range.
 ## Operated (hero pressed Interact on it): aims at the mouse with boosted
 ## damage, fire rate and range, can use its ability, and earns Mastery XP.
+## The operating hero can't be hurt; enemies go for the tower instead. If
+## the tower is destroyed the hero is thrown out and rubble is left behind.
+
+signal destroyed(tower: Tower)
 
 const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
 ## How long the firing frame shows after each shot, in seconds.
 const FIRE_FRAME_TIME := 0.12
-## Where the operating hero stands, relative to the tower's base: at its
-## side and a touch behind, so neither hides the other's turning head.
-const OPERATOR_OFFSET := Vector2(-38, -4)
-## Where the hero steps out to when leaving, clear of the tower's body.
-const EXIT_OFFSET := Vector2(0, 34)
+## The operating hero stands this far to the tower's Core-facing side (and a
+## touch behind it), so neither hides the other and they stay inside the walls.
+const OPERATOR_SIDE := 38.0
+## Leaving puts the hero this far toward the Core, clear of the tower's body.
+const EXIT_DISTANCE := 48.0
+
+## How far from its base enemies can hit it from, in pixels.
+@export var hit_radius := 24.0
 ## A rotating head only fires once it points within this of its aim (radians).
 const HEAD_FIRE_TOLERANCE := 0.2
 ## How far the head kicks back when it fires, in pixels.
@@ -38,6 +45,8 @@ var _ability_cooldown_left := 0.0
 var _head_angle := 0.0
 var _wanted_angle := 0.0
 var _head_rest := Vector2.ZERO
+## Unit direction from the tower toward the Core, snapped to an axis.
+var _inward := Vector2.RIGHT
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var base_sprite: Sprite2D = $Base
@@ -61,6 +70,11 @@ func _ready() -> void:
 	health_bar.place_above(sprite)
 	_setup_head()
 	health.reset(definition.max_health)
+	health.died.connect(_on_died)
+	var core := get_tree().get_first_node_in_group(&"core") as Node2D
+	if core:
+		var to_core := core.global_position - global_position
+		_inward = Vector2(signf(to_core.x), 0) if absf(to_core.x) >= absf(to_core.y) else Vector2(0, signf(to_core.y))
 	if projectile_parent == null:
 		projectile_parent = get_parent()
 
@@ -120,6 +134,8 @@ func attack_range() -> float:
 # --- Operating ---
 
 func interact(hero: Hero) -> void:
+	if is_destroyed():
+		return
 	if operator == hero:
 		hero.stop_operating()
 	elif operator == null:
@@ -127,6 +143,8 @@ func interact(hero: Hero) -> void:
 
 
 func get_interact_prompt(hero: Hero) -> String:
+	if is_destroyed():
+		return ""
 	if operator == hero:
 		return "[E] Leave %s" % definition.display_name
 	if operator == null:
@@ -135,11 +153,41 @@ func get_interact_prompt(hero: Hero) -> String:
 
 
 func operator_position() -> Vector2:
-	return global_position + OPERATOR_OFFSET
+	return global_position + _inward * OPERATOR_SIDE + Vector2(0, -4)
 
 
 func exit_position() -> Vector2:
-	return global_position + EXIT_OFFSET
+	return global_position + _inward * EXIT_DISTANCE + Vector2(0, 12)
+
+
+## Solid area for enemy pathfinding: its body circle.
+func nav_footprint() -> Rect2:
+	var shape := $Body as CollisionShape2D
+	var r: float = (shape.shape as CircleShape2D).radius
+	return Rect2(global_position + shape.position - Vector2(r, r), Vector2(r, r) * 2.0)
+
+
+func is_destroyed() -> bool:
+	return health.is_dead
+
+
+func _on_died() -> void:
+	if operator:
+		operator.stop_operating()
+	set_physics_process(false)
+	for group in [&"towers", &"nav_blockers", &"breakables"]:
+		remove_from_group(group)
+	set_deferred(&"collision_layer", 0)
+	base_sprite.visible = false
+	head.visible = false
+	sprite.visible = true
+	sprite.flip_h = false
+	sprite.animation = StringName("lv%d_destroyed" % level)
+	sprite.stop()
+	sprite.frame = 0
+	queue_redraw()
+	get_tree().call_group(&"nav_grid", &"mark_dirty")
+	destroyed.emit(self)
 
 
 ## Called by Hero.start_operating / stop_operating; pass null to release.

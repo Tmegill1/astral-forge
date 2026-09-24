@@ -6,11 +6,20 @@ extends Resource
 
 @export var id: StringName
 @export var display_name: String
+## One or two lines for the build menu.
+@export_multiline var description: String
+## False = listed in the build menu but not buildable yet.
+@export var available := true
 @export var sprite_frames: SpriteFrames
 ## Sprite sheets are drawn large; this shrinks them to fit the 64px tile grid.
 @export var sprite_scale: float = 0.55
 ## Stored resources spent to build it, e.g. {"scrap": 10}.
 @export var cost: Dictionary[StringName, int] = {}
+
+## Picture for menus: the first idle frame.
+func icon() -> Texture2D:
+	return sprite_frames.get_frame_texture(&"lv1_idle", 0)
+
 
 @export_group("Stats")
 @export var max_health := 150.0

@@ -149,6 +149,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"interact"):
 		interact()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"manage"):
+		var target := _nearest_interactable()
+		if target and target.has_method(&"manage"):
+			target.manage(self)
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"tower_ability") and operating:
 		operating.use_ability()
 
@@ -157,6 +163,7 @@ func start_operating(tower: Tower) -> void:
 	if operating:
 		stop_operating()
 	operating = tower
+	health.invulnerable = true
 	_move_target = null
 	queue_redraw()
 	tower.set_operator(self)
@@ -172,6 +179,7 @@ func stop_operating() -> void:
 	operating.set_operator(null)
 	global_position = operating.exit_position()
 	operating = null
+	health.invulnerable = false
 	_zoom_to(1.0)
 	operating_changed.emit(null)
 

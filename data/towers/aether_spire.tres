@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TowerDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/tower_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/aether_spire.tres" id="2_frames"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"aether_spire"
+display_name = "Aether Spire"
+description = "Magic bolts that chain between enemies and pierce armour."
+available = false
+sprite_frames = ExtResource("2_frames")
+cost = Dictionary[StringName, int]({
+&"scrap": 14
+})

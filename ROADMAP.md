@@ -105,14 +105,18 @@ All operated bonuses and the ability live in each tower's data file (`operated_*
 
 ---
 
-## Phase 6 — Walls vs. towers
+## Phase 6 — Walls, build menu, repair & sell
 
-- [ ] **[AI]** Same slot can be a **wall** instead of a tower
-- [ ] **[AI]** Goblins attack walls that block them
-- [ ] **[AI]** Repair damaged walls/towers with Scrap
-- [ ] **[You]** Decide: can you sell/replace a structure? For how much back?
+- [x] **[AI]** E on an empty pad pauses the game and opens a **build menu** of the towers for that pad (Mortar, Embercaster, Spire show as "Coming soon" until Phase 8)
+- [x] **[AI]** Every tower comes with **walls**: out from both sides of the tower, then turning back toward the middle — enemies must go around (`wall_length`, `wall_return` on each BuildSlot)
+- [x] **[AI]** Enemies **path around walls** (grid pathfinding); if completely walled off they smash the nearest wall
+- [x] **[AI]** While you **operate a tower you can't be hurt** — enemies attack the tower instead; if it's destroyed you're thrown out and the wreckage clears after 4s (walls stay up)
+- [x] **[AI]** F at a tower: **Repair** tower + walls (1 Scrap per 25 missing health, rebuilds destroyed pieces) or **Sell** for **50%** back (removes its walls)
+- [x] **[You]** Decide: sell for 50% of the cost
+- [ ] **[Both]** Play it — do the walls funnel enemies well? Is repair too cheap/expensive?
+- [ ] **[You]** Art wish: a proper wall piece for walls running up/down the screen (currently a row of pillars cut from the across-the-screen wall)
 
-**Done when:** "wall or turret here?" is a real choice.
+**Done when:** building a tower shapes where enemies can walk, and keeping walls repaired matters.
 
 ---
 

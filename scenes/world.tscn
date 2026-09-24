@@ -8,6 +8,9 @@
 [ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="6_goblin"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_over.tscn" id="7_game_over"]
 [ext_resource type="PackedScene" path="res://scenes/towers/build_slot.tscn" id="8_build_slot"]
+[ext_resource type="Script" path="res://scripts/world/nav_grid.gd" id="9_nav"]
+[ext_resource type="PackedScene" path="res://scenes/ui/build_menu.tscn" id="10_build_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/tower_menu.tscn" id="11_tower_menu"]
 
 [node name="World" type="Node2D" unique_id=164071451]
 script = ExtResource("2_world")
@@ -31,6 +34,9 @@ position = Vector2(850, 400)
 [node name="HeroSpawn" type="Marker2D" parent="."]
 position = Vector2(640, 540)
 
+[node name="NavGrid" type="Node" parent="."]
+script = ExtResource("9_nav")
+
 [node name="EnemySpawner" type="Node" parent="."]
 script = ExtResource("5_spawner")
 enemy = ExtResource("6_goblin")
@@ -38,3 +44,7 @@ enemy = ExtResource("6_goblin")
 [node name="HUD" parent="." instance=ExtResource("3_hud")]
 
 [node name="GameOver" parent="." instance=ExtResource("7_game_over")]
+
+[node name="BuildMenu" parent="." instance=ExtResource("10_build_menu")]
+
+[node name="TowerMenu" parent="." instance=ExtResource("11_tower_menu")]
