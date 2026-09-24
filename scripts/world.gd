@@ -7,6 +7,8 @@ const HERO_SCENE := preload("res://scenes/heroes/hero.tscn")
 ## How far inside the map edge the hero's feet must stay, in pixels.
 const EDGE_MARGIN := 24.0
 
+const OUTSIDE_MAP_COLOR := Color(0.07, 0.1, 0.07)
+
 ## Seconds before a fallen hero gets back up at HeroSpawn (by the Core).
 @export var hero_respawn_time := 15.0
 ## Share of carried resources lost when the hero falls. The rest is dropped
@@ -35,10 +37,9 @@ func _ready() -> void:
 	hero.position = hero_spawn.position
 	hero.bounds = map.grow(-EDGE_MARGIN)
 	units.add_child(hero)
-	hero.camera.limit_left = int(map.position.x)
-	hero.camera.limit_top = int(map.position.y)
-	hero.camera.limit_right = int(map.end.x)
-	hero.camera.limit_bottom = int(map.end.y)
+	hero.camera_bounds = map
+	# What shows past the map's edge when zoomed out.
+	RenderingServer.set_default_clear_color(OUTSIDE_MAP_COLOR)
 	hero.died.connect(_on_hero_died)
 	hud.bind_hero(hero)
 	hud.bind_core(core)

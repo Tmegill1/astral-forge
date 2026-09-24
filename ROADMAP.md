@@ -30,6 +30,7 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 ## Phase 1 — Hero walks around
 
 - [x] **[AI]** Artificer hero: move with WASD, camera follows
+- [x] **[AI]** Right-click to walk to a spot; hold right-click to keep following the cursor (WASD cancels it; while operating a tower, right-click is the tower ability)
 - [x] **[AI]** Idle / walk / death animations hooked up
 - [x] **[AI]** Hero health + a basic attack (auto-fires bolts toward the mouse)
 - [x] **[AI]** An "Interact" button (E) — used later for towers, building, depositing
@@ -79,7 +80,7 @@ Tuning knobs: respawn time and loss share are on the `World` node (`hero_respawn
 - [x] **[AI]** Stand on a slot + press E → spend 10 stored Scrap → Gearshot Turret appears (prompt says how much you're short)
 - [x] **[AI]** Gearshot automatically aims at and shoots the nearest goblin within ~4 tiles (8 dmg, 1.5 shots/sec)
 - [ ] **[Both]** Play it — is the turret too strong or too weak? Is 10 Scrap the right price?
-- [ ] **[You]** Art wish: turret frames aiming **down** (current art only aims up/sideways; enemies below get the nearest pose)
+- [x] **[AI]** Turret head rotates smoothly in any direction: `tools/split_turret.py` cuts the art into a fixed base + turning head (muzzle flash and recoil instead of swapping frames)
 
 **How towers work:** same idea as heroes and enemies. Every tower shares `scripts/towers/tower.gd`; each type is a data file in `data/towers/` (art, cost, damage, fire rate, range, and which way each frame's barrel points). Each `BuildSlot` in the world scene has a `tower` it offers.
 
@@ -89,12 +90,16 @@ Tuning knobs: respawn time and loss share are on the `World` node (`hero_respawn
 
 ## Phase 5 — Operate the tower ⭐ the signature mechanic
 
-- [ ] **[AI]** Press E at a tower → hero takes control; press E again → leave (instant)
-- [ ] **[AI]** While controlled: aim with the mouse, **+35% damage, +50% fire rate**
-- [ ] **[AI]** One tower active ability (e.g. burst fire)
-- [ ] **[AI]** Tower earns Mastery XP while you operate it
-- [ ] **[AI]** Clear "you are controlling this" visuals
+- [x] **[AI]** Press E at a tower → hero takes control; press E again → leave (instant)
+- [x] **[AI]** While controlled: aim with the mouse, **+35% damage, +50% fire rate, +15% range**
+- [x] **[AI]** Camera zooms out **20%** while operating (`operating_zoom` on the Hero)
+- [x] **[AI]** One tower active ability: **Rapid Fire** — Q or right-click, 3× fire rate for 3s, 12s cooldown
+- [x] **[AI]** Tower earns Mastery XP (1 XP per damage dealt while you operate it)
+- [x] **[AI]** Clear "you are controlling this" visuals (range ring + operating panel)
 - [ ] **[You]** The big question: **is operating a tower fun?** Would you choose to do it?
+- [ ] **[You]** Balance: range bonus (10–20%?), zoom amount, ability numbers
+
+All operated bonuses and the ability live in each tower's data file (`operated_*_multiplier`, `ability_*`).
 
 **Done when:** jumping into the turret feels noticeably better than leaving it on auto.
 
@@ -117,6 +122,7 @@ Tuning knobs: respawn time and loss share are on the `World` node (`hero_respawn
 - [ ] **[AI]** 4 sectors (North/East/South/West); waves pick which sides attack
 - [ ] **[AI]** Warning arrows showing where the next attack comes from
 - [ ] **[AI]** Scrap piles out in the world to scavenge between waves
+- [ ] **[You]** Paint a bigger map (the current 20×12 tiles is smaller than the zoomed-out operating view, so a dark border shows)
 - [ ] **[AI]** A few waves that get harder
 
 ### 🎯 FIRST PLAYTEST MILESTONE
@@ -133,7 +139,7 @@ You can: leave the Core → kill goblins → carry Scrap home → choose wall or
 ## Phase 8 — More stuff to build
 
 - [ ] **[AI]** Aether (2nd resource: rare, found far from base)
-- [ ] **[AI]** Tower levels 1 → 2 → 3 (the art already has 3 levels per tower)
+- [ ] **[AI]** Tower levels 1 → 2 → 3 (the art already has 3 levels per tower) — split each level's Gearshot art into base + head with `tools/split_turret.py`
 - [ ] **[AI]** Rune Mortar (long-range splash)
 - [ ] **[AI]** Embercaster (short-range flamethrower + burn)
 - [ ] **[AI]** Aether Spire (chain lightning)

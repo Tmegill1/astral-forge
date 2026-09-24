@@ -31,8 +31,11 @@ func _process(_delta: float) -> void:
 	pad.texture = active_texture if near and built == null else empty_texture
 
 
-func interact(_hero: Hero) -> void:
-	if locked or built or tower == null:
+func interact(hero: Hero) -> void:
+	if built:
+		built.interact(hero)
+		return
+	if locked or tower == null:
 		return
 	var core := get_tree().get_first_node_in_group(&"core") as CommandCore
 	if core == null or not core.stored.spend_all(tower.cost):
@@ -44,8 +47,10 @@ func interact(_hero: Hero) -> void:
 	add_child(built)
 
 
-func get_interact_prompt(_hero: Hero) -> String:
-	if locked or built or tower == null:
+func get_interact_prompt(hero: Hero) -> String:
+	if built:
+		return built.get_interact_prompt(hero)
+	if locked or tower == null:
 		return ""
 	var core := get_tree().get_first_node_in_group(&"core") as CommandCore
 	var missing := core.stored.shortfall(tower.cost)

@@ -1,23 +1,48 @@
 class_name Tower
 extends StaticBody2D
 ## Every tower uses this script; art, cost and stats come from the
-## TowerDefinition passed to setup(). On its own it shoots the nearest enemy
-## in range. (Phase 5 adds the hero operating it.)
+## TowerDefinition passed to setup().
+##
+## Automatic: shoots the nearest enemy in range.
+## Operated (hero pressed Interact on it): aims at the mouse with boosted
+## damage, fire rate and range, can use its ability, and earns Mastery XP.
 
 const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
 ## How long the firing frame shows after each shot, in seconds.
 const FIRE_FRAME_TIME := 0.12
+## Where the operating hero stands, relative to the tower's base: at its
+## side and a touch behind, so neither hides the other's turning head.
+const OPERATOR_OFFSET := Vector2(-38, -4)
+## Where the hero steps out to when leaving, clear of the tower's body.
+const EXIT_OFFSET := Vector2(0, 34)
+## A rotating head only fires once it points within this of its aim (radians).
+const HEAD_FIRE_TOLERANCE := 0.2
+## How far the head kicks back when it fires, in pixels.
+const RECOIL := 3.0
 
 var definition: TowerDefinition
 var level := 1
 ## Where fired bolts are added; set by whoever places the tower.
 var projectile_parent: Node
+## The hero currently operating this tower, or null when automatic.
+var operator: Hero
+## Earned from damage dealt while operated; unlocks evolutions later.
+var mastery_xp := 0.0
 
 var _cooldown := 0.0
 var _aim_frame := 0
 var _fire_frame_left := 0.0
+var _ability_left := 0.0
+var _ability_cooldown_left := 0.0
+## Rotating head: where it points now and where it wants to point (radians).
+var _head_angle := 0.0
+var _wanted_angle := 0.0
+var _head_rest := Vector2.ZERO
 
 @onready var sprite: AnimatedSprite2D = $Sprite
+@onready var base_sprite: Sprite2D = $Base
+@onready var head: Sprite2D = $Head
+@onready var muzzle_flash: Node2D = $Head/Flash
 @onready var health: Health = $Health
 @onready var health_bar: HealthBar = $HealthBar
 
@@ -34,6 +59,7 @@ func _ready() -> void:
 	sprite.offset = -definition.sprite_frames.get_meta("foot_offset", Vector2.ZERO)
 	_show(&"idle")
 	health_bar.place_above(sprite)
+	_setup_head()
 	health.reset(definition.max_health)
 	if projectile_parent == null:
 		projectile_parent = get_parent()
@@ -41,25 +67,108 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_cooldown -= delta
+	_ability_left = maxf(_ability_left - delta, 0.0)
+	_ability_cooldown_left = maxf(_ability_cooldown_left - delta, 0.0)
 	if _fire_frame_left > 0.0:
 		_fire_frame_left -= delta
 		if _fire_frame_left <= 0.0:
 			_show(&"idle")
 
-	var target := _find_target()
-	if target == null:
-		return
-	var aim_point := _aim_point(target)
+	var aim_point: Vector2
+	var wants_to_fire: bool
+	if operator:
+		aim_point = operator.get_global_mouse_position()
+		wants_to_fire = operator.auto_fire or Input.is_action_pressed(&"fire")
+	else:
+		var target := _find_target()
+		if target == null:
+			return
+		aim_point = _aim_point(target)
+		wants_to_fire = true
 	_aim_at(aim_point)
-	if _cooldown <= 0.0:
-		_cooldown = 1.0 / definition.attacks_per_second
+	_turn_head(delta)
+	if wants_to_fire and _cooldown <= 0.0 and _head_on_target():
+		_cooldown = 1.0 / fire_rate()
 		_fire_at(aim_point)
 
+
+# --- Current stats (operating and the ability change them) ---
+
+func damage() -> float:
+	var value := definition.attack_damage
+	if operator:
+		value *= definition.operated_damage_multiplier
+	return value
+
+
+func fire_rate() -> float:
+	var value := definition.attacks_per_second
+	if operator:
+		value *= definition.operated_fire_rate_multiplier
+	if _ability_left > 0.0:
+		value *= definition.ability_fire_rate_multiplier
+	return value
+
+
+func attack_range() -> float:
+	var value := definition.attack_range
+	if operator:
+		value *= definition.operated_range_multiplier
+	return value
+
+
+# --- Operating ---
+
+func interact(hero: Hero) -> void:
+	if operator == hero:
+		hero.stop_operating()
+	elif operator == null:
+		hero.start_operating(self)
+
+
+func get_interact_prompt(hero: Hero) -> String:
+	if operator == hero:
+		return "[E] Leave %s" % definition.display_name
+	if operator == null:
+		return "[E] Operate %s" % definition.display_name
+	return ""
+
+
+func operator_position() -> Vector2:
+	return global_position + OPERATOR_OFFSET
+
+
+func exit_position() -> Vector2:
+	return global_position + EXIT_OFFSET
+
+
+## Called by Hero.start_operating / stop_operating; pass null to release.
+func set_operator(hero: Hero) -> void:
+	operator = hero
+	_ability_left = 0.0
+	queue_redraw()
+
+
+func use_ability() -> void:
+	if operator and _ability_cooldown_left <= 0.0:
+		_ability_left = definition.ability_duration
+		_ability_cooldown_left = definition.ability_cooldown
+
+
+func ability_active_left() -> float:
+	return _ability_left
+
+
+func ability_cooldown_left() -> float:
+	return _ability_cooldown_left
+
+
+# --- Targeting and firing ---
 
 ## Nearest living enemy within range.
 func _find_target() -> Enemy:
 	var best: Enemy = null
-	var best_distance := definition.attack_range
+	var best_distance := attack_range()
 	for node in get_tree().get_nodes_in_group(&"enemies"):
 		var enemy := node as Enemy
 		if enemy.health.is_dead:
@@ -76,12 +185,63 @@ func _aim_point(enemy: Enemy) -> Vector2:
 	return enemy.hurtbox_shape.global_position
 
 
+func _has_head() -> bool:
+	return definition.head_texture != null
+
+
+func _setup_head() -> void:
+	base_sprite.visible = _has_head()
+	head.visible = _has_head()
+	if not _has_head():
+		return
+	sprite.visible = false
+	var scale_v := Vector2.ONE * definition.sprite_scale
+	base_sprite.texture = definition.base_texture
+	base_sprite.scale = scale_v
+	base_sprite.offset = sprite.offset
+	head.texture = definition.head_texture
+	head.scale = scale_v
+	_head_rest = definition.head_pivot * definition.sprite_scale
+	head.position = _head_rest
+	muzzle_flash.position = Vector2.from_angle(deg_to_rad(definition.head_drawn_angle)) \
+			* definition.head_barrel_length
+	_head_angle = deg_to_rad(definition.head_drawn_angle)
+	_wanted_angle = _head_angle
+
+
+func _turn_head(delta: float) -> void:
+	if not _has_head():
+		return
+	_head_angle = wrapf(rotate_toward(_head_angle, _wanted_angle,
+			deg_to_rad(definition.head_turn_speed) * delta), -PI, PI)
+	head.rotation = _head_angle - deg_to_rad(definition.head_drawn_angle)
+	# Ease back from recoil.
+	head.position = head.position.lerp(_head_rest, minf(1.0, delta * 20.0))
+
+
+func _head_on_target() -> bool:
+	return not _has_head() or absf(angle_difference(_head_angle, _wanted_angle)) <= HEAD_FIRE_TOLERANCE
+
+
+## Where shots start before the barrel length is added.
 func _muzzle_base() -> Vector2:
+	if _has_head():
+		return global_position + _head_rest
 	return global_position + Vector2(0.0, -definition.muzzle_height)
 
 
-## Picks the frame (or mirrored frame) whose barrel points closest to `point`.
+func _barrel_length() -> float:
+	if _has_head():
+		return definition.head_barrel_length * definition.sprite_scale
+	return definition.barrel_length
+
+
+## Turns the head toward `point`, or picks the frame (or mirrored frame)
+## whose barrel points closest to it.
 func _aim_at(point: Vector2) -> void:
+	if _has_head():
+		_wanted_angle = (point - _muzzle_base()).angle()
+		return
 	if definition.aim_angles.is_empty():
 		return
 	var wanted := (point - _muzzle_base()).angle()
@@ -101,19 +261,29 @@ func _aim_at(point: Vector2) -> void:
 func _fire_at(point: Vector2) -> void:
 	var base := _muzzle_base()
 	var direction := (point - base).normalized()
+	if direction == Vector2.ZERO:
+		direction = Vector2.UP
 	var bolt: Projectile = BOLT_SCENE.instantiate()
-	bolt.global_position = base + direction * definition.barrel_length
+	bolt.global_position = base + direction * _barrel_length()
 	bolt.direction = direction
 	bolt.speed = definition.projectile_speed
-	bolt.damage = definition.attack_damage
-	bolt.max_distance = definition.attack_range + 60.0
+	bolt.damage = damage()
+	# Operated shots fly exactly the (boosted) range; automatic ones a bit
+	# past it so they can reach a target that walked out while in flight.
+	bolt.max_distance = attack_range() if operator else attack_range() + 60.0
+	if operator:
+		bolt.hit.connect(func(dealt: float, _killed: bool) -> void: mastery_xp += dealt)
 	projectile_parent.add_child(bolt)
-	_show(&"fire")
-	_fire_frame_left = FIRE_FRAME_TIME
+	if _has_head():
+		muzzle_flash.flash(FIRE_FRAME_TIME)
+		head.position = _head_rest - direction * RECOIL
+	else:
+		_show(&"fire")
+		_fire_frame_left = FIRE_FRAME_TIME
 
 
 ## Shows this level's idle or fire art at the current aim frame. Towers that
-## don't turn just play the animation.
+## don't turn just play the animation. (Unused while a rotating head is shown.)
 func _show(state: StringName) -> void:
 	var animation := StringName("lv%d_%s" % [level, state])
 	if definition.aim_angles.is_empty():
@@ -122,3 +292,12 @@ func _show(state: StringName) -> void:
 		sprite.animation = animation
 		sprite.stop()
 		sprite.frame = _aim_frame
+
+
+## While operated: a faint ring showing how far shots reach.
+func _draw() -> void:
+	if operator == null:
+		return
+	var centre := _muzzle_base() - global_position
+	draw_circle(centre, attack_range(), Color(0.45, 0.85, 1.0, 0.05))
+	draw_arc(centre, attack_range(), 0.0, TAU, 96, Color(0.45, 0.85, 1.0, 0.35), 2.0)

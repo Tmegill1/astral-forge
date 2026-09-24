@@ -2,7 +2,8 @@ class_name HUD
 extends CanvasLayer
 ## Always-on-screen info: the hero panel (name, health, stats, carried
 ## resources), the Command Core (health, stored resources), the interact
-## prompt and the respawn countdown. Later phases add wave info.
+## prompt, the respawn countdown, and the operating panel while the hero
+## controls a tower. Later phases add wave info.
 
 @onready var hero_name: Label = %HeroName
 @onready var health_bar: ProgressBar = %HealthBar
@@ -14,9 +15,35 @@ extends CanvasLayer
 @onready var stored_text: Label = %StoredText
 @onready var prompt: Label = %Prompt
 @onready var respawn_text: Label = %RespawnText
+@onready var operate_panel: PanelContainer = %OperatePanel
+@onready var operate_title: Label = %OperateTitle
+@onready var operate_stats: Label = %OperateStats
+@onready var ability_text: Label = %AbilityText
+@onready var mastery_text: Label = %MasteryText
+
+var _hero: Hero
+
+
+func _process(_delta: float) -> void:
+	var tower := _hero.operating if _hero else null
+	operate_panel.visible = tower != null
+	if tower == null:
+		return
+	var def := tower.definition
+	operate_title.text = "Operating %s" % def.display_name
+	operate_stats.text = "Damage %.0f · %.1f shots/s · Range %.0f" % [
+		tower.damage(), tower.fire_rate(), tower.attack_range()]
+	if tower.ability_active_left() > 0.0:
+		ability_text.text = "%s active: %.1fs" % [def.ability_name, tower.ability_active_left()]
+	elif tower.ability_cooldown_left() > 0.0:
+		ability_text.text = "[Q] %s recharging: %ds" % [def.ability_name, ceili(tower.ability_cooldown_left())]
+	else:
+		ability_text.text = "[Q] %s ready" % def.ability_name
+	mastery_text.text = "Mastery %d XP" % floori(tower.mastery_xp)
 
 
 func bind_hero(hero: Hero) -> void:
+	_hero = hero
 	hero_name.text = hero.definition.display_name
 	var s := hero.stats
 	stats_text.text = "Damage %.0f   Fire rate %.1f/s\nSpeed %.0f   Range %.0f" % [

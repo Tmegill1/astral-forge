@@ -1,7 +1,9 @@
-[gd_resource type="Resource" script_class="TowerDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="TowerDefinition" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/towers/tower_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/gearshot.tres" id="2_frames"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv1_base.png" id="3_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv1_head.png" id="4_head"]
 
 [resource]
 script = ExtResource("1_def")
@@ -17,6 +19,12 @@ attack_damage = 8.0
 attacks_per_second = 1.5
 attack_range = 260.0
 projectile_speed = 650.0
+base_texture = ExtResource("3_base")
+head_texture = ExtResource("4_head")
+head_pivot = Vector2(-3, -77)
+head_drawn_angle = -111.0
+head_barrel_length = 63.0
+head_turn_speed = 720.0
 aim_angles = PackedFloat32Array(-63, -45, -90, -149)
 muzzle_height = 50.0
 barrel_length = 30.0

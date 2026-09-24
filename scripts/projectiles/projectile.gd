@@ -4,6 +4,9 @@ extends Area2D
 ## Health child (on the hit body/area or its parent), and disappears after max_distance. Which things it can hit is set
 ## by the scene's collision mask.
 
+## Emitted when the bolt damages something; `killed` if that finished it.
+signal hit(damage: float, killed: bool)
+
 @export var color := Color(0.45, 0.85, 1.0)
 @export var radius := 5.0
 
@@ -41,6 +44,7 @@ func _on_hit(target: Node) -> void:
 	# Two overlaps can report in the same frame; only the first one counts.
 	_spent = true
 	health.take_damage(damage)
+	hit.emit(damage, health.is_dead)
 	queue_free()
 
 
