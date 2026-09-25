@@ -118,7 +118,18 @@ func _repath(goal: Node2D) -> void:
 	_path = nav.find_path(global_position, aim)
 	_path_version = nav.version
 	var end := _path[-1] if not _path.is_empty() else global_position
-	_blocked = end.distance_to(aim) > definition.attack_range + nav.agent_radius + nav.cell_size
+	_blocked = not _path_reaches(goal, end, aim, nav)
+
+
+## True if a path ending at `end` gets the enemy up to `goal`. A solid goal
+## (the Core, a tower) can only be approached to the edge of its grown nav
+## footprint, a square that on a diagonal sits farther out than `aim`.
+func _path_reaches(goal: Node2D, end: Vector2, aim: Vector2, nav: NavGrid) -> bool:
+	var slack := definition.attack_range + nav.agent_radius + nav.cell_size
+	if goal.has_method(&"nav_footprint"):
+		var footprint: Rect2 = goal.nav_footprint()
+		return footprint.grow(slack).has_point(end)
+	return end.distance_to(aim) <= slack
 
 
 ## The next path point to walk to; straight at the target once the path runs out.
