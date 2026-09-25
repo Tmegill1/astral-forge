@@ -15,6 +15,8 @@ extends Resource
 ## {"max_health": 0.9} gives this hero 90% of the baseline health.
 ## Stats not listed stay at 1x.
 @export var stat_multipliers: Dictionary[StringName, float] = {}
+## Stat upgrades this hero can buy at the Command Core, in menu order.
+@export var upgrades: Array[HeroUpgrade] = []
 
 
 ## Returns this hero's final stats: the baseline with multipliers applied.

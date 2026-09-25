@@ -18,6 +18,8 @@ signal died
 signal interact_prompt_changed(text: String)
 ## The tower now being operated, or null after leaving one.
 signal operating_changed(tower: Tower)
+## Stats changed (an upgrade was bought).
+signal stats_changed
 
 const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
 ## Walk animations from straight up to straight down, 45 degrees apart.
@@ -48,6 +50,10 @@ const WALK_BY_DIRECTION: Array[StringName] = [
 var definition: HeroDefinition
 ## Final stats for this run: baseline x this hero's multipliers.
 var stats: HeroStats
+## Stats at the start of the run, before upgrades.
+var base_stats: HeroStats
+## Ranks bought at the Core, by upgrade id. They last the whole run.
+var upgrade_ranks: Dictionary[StringName, int] = {}
 ## World-space area the hero can't leave. Empty means no limit.
 var bounds := Rect2()
 ## Resources picked up but not yet deposited; at risk if the hero falls.
@@ -77,7 +83,8 @@ var _facing := 1.0
 ## Call before adding the hero to the scene tree.
 func setup(hero_definition: HeroDefinition) -> void:
 	definition = hero_definition
-	stats = definition.build_stats()
+	base_stats = definition.build_stats()
+	stats = base_stats.duplicate()
 
 
 func _ready() -> void:
@@ -319,6 +326,26 @@ func _update_prompt() -> void:
 	if text != _prompt:
 		_prompt = text
 		interact_prompt_changed.emit(text)
+
+
+# --- Upgrades ---
+
+func rank_of(upgrade: HeroUpgrade) -> int:
+	return upgrade_ranks.get(upgrade.id, 0)
+
+
+## Adds one rank of `upgrade` (the Core has already been paid). Extra max
+## health is added on top of the current health.
+func add_rank(upgrade: HeroUpgrade) -> void:
+	upgrade_ranks[upgrade.id] = rank_of(upgrade) + 1
+	stats = base_stats.duplicate()
+	for owned in definition.upgrades:
+		var rank := rank_of(owned)
+		if rank > 0:
+			stats.set(owned.stat, base_stats.get(owned.stat) * owned.multiplier(rank))
+	if not is_equal_approx(stats.max_health, health.max_health):
+		health.grow_max(stats.max_health)
+	stats_changed.emit()
 
 
 ## Brings a dead hero back at full health.

@@ -74,9 +74,12 @@ func _update_wave_panel() -> void:
 func bind_hero(hero: Hero) -> void:
 	_hero = hero
 	hero_name.text = hero.definition.display_name
-	var s := hero.stats
-	stats_text.text = "Damage %.0f   Fire rate %.1f/s\nSpeed %.0f   Range %.0f" % [
-		s.attack_damage, s.attacks_per_second, s.move_speed, s.attack_range]
+	var show_stats := func() -> void:
+		var s := hero.stats
+		stats_text.text = "Damage %.0f   Fire rate %.1f/s\nSpeed %.0f   Range %.0f" % [
+			s.attack_damage, s.attacks_per_second, s.move_speed, s.attack_range]
+	hero.stats_changed.connect(show_stats)
+	show_stats.call()
 	_bind_bar(hero.health, health_bar, health_text)
 	var show_carried := func() -> void:
 		carried_text.text = "Carrying %d" % hero.carried.get_amount(Loot.SCRAP)

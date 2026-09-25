@@ -2,6 +2,11 @@
 
 [ext_resource type="Script" uid="uid://dtugv24p7c30w" path="res://scripts/heroes/hero_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" uid="uid://cl0m21c104grb" path="res://assets/sprites/artificer.tres" id="2_frames"]
+[ext_resource type="Script" path="res://scripts/heroes/hero_upgrade.gd" id="3_up"]
+[ext_resource type="Resource" path="res://data/hero_upgrades/damage.tres" id="4_damage"]
+[ext_resource type="Resource" path="res://data/hero_upgrades/fire_rate.tres" id="5_fire"]
+[ext_resource type="Resource" path="res://data/hero_upgrades/max_health.tres" id="6_health"]
+[ext_resource type="Resource" path="res://data/hero_upgrades/move_speed.tres" id="7_speed"]
 
 [resource]
 script = ExtResource("1_def")
@@ -12,3 +17,4 @@ sprite_scale = 0.385
 stat_multipliers = Dictionary[StringName, float]({
 &"max_health": 0.9
 })
+upgrades = Array[ExtResource("3_up")]([ExtResource("4_damage"), ExtResource("5_fire"), ExtResource("6_health"), ExtResource("7_speed")])
