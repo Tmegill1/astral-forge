@@ -48,6 +48,7 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 ## Phase 2 — The Core and one Goblin
 
 - [x] **[AI]** Command Core in the middle of the map, with health (looks more broken at 66% and 33%)
+- [x] **[AI]** Core regenerates 10 health every 5 s (`regen_amount` / `regen_interval` on the CommandCore)
 - [x] **[AI]** Goblin walks toward the Core and attacks it (turns on the hero if you get close)
 - [x] **[AI]** Hero can kill goblins
 - [x] **[AI]** Core reaches 0 → "You Lose" screen (Restart button or R)
@@ -176,7 +177,9 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar 4) Embercaster 5) Spire 6) 
 ## Phase 10 — A full run
 
 - [ ] **[AI]** Artificer abilities: passive, **Overclock** (boost your tower), **Full Steam** ultimate (share it with all towers)
-- [ ] **[AI]** Upgrade choices after waves (pick 1 of 3) — include fire-rate upgrades (hero starts at 1 shot/sec)
+- [x] **[AI]** Hero upgrades at the Core (F): Damage, Fire rate, Max health (+20%/rank), Move speed (+8%/rank); 5 ranks costing 12 / 20 / 30 + 1 Aether / 40 + 2 / 55 + 3, from the same stored pool as towers (data in `data/hero_upgrades/`)
+- [ ] **[AI]** Specialized roguelite hero upgrades, picked during a run: chain-lightning shots, flamethrower, and similar
+- [ ] **[AI]** Upgrade choices after waves (pick 1 of 3) — stat ranks now live at the Core; these picks are the specialized ones
 - [ ] **[AI]** One evolution per tower (e.g. Gearshot → Gatling Engine or Rune Cannon)
 - [ ] **[AI]** 10 waves, a mini-boss around wave 6, final boss
 - [ ] **[AI]** Win screen
