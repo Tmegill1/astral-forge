@@ -72,6 +72,7 @@ func _physics_process(delta: float) -> void:
 			_slow_factor = 1.0
 	var goal := _pick_target()
 	if goal == null:
+		velocity = Vector2.ZERO
 		sprite.play(&"idle")
 		return
 	if _needs_repath(goal):
@@ -83,6 +84,8 @@ func _physics_process(delta: float) -> void:
 			_target = breakable
 
 	if _in_reach(_target):
+		# Standing still to attack (towers read velocity to lead their shots).
+		velocity = Vector2.ZERO
 		sprite.flip_h = _target.global_position.x < global_position.x
 		if _cooldown <= 0.0:
 			_cooldown = 1.0 / definition.attacks_per_second
