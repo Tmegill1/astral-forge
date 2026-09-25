@@ -3,7 +3,8 @@ extends StaticBody2D
 ## The heart of the fortress. Enemies march on it; when its health hits
 ## zero the run is lost. Its look changes as it takes damage, and it slowly
 ## regenerates (regen_amount every regen_interval seconds). It also banks
-## resources: heroes deposit what they carry here with Interact.
+## resources: heroes deposit what they carry here with Interact. Manage (F)
+## opens the hero upgrade menu; ranks are paid from stored resources.
 
 signal destroyed
 
@@ -55,9 +56,27 @@ func interact(hero: Hero) -> void:
 
 
 func get_interact_prompt(hero: Hero) -> String:
-	if hero.carried.is_empty():
-		return ""
-	return "[E] Deposit %s" % hero.carried.describe()
+	var parts: PackedStringArray = []
+	if not hero.carried.is_empty():
+		parts.append("[E] Deposit %s" % hero.carried.describe())
+	if not hero.definition.upgrades.is_empty():
+		parts.append("[F] Upgrade hero")
+	return "    ".join(parts)
+
+
+func manage(hero: Hero) -> void:
+	if not hero.definition.upgrades.is_empty():
+		get_tree().call_group(&"hero_upgrade_menu", &"open", self, hero)
+
+
+## Pays for the next rank of `upgrade` from stored resources and gives it to
+## the hero. False if it's maxed or unaffordable (nothing is spent then).
+func buy_upgrade(hero: Hero, upgrade: HeroUpgrade) -> bool:
+	var rank := hero.rank_of(upgrade)
+	if rank >= upgrade.max_rank() or not stored.spend_all(upgrade.cost_for(rank + 1)):
+		return false
+	hero.add_rank(upgrade)
+	return true
 
 
 func _on_health_changed(current: float, maximum: float) -> void:

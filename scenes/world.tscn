@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://c6q8le2hlir3" path="res://scripts/world/nav_grid.gd" id="9_nav"]
 [ext_resource type="PackedScene" path="res://scenes/ui/build_menu.tscn" id="10_build_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/tower_menu.tscn" id="11_tower_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hero_upgrade_menu.tscn" id="12_hero_menu"]
 
 [node name="World" type="Node2D" unique_id=164071451]
 script = ExtResource("2_world")
@@ -110,3 +111,5 @@ run = ExtResource("6_run")
 [node name="BuildMenu" parent="." unique_id=851941954 instance=ExtResource("10_build_menu")]
 
 [node name="TowerMenu" parent="." unique_id=904009705 instance=ExtResource("11_tower_menu")]
+
+[node name="HeroUpgradeMenu" parent="." instance=ExtResource("12_hero_menu")]
