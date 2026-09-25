@@ -1,7 +1,8 @@
 class_name CommandCore
 extends StaticBody2D
 ## The heart of the fortress. Enemies march on it; when its health hits
-## zero the run is lost. Its look changes as it takes damage. It also banks
+## zero the run is lost. Its look changes as it takes damage, and it slowly
+## regenerates (regen_amount every regen_interval seconds). It also banks
 ## resources: heroes deposit what they carry here with Interact.
 
 signal destroyed
@@ -9,12 +10,18 @@ signal destroyed
 @export var max_health := 500.0
 ## How far from the centre enemies can hit it from, in pixels.
 @export var hit_radius := 95.0
+## Health regained every regen_interval seconds while the Core stands.
+@export var regen_amount := 10.0
+## Seconds between regeneration ticks. 0 turns regeneration off.
+@export var regen_interval := 5.0
 @export var intact_texture: Texture2D
 @export var damaged_texture: Texture2D
 @export var ruined_texture: Texture2D
 
 ## Deposited resources; this is what building spends.
 var stored := ResourceBag.new()
+
+var _regen_left := 0.0
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var health: Health = $Health
@@ -24,6 +31,17 @@ func _ready() -> void:
 	health.changed.connect(_on_health_changed)
 	health.died.connect(destroyed.emit)
 	health.reset(max_health)
+	_regen_left = regen_interval
+
+
+func _process(delta: float) -> void:
+	if regen_interval <= 0.0 or health.is_dead:
+		return
+	_regen_left -= delta
+	if _regen_left <= 0.0:
+		_regen_left += regen_interval
+		if health.current < health.max_health:
+			health.heal(regen_amount)
 
 
 ## Solid area for enemy pathfinding: its body circle.
