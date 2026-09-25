@@ -8,6 +8,7 @@ extends Node2D
 ## middle, funnelling enemies around them.
 ## Built: Interact operates the tower; Manage (F) opens repair / sell.
 ## Destroyed: the wreckage clears after a few seconds; walls stay up.
+## Locked: Interact pays unlock_cost (Scrap) to open the pad.
 
 const TOWER_SCENE := preload("res://scenes/towers/tower.tscn")
 const WALL_SCENE := preload("res://scenes/structures/wall.tscn")
@@ -24,6 +25,8 @@ const PANEL_WIDTH := 80.0
 
 @export var buildable: Array[TowerDefinition] = []
 @export var locked := false
+## Stored resources spent to unlock a locked pad.
+@export var unlock_cost: Dictionary[StringName, int] = {&"scrap": 6}
 @export var empty_texture: Texture2D
 @export var active_texture: Texture2D
 @export var locked_texture: Texture2D
@@ -70,9 +73,11 @@ func _process(delta: float) -> void:
 # --- Interaction ---
 
 func interact(hero: Hero) -> void:
-	if built:
+	if locked:
+		unlock()
+	elif built:
 		built.interact(hero)
-	elif not locked:
+	else:
 		get_tree().call_group(&"build_menu", &"open", self)
 
 
@@ -83,7 +88,10 @@ func manage(_hero: Hero) -> void:
 
 func get_interact_prompt(hero: Hero) -> String:
 	if locked:
-		return ""
+		var missing := core().stored.shortfall(unlock_cost)
+		if missing.is_empty():
+			return "[E] Unlock slot (%s)" % Loot.describe(unlock_cost)
+		return "Unlock slot: need %s more" % Loot.describe(missing)
 	if built == null:
 		return "[E] Build"
 	if built.is_destroyed():
@@ -98,6 +106,15 @@ func get_interact_prompt(hero: Hero) -> String:
 
 func core() -> CommandCore:
 	return get_tree().get_first_node_in_group(&"core") as CommandCore
+
+
+## Pays unlock_cost and opens the pad for building. False if it isn't
+## locked or the Core can't afford it (nothing is spent then).
+func unlock() -> bool:
+	if not locked or not core().stored.spend_all(unlock_cost):
+		return false
+	locked = false
+	return true
 
 
 ## Pays for and builds `tower`, plus any missing walls. False if it can't.
