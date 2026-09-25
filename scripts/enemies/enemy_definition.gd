@@ -29,3 +29,6 @@ extends Resource
 @export_group("Loot")
 ## Resource type -> (min, max) dropped on death, e.g. {"scrap": (1, 2)}.
 @export var drops: Dictionary[StringName, Vector2i] = {}
+## Resource type -> chance (0 to 1) of also dropping exactly one on death,
+## e.g. {"aether": 0.05}.
+@export var rare_drops: Dictionary[StringName, float] = {}

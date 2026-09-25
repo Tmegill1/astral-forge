@@ -19,3 +19,6 @@ attack_hit_frame = 3
 drops = Dictionary[StringName, Vector2i]({
 &"scrap": Vector2i(1, 2)
 })
+rare_drops = Dictionary[StringName, float]({
+&"aether": 0.05
+})
