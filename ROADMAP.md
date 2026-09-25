@@ -148,11 +148,11 @@ You can: leave the Core → kill goblins → carry Scrap home → build a Gearsh
 
 ## Phase 8 — More stuff to build
 
-Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar 4) Embercaster 5) Spire 6) Harvester. Each step: design → build → playtest.
+Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster 5) Spire 6) Harvester. Each step: design → build → playtest.
 
 - [x] **[AI]** Aether (2nd resource: rare, found far from base): crystals 800+ px from the Core each break (1–2, max 3, 2–4 Aether each) + 5% goblin drop
 - [x] **[AI]** Tower levels 1 → 2 → 3: upgrade in the F menu (Gearshot Lv2 15 Scrap, Lv3 25 Scrap + 3 Aether); ×1.3 damage, ×1.15 fire rate, ×1.1 range, ×1.4 health per level; walls level up too (120/180/260)
-- [ ] **[AI]** Rune Mortar (long-range splash)
+- [x] **[AI]** Rune Mortar (long-range splash): 15 Scrap (Lv2 20, Lv3 30 + 3 Aether); shells the biggest clump and leads it, can't hit inside 110 px; operated = shells land on the mouse; Q = Rune Shell (2× blast + 4 s slowing circle)
 - [ ] **[AI]** Embercaster (short-range flamethrower + burn)
 - [ ] **[AI]** Aether Spire (chain lightning)
 - [ ] **[AI]** Aether Harvester (pulls Scrap toward it; Lv3 auto-deposits)
