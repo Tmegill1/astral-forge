@@ -6,7 +6,8 @@ extends Node2D
 ## towers. Building also raises walls on both sides of the tower: they run
 ## out at right angles to the Core direction, then turn back toward the
 ## middle, funnelling enemies around them.
-## Built: Interact operates the tower; Manage (F) opens repair / sell.
+## Built: Interact operates the tower; Manage (F) opens repair / upgrade /
+## sell. Upgrading a tower levels up its walls too (art and health).
 ## Destroyed: the wreckage clears after a few seconds; walls stay up.
 ## Locked: Interact pays unlock_cost (Scrap) to open the pad.
 
@@ -22,6 +23,8 @@ const WRECKAGE_TIME := 4.0
 const POST_SPACING := 18.0
 ## Walls that run across the screen use pieces about this wide, in pixels.
 const PANEL_WIDTH := 80.0
+## Wall piece health at wall level 1, 2, 3.
+const WALL_HEALTH: Array[float] = [120.0, 180.0, 260.0]
 
 @export var buildable: Array[TowerDefinition] = []
 @export var locked := false
@@ -42,13 +45,20 @@ const PANEL_WIDTH := 80.0
 @export var wall_length := 170.0
 ## Length of the end piece turning back toward the middle, in pixels.
 @export var wall_return := 100.0
-@export var wall_texture: Texture2D
-@export var wall_damaged_texture: Texture2D
+## Wall art per wall level (index 0 = Lv1).
+@export var wall_textures: Array[Texture2D] = []
+@export var wall_damaged_textures: Array[Texture2D] = []
+## Width of each level's left pillar, cut out as a post for up/down walls.
+@export var wall_post_widths: PackedInt32Array = [52, 52, 48]
 @export var wall_scale := 0.4
 
 var built: Tower
 ## One entry per planned wall piece; null where a piece was destroyed.
 var walls: Array[Wall] = []
+## Level of this slot's walls; raised by tower upgrades, reset by selling.
+var wall_level := 1
+## Everything paid for the current tower (build + upgrades), for refunds.
+var invested: Dictionary[StringName, int] = {}
 
 var _wall_plan: Array[Dictionary] = []
 var _wreckage_left := 0.0
@@ -121,6 +131,7 @@ func unlock() -> bool:
 func build(tower: TowerDefinition) -> bool:
 	if built or locked or not tower.available or not core().stored.spend_all(tower.cost):
 		return false
+	invested = tower.cost.duplicate()
 	built = TOWER_SCENE.instantiate()
 	built.setup(tower)
 	built.position = tower_offset
@@ -134,12 +145,12 @@ func build(tower: TowerDefinition) -> bool:
 
 func sell_value() -> Dictionary[StringName, int]:
 	var value: Dictionary[StringName, int] = {}
-	for type in built.definition.cost:
-		value[type] = floori(built.definition.cost[type] * SELL_REFUND)
+	for type in invested:
+		value[type] = floori(invested[type] * SELL_REFUND)
 	return value
 
 
-## Removes the tower and its walls and refunds part of the cost.
+## Removes the tower and its walls and refunds part of what was spent on it.
 func sell() -> void:
 	if built == null or built.is_destroyed():
 		return
@@ -151,7 +162,9 @@ func sell() -> void:
 			wall.queue_free()
 	walls.clear()
 	_wall_plan.clear()
+	wall_level = 1
 	_clear_tower()
+	invested = {}
 
 
 ## Scrap needed to bring the tower and every wall piece back to full.
@@ -161,7 +174,7 @@ func repair_cost() -> int:
 		if is_instance_valid(wall):
 			missing += wall.health.max_health - wall.health.current
 		else:
-			missing += Wall.DEFAULT_MAX_HEALTH
+			missing += WALL_HEALTH[wall_level - 1]
 	return ceili(missing / REPAIR_HP_PER_SCRAP)
 
 
@@ -174,6 +187,27 @@ func repair() -> bool:
 		if is_instance_valid(wall):
 			wall.health.heal(wall.health.max_health)
 	_raise_walls()
+	return true
+
+
+## Pays for the tower's next level and applies it, levelling up the walls
+## with it. False if there's no tower, it's wrecked or maxed, or the Core
+## can't afford it (nothing is spent then).
+func upgrade() -> bool:
+	if built == null or built.is_destroyed() or built.level >= TowerDefinition.MAX_LEVEL:
+		return false
+	var cost := built.definition.upgrade_cost(built.level + 1)
+	if not core().stored.spend_all(cost):
+		return false
+	for type in cost:
+		invested[type] = invested.get(type, 0) + cost[type]
+	built.set_level(built.level + 1)
+	if built.level > wall_level:
+		wall_level = built.level
+		for i in walls.size():
+			if is_instance_valid(walls[i]):
+				var textures := _wall_art(_wall_plan[i].post)
+				walls[i].restyle(textures[0], textures[1], WALL_HEALTH[wall_level - 1])
 	return true
 
 
@@ -196,17 +230,15 @@ func _raise_walls() -> void:
 	if _wall_plan.is_empty():
 		_wall_plan = _plan_walls()
 		walls.resize(_wall_plan.size())
-	var post_intact := _post_texture(wall_texture)
-	var post_damaged := _post_texture(wall_damaged_texture)
 	for i in _wall_plan.size():
 		if is_instance_valid(walls[i]):
 			continue
 		var piece: Dictionary = _wall_plan[i]
 		var wall: Wall = WALL_SCENE.instantiate()
-		if piece.post:
-			wall.setup(post_intact, post_damaged, Vector2(20, 14), wall_scale)
-		else:
-			wall.setup(wall_texture, wall_damaged_texture, Vector2(piece.width, 14), wall_scale)
+		var textures := _wall_art(piece.post)
+		var size := Vector2(20, 14) if piece.post else Vector2(piece.width, 14)
+		wall.setup(textures[0], textures[1], size, wall_scale)
+		wall.max_health = WALL_HEALTH[wall_level - 1]
 		wall.position = piece.position
 		get_parent().add_child(wall)
 		walls[i] = wall
@@ -249,9 +281,19 @@ func _plan_segment(from: Vector2, to: Vector2) -> Array[Dictionary]:
 	return plan
 
 
+## [intact, damaged] art for a wall piece at the current wall level.
+func _wall_art(post: bool) -> Array[Texture2D]:
+	var intact := wall_textures[wall_level - 1]
+	var damaged := wall_damaged_textures[wall_level - 1]
+	if post:
+		var width := wall_post_widths[wall_level - 1]
+		return [_post_texture(intact, width), _post_texture(damaged, width)]
+	return [intact, damaged]
+
+
 ## The left pillar of a wall picture, used as a post.
-func _post_texture(texture: Texture2D) -> Texture2D:
+func _post_texture(texture: Texture2D, width: int) -> Texture2D:
 	var post := AtlasTexture.new()
 	post.atlas = texture
-	post.region = Rect2(0, 0, 52, texture.get_height())
+	post.region = Rect2(0, 0, width, texture.get_height())
 	return post

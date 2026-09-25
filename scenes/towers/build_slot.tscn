@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/towers/build_slot.gd" id="1_slot"]
 [ext_resource type="Texture2D" path="res://assets/sprites/fortress/slot_empty.png" id="2_empty"]
@@ -11,6 +11,10 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/fortress/wall_lv1.png" id="9_wall"]
 [ext_resource type="Texture2D" path="res://assets/sprites/fortress/wall_lv1_damaged.png" id="10_wall_damaged"]
 [ext_resource type="Script" path="res://scripts/towers/tower_definition.gd" id="11_def"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fortress/wall_lv2.png" id="12_wall2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fortress/wall_lv3.png" id="13_wall3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fortress/wall_lv2_damaged.png" id="14_wall2_damaged"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fortress/wall_lv3_damaged.png" id="15_wall3_damaged"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
 radius = 45.0
@@ -19,8 +23,8 @@ radius = 45.0
 y_sort_enabled = true
 script = ExtResource("1_slot")
 buildable = Array[ExtResource("11_def")]([ExtResource("5_gearshot"), ExtResource("6_mortar"), ExtResource("7_ember"), ExtResource("8_spire")])
-wall_texture = ExtResource("9_wall")
-wall_damaged_texture = ExtResource("10_wall_damaged")
+wall_textures = Array[Texture2D]([ExtResource("9_wall"), ExtResource("12_wall2"), ExtResource("13_wall3")])
+wall_damaged_textures = Array[Texture2D]([ExtResource("10_wall_damaged"), ExtResource("14_wall2_damaged"), ExtResource("15_wall3_damaged")])
 empty_texture = ExtResource("2_empty")
 active_texture = ExtResource("3_active")
 locked_texture = ExtResource("4_locked")

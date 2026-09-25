@@ -45,6 +45,17 @@ func _ready() -> void:
 	health.reset(max_health)
 
 
+## Switches to another level's art and maximum health, keeping the damage
+## taken (for a tower upgrade).
+func restyle(intact: Texture2D, damaged: Texture2D, new_max: float) -> void:
+	intact_texture = intact
+	damaged_texture = damaged
+	max_health = new_max
+	sprite.offset = Vector2(0, -intact_texture.get_height() / 2.0)
+	health.grow_max(new_max)
+	_on_health_changed(health.current, health.max_health)
+
+
 func nav_footprint() -> Rect2:
 	return Rect2(global_position + Vector2(-footprint.x / 2.0, -footprint.y), footprint)
 
