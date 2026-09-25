@@ -19,7 +19,7 @@
 - [x] Godot project, terrain tileset (64×64 tiles), world scene, grass painted
 - [x] **[AI]** Copy the art from the Desktop folder into `assets/source/` (originals, never edited; Godot ignores this folder)
 - [x] **[AI]** Cut each sprite sheet into clean, equal-size frames → `tools/slice_sprites.py` writes `assets/sprites/<name>.png` + `<name>.tres` (Godot SpriteFrames with named animations)
-- [ ] **[You]** Look over the sprite preview and the "What each art file is" table below; fix anything I guessed wrong (rename = change the name in `SHEETS` in `tools/slice_sprites.py` and re-run it)
+- [x] **[You]** Look over the sprite preview and the "What each art file is" table below; fix anything I guessed wrong (rename = change the name in `SHEETS` in `tools/slice_sprites.py` and re-run it)
 
 Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire frames that shoot past the frame edge get their shell/bolt/flame clipped. Projectiles will be separate sprites later anyway.
 
@@ -147,13 +147,15 @@ You can: leave the Core → kill goblins → carry Scrap home → build a Gearsh
 
 ## Phase 8 — More stuff to build
 
-- [ ] **[AI]** Aether (2nd resource: rare, found far from base)
+Order: 1) slots + Aether ✅ 2) levels 3) Mortar 4) Embercaster 5) Spire 6) Harvester. Each step: design → build → playtest.
+
+- [x] **[AI]** Aether (2nd resource: rare, found far from base): crystals 800+ px from the Core each break (1–2, max 3, 2–4 Aether each) + 5% goblin drop
 - [ ] **[AI]** Tower levels 1 → 2 → 3 (the art already has 3 levels per tower) — split each level's Gearshot art into base + head with `tools/split_turret.py`
 - [ ] **[AI]** Rune Mortar (long-range splash)
 - [ ] **[AI]** Embercaster (short-range flamethrower + burn)
 - [ ] **[AI]** Aether Spire (chain lightning)
 - [ ] **[AI]** Aether Harvester (pulls Scrap toward it; Lv3 auto-deposits)
-- [ ] **[AI]** Expand to 12–16 build slots
+- [x] **[AI]** Expand to 12–16 build slots: a ring of 12 (3 per side); 4 open, 8 unlock for 6 Scrap; walls join into one line per side, corners stay open
 - [ ] **[You]** Decide: is Mastery per-tower or per-tower-type?
 - [ ] **[Both]** Playtest after each new tower
 

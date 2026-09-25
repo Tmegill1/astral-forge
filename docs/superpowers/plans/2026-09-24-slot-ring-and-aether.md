@@ -579,22 +579,22 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 - Consumes: `BuildSlot` exports `locked`, `wall_length`, `wall_return`, `unlock_cost` (Task 5)
 - Produces: 12 slots under `Units/`, named below; 4 middle ones unlocked
 
-Starting layout (Core at `(640, 384)`; Task 7 tunes these):
+Layout (Core at `(640, 384)`; final values after Task 7 tuning):
 
 | Node | Position | locked | wall_length |
 |---|---|---|---|
-| BuildSlotNorthWest | (470, 114) | true | 85 |
-| BuildSlotNorth | (640, 114) | false | 85 |
-| BuildSlotNorthEast | (810, 114) | true | 85 |
-| BuildSlotWestNorth | (310, 250) | true | 75 |
-| BuildSlotWest | (310, 400) | false | 75 |
-| BuildSlotWestSouth | (310, 550) | true | 75 |
-| BuildSlotEastNorth | (970, 250) | true | 75 |
-| BuildSlotEast | (970, 400) | false | 75 |
-| BuildSlotEastSouth | (970, 550) | true | 75 |
-| BuildSlotSouthWest | (470, 654) | true | 85 |
-| BuildSlotSouth | (640, 654) | false | 85 |
-| BuildSlotSouthEast | (810, 654) | true | 85 |
+| BuildSlotNorthWest | (480, 114) | true | 80 |
+| BuildSlotNorth | (640, 114) | false | 80 |
+| BuildSlotNorthEast | (800, 114) | true | 80 |
+| BuildSlotWestNorth | (310, 260) | true | 70 |
+| BuildSlotWest | (310, 400) | false | 70 |
+| BuildSlotWestSouth | (310, 540) | true | 70 |
+| BuildSlotEastNorth | (970, 260) | true | 70 |
+| BuildSlotEast | (970, 400) | false | 70 |
+| BuildSlotEastSouth | (970, 540) | true | 70 |
+| BuildSlotSouthWest | (480, 654) | true | 80 |
+| BuildSlotSouth | (640, 654) | false | 80 |
+| BuildSlotSouthEast | (800, 654) | true | 80 |
 
 All 12 get `wall_return = 0.0`.
 

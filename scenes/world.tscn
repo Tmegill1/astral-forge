@@ -26,71 +26,71 @@ y_sort_enabled = true
 position = Vector2(640, 384)
 
 [node name="BuildSlotNorthWest" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(470, 114)
+position = Vector2(480, 114)
 locked = true
-wall_length = 85.0
+wall_length = 80.0
 wall_return = 0.0
 
 [node name="BuildSlotNorth" parent="Units" instance=ExtResource("8_build_slot")]
 position = Vector2(640, 114)
-wall_length = 85.0
+wall_length = 80.0
 wall_return = 0.0
 
 [node name="BuildSlotNorthEast" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(810, 114)
+position = Vector2(800, 114)
 locked = true
-wall_length = 85.0
+wall_length = 80.0
 wall_return = 0.0
 
 [node name="BuildSlotWestNorth" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(310, 250)
+position = Vector2(310, 260)
 locked = true
-wall_length = 75.0
+wall_length = 70.0
 wall_return = 0.0
 
 [node name="BuildSlotWest" parent="Units" unique_id=18198971 instance=ExtResource("8_build_slot")]
 position = Vector2(310, 400)
-wall_length = 75.0
+wall_length = 70.0
 wall_return = 0.0
 
 [node name="BuildSlotWestSouth" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(310, 550)
+position = Vector2(310, 540)
 locked = true
-wall_length = 75.0
+wall_length = 70.0
 wall_return = 0.0
 
 [node name="BuildSlotEastNorth" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(970, 250)
+position = Vector2(970, 260)
 locked = true
-wall_length = 75.0
+wall_length = 70.0
 wall_return = 0.0
 
 [node name="BuildSlotEast" parent="Units" unique_id=1044983099 instance=ExtResource("8_build_slot")]
 position = Vector2(970, 400)
-wall_length = 75.0
+wall_length = 70.0
 wall_return = 0.0
 
 [node name="BuildSlotEastSouth" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(970, 550)
+position = Vector2(970, 540)
 locked = true
-wall_length = 75.0
+wall_length = 70.0
 wall_return = 0.0
 
 [node name="BuildSlotSouthWest" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(470, 654)
+position = Vector2(480, 654)
 locked = true
-wall_length = 85.0
+wall_length = 80.0
 wall_return = 0.0
 
 [node name="BuildSlotSouth" parent="Units" instance=ExtResource("8_build_slot")]
 position = Vector2(640, 654)
-wall_length = 85.0
+wall_length = 80.0
 wall_return = 0.0
 
 [node name="BuildSlotSouthEast" parent="Units" instance=ExtResource("8_build_slot")]
-position = Vector2(810, 654)
+position = Vector2(800, 654)
 locked = true
-wall_length = 85.0
+wall_length = 80.0
 wall_return = 0.0
 
 [node name="HeroSpawn" type="Marker2D" parent="." unique_id=1308895600]
