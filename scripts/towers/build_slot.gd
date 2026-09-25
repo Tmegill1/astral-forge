@@ -109,7 +109,7 @@ func get_interact_prompt(hero: Hero) -> String:
 	var text := built.get_interact_prompt(hero)
 	if hero.operating == built:
 		return text
-	return text + "    [F] Repair / Sell"
+	return text + "    [F] Repair / Upgrade / Sell"
 
 
 # --- Building, selling, repairing ---
