@@ -47,6 +47,8 @@ var _wanted_angle := 0.0
 var _head_rest := Vector2.ZERO
 ## Unit direction from the tower toward the Core, snapped to an axis.
 var _inward := Vector2.RIGHT
+## This level's rotating head, or null for frame-based art.
+var _head: TurretHead
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var base_sprite: Sprite2D = $Base
@@ -68,6 +70,7 @@ func _ready() -> void:
 	sprite.offset = -definition.sprite_frames.get_meta("foot_offset", Vector2.ZERO)
 	_show(&"idle")
 	health_bar.place_above(sprite)
+	_head = definition.head_for(level)
 	_setup_head()
 	health.reset(definition.max_health)
 	health.died.connect(_on_died)
@@ -234,7 +237,7 @@ func _aim_point(enemy: Enemy) -> Vector2:
 
 
 func _has_head() -> bool:
-	return definition.head_texture != null
+	return _head != null
 
 
 func _setup_head() -> void:
@@ -244,16 +247,15 @@ func _setup_head() -> void:
 		return
 	sprite.visible = false
 	var scale_v := Vector2.ONE * definition.sprite_scale
-	base_sprite.texture = definition.base_texture
+	base_sprite.texture = _head.base_texture
 	base_sprite.scale = scale_v
 	base_sprite.offset = sprite.offset
-	head.texture = definition.head_texture
+	head.texture = _head.head_texture
 	head.scale = scale_v
-	_head_rest = definition.head_pivot * definition.sprite_scale
+	_head_rest = _head.pivot * definition.sprite_scale
 	head.position = _head_rest
-	muzzle_flash.position = Vector2.from_angle(deg_to_rad(definition.head_drawn_angle)) \
-			* definition.head_barrel_length
-	_head_angle = deg_to_rad(definition.head_drawn_angle)
+	muzzle_flash.position = Vector2.from_angle(deg_to_rad(_head.drawn_angle)) * _head.barrel_length
+	_head_angle = deg_to_rad(_head.drawn_angle)
 	_wanted_angle = _head_angle
 
 
@@ -262,7 +264,7 @@ func _turn_head(delta: float) -> void:
 		return
 	_head_angle = wrapf(rotate_toward(_head_angle, _wanted_angle,
 			deg_to_rad(definition.head_turn_speed) * delta), -PI, PI)
-	head.rotation = _head_angle - deg_to_rad(definition.head_drawn_angle)
+	head.rotation = _head_angle - deg_to_rad(_head.drawn_angle)
 	# Ease back from recoil.
 	head.position = head.position.lerp(_head_rest, minf(1.0, delta * 20.0))
 
@@ -280,7 +282,7 @@ func _muzzle_base() -> Vector2:
 
 func _barrel_length() -> float:
 	if _has_head():
-		return definition.head_barrel_length * definition.sprite_scale
+		return _head.barrel_length * definition.sprite_scale
 	return definition.barrel_length
 
 

@@ -21,6 +21,11 @@ func icon() -> Texture2D:
 	return sprite_frames.get_frame_texture(&"lv1_idle", 0)
 
 
+## This level's rotating head, or null to use the frame-based art.
+func head_for(tower_level: int) -> TurretHead:
+	return heads[tower_level - 1] if tower_level <= heads.size() else null
+
+
 @export_group("Stats")
 @export var max_health := 150.0
 @export var attack_damage := 8.0
@@ -46,17 +51,10 @@ func icon() -> Texture2D:
 @export var ability_fire_rate_multiplier := 3.0
 
 @export_group("Rotating head")
-## Optional: a static base plus a head that turns to face any direction
-## (made by tools/split_turret.py). When set, these replace the idle/fire
-## frames and aim_angles below.
-@export var base_texture: Texture2D
-@export var head_texture: Texture2D
-## Where the head turns, relative to the tower's base point, in texture pixels.
-@export var head_pivot := Vector2.ZERO
-## Direction the barrel points in head_texture (degrees, 0 = right, -90 = up).
-@export var head_drawn_angle := 0.0
-## Pivot to barrel tip, in texture pixels.
-@export var head_barrel_length := 0.0
+## Optional, per level (index 0 = Lv1): a static base plus a head that turns
+## to face any direction. A level with an entry uses it instead of its
+## idle/fire frames and aim_angles below.
+@export var heads: Array[TurretHead] = []
 ## Degrees per second the head can turn.
 @export var head_turn_speed := 720.0
 
