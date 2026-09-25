@@ -94,7 +94,7 @@ func _physics_process(delta: float) -> void:
 	var aim_point: Vector2
 	var wants_to_fire: bool
 	if operator:
-		aim_point = operator.get_global_mouse_position()
+		aim_point = _operated_aim_point()
 		wants_to_fire = operator.auto_fire or Input.is_action_pressed(&"fire")
 	else:
 		var target := _find_target()
@@ -230,6 +230,11 @@ func ability_cooldown_left() -> float:
 
 
 # --- Targeting and firing ---
+
+## Where an operated tower aims: the mouse. Tower types can clamp it.
+func _operated_aim_point() -> Vector2:
+	return operator.get_global_mouse_position()
+
 
 ## Nearest living enemy within range.
 func _find_target() -> Enemy:

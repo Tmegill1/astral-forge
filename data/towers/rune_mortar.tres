@@ -1,15 +1,33 @@
-[gd_resource type="Resource" script_class="TowerDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="MortarDefinition" load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scripts/towers/tower_definition.gd" id="1_def"]
+[ext_resource type="Script" path="res://scripts/towers/mortar_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/rune_mortar.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/towers/mortar_tower.tscn" id="3_scene"]
 
 [resource]
 script = ExtResource("1_def")
 id = &"rune_mortar"
 display_name = "Rune Mortar"
 description = "Long-range lobbed shells that hit an area. Great against clusters."
-available = false
 sprite_frames = ExtResource("2_frames")
+sprite_scale = 0.55
+scene = ExtResource("3_scene")
 cost = Dictionary[StringName, int]({
 &"scrap": 15
 })
+max_health = 150.0
+attack_damage = 14.0
+attacks_per_second = 0.5
+attack_range = 420.0
+lv2_cost = Dictionary[StringName, int]({
+&"scrap": 20
+})
+lv3_cost = Dictionary[StringName, int]({
+&"scrap": 30,
+&"aether": 3
+})
+operated_damage_multiplier = 1.35
+operated_fire_rate_multiplier = 1.0
+operated_range_multiplier = 1.15
+ability_name = "Rune Shell"
+ability_cooldown = 15.0

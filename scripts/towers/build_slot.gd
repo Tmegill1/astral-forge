@@ -132,7 +132,7 @@ func build(tower: TowerDefinition) -> bool:
 	if built or locked or not tower.available or not core().stored.spend_all(tower.cost):
 		return false
 	invested = tower.cost.duplicate()
-	built = TOWER_SCENE.instantiate()
+	built = (tower.scene if tower.scene else TOWER_SCENE).instantiate()
 	built.setup(tower)
 	built.position = tower_offset
 	built.projectile_parent = get_parent()

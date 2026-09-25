@@ -15,6 +15,9 @@ const MAX_LEVEL := 3
 @export var sprite_frames: SpriteFrames
 ## Sprite sheets are drawn large; this shrinks them to fit the 64px tile grid.
 @export var sprite_scale: float = 0.55
+## Scene to build for this tower type; empty uses the standard tower scene.
+## Towers with their own behaviour (e.g. the Rune Mortar) set their own.
+@export var scene: PackedScene
 ## Stored resources spent to build it, e.g. {"scrap": 10}.
 @export var cost: Dictionary[StringName, int] = {}
 
