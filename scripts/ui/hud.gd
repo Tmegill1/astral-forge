@@ -13,6 +13,8 @@ extends CanvasLayer
 @onready var core_health_text: Label = %CoreHealthText
 @onready var carried_text: Label = %CarriedText
 @onready var stored_text: Label = %StoredText
+@onready var carried_aether_text: Label = %CarriedAetherText
+@onready var stored_aether_text: Label = %StoredAetherText
 @onready var prompt: Label = %Prompt
 @onready var respawn_text: Label = %RespawnText
 @onready var operate_panel: PanelContainer = %OperatePanel
@@ -78,6 +80,7 @@ func bind_hero(hero: Hero) -> void:
 	_bind_bar(hero.health, health_bar, health_text)
 	var show_carried := func() -> void:
 		carried_text.text = "Carrying %d" % hero.carried.get_amount(Loot.SCRAP)
+		carried_aether_text.text = str(hero.carried.get_amount(Loot.AETHER))
 	hero.carried.changed.connect(show_carried)
 	show_carried.call()
 	hero.interact_prompt_changed.connect(func(text: String) -> void: prompt.text = text)
@@ -88,6 +91,7 @@ func bind_core(core: CommandCore) -> void:
 	_bind_bar(core.health, core_health_bar, core_health_text)
 	var show_stored := func() -> void:
 		stored_text.text = "Stored %d" % core.stored.get_amount(Loot.SCRAP)
+		stored_aether_text.text = str(core.stored.get_amount(Loot.AETHER))
 	core.stored.changed.connect(show_stored)
 	show_stored.call()
 
