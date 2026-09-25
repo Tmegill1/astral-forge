@@ -215,7 +215,7 @@ func _raise_walls() -> void:
 
 ## Where each wall piece goes (world positions): two runs out from the
 ## tower at right angles to the Core direction, each ending in a piece
-## that turns back toward the middle.
+## that turns back toward the middle (unless wall_return is 0).
 func _plan_walls() -> Array[Dictionary]:
 	var origin := global_position + tower_offset
 	var to_core := core().global_position - origin
@@ -227,7 +227,9 @@ func _plan_walls() -> Array[Dictionary]:
 		var start: Vector2 = origin + along * side * wall_start
 		var corner: Vector2 = origin + along * side * wall_length
 		plan.append_array(_plan_segment(start, corner))
-		plan.append_array(_plan_segment(corner, corner + inward * wall_return))
+		# wall_return 0 (the slot ring) means a straight run, not a zero-length piece.
+		if wall_return > 0.0:
+			plan.append_array(_plan_segment(corner, corner + inward * wall_return))
 	return plan
 
 
