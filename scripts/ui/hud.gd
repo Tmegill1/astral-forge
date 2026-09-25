@@ -37,7 +37,7 @@ func _process(_delta: float) -> void:
 	if tower == null:
 		return
 	var def := tower.definition
-	operate_title.text = "Operating %s" % def.display_name
+	operate_title.text = "Operating %s Lv%d" % [def.display_name, tower.level]
 	operate_stats.text = "Damage %.0f · %.1f shots/s · Range %.0f" % [
 		tower.damage(), tower.fire_rate(), tower.attack_range()]
 	if tower.ability_active_left() > 0.0:

@@ -48,8 +48,8 @@ lv2_cost = Dictionary[StringName, int]({
 &"scrap": 15
 })
 lv3_cost = Dictionary[StringName, int]({
-&"aether": 3,
-&"scrap": 25
+&"scrap": 25,
+&"aether": 3
 })
 max_health = 150.0
 attack_damage = 8.0
