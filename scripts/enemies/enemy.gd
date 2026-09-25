@@ -31,6 +31,9 @@ var _path_version := -1
 var _repath_left := 0.0
 ## True when the last path couldn't get within reach of the goal.
 var _blocked := false
+## Movement is multiplied by this while slowed (1 = normal).
+var _slow_factor := 1.0
+var _slow_left := 0.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var health: Health = $Health
@@ -63,6 +66,10 @@ func _physics_process(delta: float) -> void:
 		return
 	_cooldown -= delta
 	_repath_left -= delta
+	if _slow_left > 0.0:
+		_slow_left -= delta
+		if _slow_left <= 0.0:
+			_slow_factor = 1.0
 	var goal := _pick_target()
 	if goal == null:
 		sprite.play(&"idle")
@@ -87,12 +94,23 @@ func _physics_process(delta: float) -> void:
 
 	var step_to := _next_waypoint()
 	var direction := (step_to - global_position).normalized()
-	velocity = direction * definition.move_speed
+	velocity = direction * definition.move_speed * _slow_factor
 	move_and_slide()
 	if absf(direction.x) > 0.1:
 		sprite.flip_h = direction.x < 0.0
 	if not _is_attacking():
 		sprite.play(&"walk")
+
+
+## Slows movement to `factor` (0.6 = 60% speed) for `seconds`. The strongest
+## slow wins; a new one refreshes the time.
+func slow(factor: float, seconds: float) -> void:
+	_slow_factor = minf(_slow_factor, factor) if _slow_left > 0.0 else factor
+	_slow_left = maxf(_slow_left, seconds)
+
+
+func speed_multiplier() -> float:
+	return _slow_factor
 
 
 func _needs_repath(goal: Node2D) -> bool:
