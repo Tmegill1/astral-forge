@@ -27,6 +27,16 @@ func reset(new_max: float = max_health) -> void:
 	changed.emit(current, max_health)
 
 
+## Changes the maximum but keeps the same amount of missing health
+## (an upgrade adds the new health on top). Does nothing when dead.
+func grow_max(new_max: float) -> void:
+	if is_dead:
+		return
+	current = maxf(current + new_max - max_health, 1.0)
+	max_health = new_max
+	changed.emit(current, max_health)
+
+
 func take_damage(amount: float) -> void:
 	if is_dead or invulnerable or amount <= 0.0:
 		return

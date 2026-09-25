@@ -72,7 +72,7 @@ func _ready() -> void:
 	health_bar.place_above(sprite)
 	_head = definition.head_for(level)
 	_setup_head()
-	health.reset(definition.max_health)
+	health.reset(definition.max_health_at(level))
 	health.died.connect(_on_died)
 	var core := get_tree().get_first_node_in_group(&"core") as Node2D
 	if core:
@@ -112,14 +112,14 @@ func _physics_process(delta: float) -> void:
 # --- Current stats (operating and the ability change them) ---
 
 func damage() -> float:
-	var value := definition.attack_damage
+	var value := definition.damage_at(level)
 	if operator:
 		value *= definition.operated_damage_multiplier
 	return value
 
 
 func fire_rate() -> float:
-	var value := definition.attacks_per_second
+	var value := definition.fire_rate_at(level)
 	if operator:
 		value *= definition.operated_fire_rate_multiplier
 	if _ability_left > 0.0:
@@ -128,10 +128,25 @@ func fire_rate() -> float:
 
 
 func attack_range() -> float:
-	var value := definition.attack_range
+	var value := definition.range_at(level)
 	if operator:
 		value *= definition.operated_range_multiplier
 	return value
+
+
+# --- Levels ---
+
+## Switches to another level: stats, health (keeping the damage taken) and
+## art. BuildSlot.upgrade() pays for it.
+func set_level(new_level: int) -> void:
+	level = clampi(new_level, 1, TowerDefinition.MAX_LEVEL)
+	health.grow_max(definition.max_health_at(level))
+	_head = definition.head_for(level)
+	sprite.visible = true
+	_setup_head()
+	_show(&"idle")
+	health_bar.place_above(sprite)
+	queue_redraw()
 
 
 # --- Operating ---
