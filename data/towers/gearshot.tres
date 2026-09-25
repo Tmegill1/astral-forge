@@ -1,10 +1,14 @@
-[gd_resource type="Resource" script_class="TowerDefinition" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="TowerDefinition" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/towers/tower_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/gearshot.tres" id="2_frames"]
 [ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv1_base.png" id="3_base"]
 [ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv1_head.png" id="4_head"]
 [ext_resource type="Script" path="res://scripts/towers/turret_head.gd" id="5_head"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv2_base.png" id="6_base2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv2_head.png" id="7_head2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv3_base.png" id="8_base3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv3_head.png" id="9_head3"]
 
 [sub_resource type="Resource" id="TurretHead_lv1"]
 script = ExtResource("5_head")
@@ -13,6 +17,22 @@ head_texture = ExtResource("4_head")
 pivot = Vector2(-3, -77)
 drawn_angle = -111.0
 barrel_length = 63.0
+
+[sub_resource type="Resource" id="TurretHead_lv2"]
+script = ExtResource("5_head")
+base_texture = ExtResource("6_base2")
+head_texture = ExtResource("7_head2")
+pivot = Vector2(0, -97)
+drawn_angle = -97.0
+barrel_length = 64.0
+
+[sub_resource type="Resource" id="TurretHead_lv3"]
+script = ExtResource("5_head")
+base_texture = ExtResource("8_base3")
+head_texture = ExtResource("9_head3")
+pivot = Vector2(-3, -100)
+drawn_angle = -93.0
+barrel_length = 85.0
 
 [resource]
 script = ExtResource("1_def")
@@ -36,7 +56,7 @@ attack_damage = 8.0
 attacks_per_second = 1.5
 attack_range = 260.0
 projectile_speed = 650.0
-heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv1")])
+heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv1"), SubResource("TurretHead_lv2"), SubResource("TurretHead_lv3")])
 head_turn_speed = 720.0
 aim_angles = PackedFloat32Array(-63, -45, -90, -149)
 muzzle_height = 50.0

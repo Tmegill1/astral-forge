@@ -26,6 +26,12 @@ TURRETS = {
     "gearshot_lv1": dict(sheet="assets/sprites/gearshot.png", cell=(192, 288), frame=(0, 2),
                          pivot=(93, 205), radius=33, tip=(70, 146), barrel_half_width=21,
                          base_extent=(60, 44)),
+    "gearshot_lv2": dict(sheet="assets/sprites/gearshot.png", cell=(192, 288), frame=(3, 2),
+                         pivot=(96, 185), radius=43, tip=(88, 122), barrel_half_width=28,
+                         base_extent=(60, 50)),
+    "gearshot_lv3": dict(sheet="assets/sprites/gearshot.png", cell=(192, 288), frame=(6, 2),
+                         pivot=(93, 182), radius=43, tip=(88, 97), barrel_half_width=30,
+                         base_extent=(60, 50)),
 }
 
 
