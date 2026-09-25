@@ -1,8 +1,9 @@
 extends Node2D
 ## Runs one game: spawns the selected hero, keeps it and the camera inside
-## the painted map, runs the waves, scatters scrap heaps each break, drops
-## loot, handles the hero falling and respawning, and ends the run when the
-## Command Core falls (defeat) or the last wave is cleared (victory).
+## the painted map, runs the waves, scatters scrap heaps and Aether crystals
+## each break, drops loot, handles the hero falling and respawning, and ends
+## the run when the Command Core falls (defeat) or the last wave is cleared
+## (victory).
 
 const HERO_SCENE := preload("res://scenes/heroes/hero.tscn")
 const HEAP_SCENE := preload("res://scenes/loot/resource_heap.tscn")
@@ -10,6 +11,8 @@ const HEAP_SCENE := preload("res://scenes/loot/resource_heap.tscn")
 const HEAP_MIN_DISTANCE := 380.0
 ## Heaps get 1 more Scrap per this many pixels from the Core.
 const HEAP_DISTANCE_PER_SCRAP := 250.0
+## Aether crystals never appear closer to the Core than this, in pixels.
+const AETHER_MIN_DISTANCE := 800.0
 ## How far inside the map edge the hero's feet must stay, in pixels.
 const EDGE_MARGIN := 24.0
 
@@ -76,24 +79,46 @@ func _unhandled_input(event: InputEvent) -> void:
 		waves.start_wave_now()
 
 
-## Drops scrap heaps at random open spots away from the Core; farther ones
-## hold more, rewarding the risk of going out.
+## Each break: Scrap heaps at random open spots away from the Core (farther
+## ones hold more, rewarding the risk of going out), plus a few Aether
+## crystals only far from the Core.
 func _scatter_heaps(map: Rect2) -> void:
+	var run := waves.run
+	var scrap_room := run.max_heaps - _heaps_of(Loot.SCRAP).size()
+	_place_heaps(map, Loot.SCRAP, mini(run.heaps_per_break, scrap_room), HEAP_MIN_DISTANCE,
+			func(distance: float) -> int: return 3 + floori(distance / HEAP_DISTANCE_PER_SCRAP))
+	var aether_room := run.max_aether - _heaps_of(Loot.AETHER).size()
+	var aether_count := randi_range(run.aether_per_break.x, run.aether_per_break.y)
+	_place_heaps(map, Loot.AETHER, mini(aether_count, aether_room), AETHER_MIN_DISTANCE,
+			func(_distance: float) -> int: return randi_range(run.aether_amount.x, run.aether_amount.y))
+
+
+## Heaps of one resource type currently on the map.
+func _heaps_of(type: StringName) -> Array:
+	return get_tree().get_nodes_in_group(&"resource_heaps").filter(
+			func(heap: ResourceHeap) -> bool: return heap.type == type)
+
+
+## Places up to `count` heaps of `type` at random open spots at least
+## `min_distance` from the Core and apart from other heaps.
+## `amount_for(distance)` decides how much each one holds.
+func _place_heaps(map: Rect2, type: StringName, count: int, min_distance: float,
+		amount_for: Callable) -> void:
 	var placed := 0
 	var tries := 0
 	var inner := map.grow(-60.0)
-	var room := waves.run.max_heaps - get_tree().get_nodes_in_group(&"resource_heaps").size()
-	while placed < mini(waves.run.heaps_per_break, room) and tries < 200:
+	while placed < count and tries < 200:
 		tries += 1
 		var at := Vector2(randf_range(inner.position.x, inner.end.x), randf_range(inner.position.y, inner.end.y))
 		var distance := at.distance_to(core.global_position)
-		if distance < HEAP_MIN_DISTANCE or nav.is_solid_at(at):
+		if distance < min_distance or nav.is_solid_at(at):
 			continue
 		if get_tree().get_nodes_in_group(&"resource_heaps").any(
 				func(h: Node2D) -> bool: return h.global_position.distance_to(at) < 120.0):
 			continue
 		var heap: ResourceHeap = HEAP_SCENE.instantiate()
-		heap.amount = 3 + floori(distance / HEAP_DISTANCE_PER_SCRAP)
+		heap.type = type
+		heap.amount = amount_for.call(distance)
 		heap.position = at
 		units.add_child(heap)
 		placed += 1
@@ -104,6 +129,10 @@ func _on_enemy_killed(enemy: Enemy) -> void:
 	var drops := enemy.definition.drops
 	for type in drops:
 		Loot.drop(units, enemy.global_position, type, randi_range(drops[type].x, drops[type].y))
+	var rare := enemy.definition.rare_drops
+	for type in rare:
+		if randf() < rare[type]:
+			Loot.drop(units, enemy.global_position, type, 1)
 
 
 func _on_hero_died() -> void:
