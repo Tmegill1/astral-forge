@@ -5,7 +5,7 @@ extends Node2D
 ## Command Core falls (defeat) or the last wave is cleared (victory).
 
 const HERO_SCENE := preload("res://scenes/heroes/hero.tscn")
-const HEAP_SCENE := preload("res://scenes/loot/scrap_heap.tscn")
+const HEAP_SCENE := preload("res://scenes/loot/resource_heap.tscn")
 ## Scrap heaps never appear closer to the Core than this, in pixels.
 const HEAP_MIN_DISTANCE := 380.0
 ## Heaps get 1 more Scrap per this many pixels from the Core.
@@ -82,17 +82,17 @@ func _scatter_heaps(map: Rect2) -> void:
 	var placed := 0
 	var tries := 0
 	var inner := map.grow(-60.0)
-	var room := waves.run.max_heaps - get_tree().get_nodes_in_group(&"scrap_heaps").size()
+	var room := waves.run.max_heaps - get_tree().get_nodes_in_group(&"resource_heaps").size()
 	while placed < mini(waves.run.heaps_per_break, room) and tries < 200:
 		tries += 1
 		var at := Vector2(randf_range(inner.position.x, inner.end.x), randf_range(inner.position.y, inner.end.y))
 		var distance := at.distance_to(core.global_position)
 		if distance < HEAP_MIN_DISTANCE or nav.is_solid_at(at):
 			continue
-		if get_tree().get_nodes_in_group(&"scrap_heaps").any(
+		if get_tree().get_nodes_in_group(&"resource_heaps").any(
 				func(h: Node2D) -> bool: return h.global_position.distance_to(at) < 120.0):
 			continue
-		var heap: ScrapHeap = HEAP_SCENE.instantiate()
+		var heap: ResourceHeap = HEAP_SCENE.instantiate()
 		heap.amount = 3 + floori(distance / HEAP_DISTANCE_PER_SCRAP)
 		heap.position = at
 		units.add_child(heap)

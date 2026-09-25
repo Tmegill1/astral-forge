@@ -1,11 +1,11 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/loot/scrap_heap.gd" id="1_heap"]
+[ext_resource type="Script" path="res://scripts/loot/resource_heap.gd" id="1_heap"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
 radius = 30.0
 
-[node name="ScrapHeap" type="Node2D" groups=["scrap_heaps"]]
+[node name="ResourceHeap" type="Node2D" groups=["resource_heaps"]]
 script = ExtResource("1_heap")
 
 [node name="Pieces" type="Node2D" parent="."]
