@@ -34,6 +34,10 @@ var _blocked := false
 ## Movement is multiplied by this while slowed (1 = normal).
 var _slow_factor := 1.0
 var _slow_left := 0.0
+## Burn: each stack deals _burn_dps per second until _burn_left runs out.
+var _burn_stacks := 0
+var _burn_dps := 0.0
+var _burn_left := 0.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var health: Health = $Health
@@ -64,6 +68,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if health.is_dead:
 		return
+	if _burn_stacks > 0:
+		_tick_burn(delta)
+		if health.is_dead:
+			return
 	_cooldown -= delta
 	_repath_left -= delta
 	if _slow_left > 0.0:
@@ -114,6 +122,31 @@ func slow(factor: float, seconds: float) -> void:
 
 func speed_multiplier() -> float:
 	return _slow_factor
+
+
+## Sets it burning: adds `stacks` (capped at max_stacks), each dealing
+## dps_per_stack per second, and restarts the timer. When sources differ, the
+## strongest damage per stack wins.
+func add_burn(dps_per_stack: float, max_stacks: int, seconds: float, stacks := 1) -> void:
+	if health.is_dead:
+		return
+	_burn_dps = maxf(_burn_dps, dps_per_stack) if _burn_stacks > 0 else dps_per_stack
+	_burn_stacks = mini(_burn_stacks + stacks, max_stacks)
+	_burn_left = seconds
+
+
+func burn_stacks() -> int:
+	return _burn_stacks
+
+
+func _tick_burn(delta: float) -> void:
+	health.take_damage(_burn_stacks * _burn_dps * minf(delta, _burn_left))
+	_burn_left -= delta
+	if _burn_left <= 0.0:
+		_burn_stacks = 0
+	# Flickers orange while burning.
+	var glow := (0.25 + 0.1 * sin(Time.get_ticks_msec() * 0.02)) if _burn_stacks > 0 else 0.0
+	sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), glow)
 
 
 func _needs_repath(goal: Node2D) -> bool:
@@ -235,6 +268,8 @@ func _on_animation_finished() -> void:
 
 
 func _on_died() -> void:
+	_burn_stacks = 0
+	sprite.modulate = Color.WHITE
 	velocity = Vector2.ZERO
 	# Stop catching bolts; deferred because this can fire mid-physics.
 	hurtbox.set_deferred(&"collision_layer", 0)
