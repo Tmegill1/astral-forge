@@ -72,43 +72,67 @@ func _can_fire() -> bool:
 
 ## Every living enemy whose body is inside the cone pointed at `point`.
 func _enemies_in_cone(point: Vector2) -> Array[Enemy]:
+	var enemies := _living_enemies()
+	var hits: Array[Enemy] = []
+	for i in _cone_hits(point, _body_points(enemies), attack_range(), deg_to_rad(cone_angle()) / 2.0):
+		hits.append(enemies[i])
+	return hits
+
+
+## The enemy in range whose cone would catch the most enemies (nearest wins
+## ties). Reach, cone and enemy positions are worked out once per search.
+func _find_target() -> Enemy:
+	var enemies := _living_enemies()
+	var points := _body_points(enemies)
+	var reach := attack_range()
+	var half := deg_to_rad(cone_angle()) / 2.0
+	var best: Enemy = null
+	var best_count := 0
+	var best_distance := INF
+	for i in enemies.size():
+		var distance := _muzzle_facing(points[i].x < global_position.x).distance_to(points[i])
+		if distance > reach:
+			continue
+		var count := _cone_hits(points[i], points, reach, half).size()
+		if count > best_count or (count == best_count and distance < best_distance):
+			best = enemies[i]
+			best_count = count
+			best_distance = distance
+	return best
+
+
+func _living_enemies() -> Array[Enemy]:
+	var result: Array[Enemy] = []
+	for node in get_tree().get_nodes_in_group(&"enemies"):
+		var enemy := node as Enemy
+		if not enemy.health.is_dead:
+			result.append(enemy)
+	return result
+
+
+## Where the flame aims on each enemy (its body).
+func _body_points(enemies: Array[Enemy]) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for enemy in enemies:
+		points.append(_aim_point(enemy))
+	return points
+
+
+## Indices of the `points` inside a cone aimed at `point`, reaching `reach`
+## from the muzzle and `half` radians either side of its centre line.
+func _cone_hits(point: Vector2, points: PackedVector2Array, reach: float, half: float) -> PackedInt32Array:
 	var left := point.x < global_position.x
 	var muzzle := _muzzle_facing(left)
 	var direction := point - muzzle
 	if direction.length() < 0.001:
 		direction = Vector2.LEFT if left else Vector2.RIGHT
-	var half := deg_to_rad(cone_angle()) / 2.0
-	var result: Array[Enemy] = []
-	for node in get_tree().get_nodes_in_group(&"enemies"):
-		var enemy := node as Enemy
-		if enemy.health.is_dead:
-			continue
-		var to_enemy := _aim_point(enemy) - muzzle
-		if to_enemy.length() <= attack_range() and absf(direction.angle_to(to_enemy)) <= half:
-			result.append(enemy)
-	return result
-
-
-## The enemy in range whose cone would catch the most enemies (nearest wins
-## ties).
-func _find_target() -> Enemy:
-	var best: Enemy = null
-	var best_count := 0
-	var best_distance := INF
-	for node in get_tree().get_nodes_in_group(&"enemies"):
-		var enemy := node as Enemy
-		if enemy.health.is_dead:
-			continue
-		var point := _aim_point(enemy)
-		var distance := _muzzle_facing(point.x < global_position.x).distance_to(point)
-		if distance > attack_range():
-			continue
-		var count := _enemies_in_cone(point).size()
-		if count > best_count or (count == best_count and distance < best_distance):
-			best = enemy
-			best_count = count
-			best_distance = distance
-	return best
+	var reach_squared := reach * reach
+	var hits := PackedInt32Array()
+	for i in points.size():
+		var to_point := points[i] - muzzle
+		if to_point.length_squared() <= reach_squared and absf(direction.angle_to(to_point)) <= half:
+			hits.append(i)
+	return hits
 
 
 func _aim_at(point: Vector2) -> void:
