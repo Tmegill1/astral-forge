@@ -35,7 +35,9 @@ Status: design approved in chat
   it) contains the most living goblins; ties go to the nearest.
 - Aim = the target's position (no leading; the flame is instant).
 - The sprite faces the aim side (mirrored when it's to the left; the art
-  faces right). The fire animation plays while spraying; idle otherwise.
+  faces right). While spraying it holds the first fire frame (the glowing
+  barrel), because the later frames' flames are clipped and the drawn cone is the
+  flame. Otherwise it shows idle.
 
 ### Operated
 - The cone points at the mouse. It sprays while fire is held (or auto-fire is
@@ -54,7 +56,8 @@ Status: design approved in chat
 
 ### Architecture
 - `EmberDefinition extends TowerDefinition`
-  (`scripts/towers/ember_definition.gd`) adds `cone_angle`, `fuel_seconds`,
+  (`scripts/towers/ember_definition.gd`) adds `cone_angle`, `muzzle_offset`
+  (where the flame starts, facing right), `fuel_seconds`,
   `refill_seconds`, `restart_fraction`, `burn_dps_per_stack`,
   `burn_max_stacks`, `burn_duration`, `overpressure_angle_multiplier`,
   `overpressure_range_multiplier`. It reuses `attacks_per_second` as the tick
@@ -65,6 +68,8 @@ Status: design approved in chat
   `_find_target`, `_aim_at`, `_fire_at`, `use_ability`, `_draw`, and extends
   `_physics_process` to refill fuel when it didn't fire this frame, switch
   idle/fire animation, and redraw.
+- Base `Tower`: when a sheet has no `lvN_destroyed` (the Embercaster's has
+  one `destroyed`), the wreck falls back to `destroyed`.
 - Base `Tower` gains one hook, `_can_fire() -> bool` (default `true`), checked
   before firing. The Embercaster returns false while locked out for fuel. The
   Gearshot and Mortar are unchanged.
