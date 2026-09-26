@@ -105,7 +105,9 @@ func _physics_process(delta: float) -> void:
 	_aim_at(aim_point)
 	_turn_head(delta)
 	if wants_to_fire and _cooldown <= 0.0 and _head_on_target() and _can_fire():
-		_cooldown = 1.0 / fire_rate()
+		# Carry over the part of a frame the last shot overshot, so shots
+		# average exactly fire_rate(); after a longer pause, start fresh.
+		_cooldown = (_cooldown if _cooldown > -delta else 0.0) + 1.0 / fire_rate()
 		_fire_at(aim_point)
 
 
