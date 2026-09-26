@@ -38,6 +38,8 @@ var _slow_left := 0.0
 var _burn_stacks := 0
 var _burn_dps := 0.0
 var _burn_left := 0.0
+## While above 0 it can't move or attack.
+var _stun_left := 0.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var health: Health = $Health
@@ -72,12 +74,18 @@ func _physics_process(delta: float) -> void:
 		_tick_burn(delta)
 		if health.is_dead:
 			return
+	_update_tint()
 	_cooldown -= delta
 	_repath_left -= delta
 	if _slow_left > 0.0:
 		_slow_left -= delta
 		if _slow_left <= 0.0:
 			_slow_factor = 1.0
+	if _stun_left > 0.0:
+		_stun_left -= delta
+		velocity = Vector2.ZERO
+		sprite.play(&"idle")
+		return
 	var goal := _pick_target()
 	if goal == null:
 		velocity = Vector2.ZERO
@@ -139,14 +147,33 @@ func burn_stacks() -> int:
 	return _burn_stacks
 
 
+## Stops it moving and attacking for `seconds`. The longer stun wins.
+func stun(seconds: float) -> void:
+	if health.is_dead:
+		return
+	_stun_left = maxf(_stun_left, seconds)
+
+
+func is_stunned() -> bool:
+	return _stun_left > 0.0
+
+
+## Stun (pale blue) shows over burn (orange); both flicker.
+func _update_tint() -> void:
+	var flicker := sin(Time.get_ticks_msec() * 0.02)
+	if _stun_left > 0.0:
+		sprite.modulate = Color.WHITE.lerp(Color(0.6, 0.85, 1.0), 0.45 + 0.15 * flicker)
+	elif _burn_stacks > 0:
+		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), 0.25 + 0.1 * flicker)
+	else:
+		sprite.modulate = Color.WHITE
+
+
 func _tick_burn(delta: float) -> void:
 	health.take_damage(_burn_stacks * _burn_dps * minf(delta, _burn_left))
 	_burn_left -= delta
 	if _burn_left <= 0.0:
 		_burn_stacks = 0
-	# Flickers orange while burning.
-	var glow := (0.25 + 0.1 * sin(Time.get_ticks_msec() * 0.02)) if _burn_stacks > 0 else 0.0
-	sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), glow)
 
 
 func _needs_repath(goal: Node2D) -> bool:
@@ -269,6 +296,7 @@ func _on_animation_finished() -> void:
 
 func _on_died() -> void:
 	_burn_stacks = 0
+	_stun_left = 0.0
 	sprite.modulate = Color.WHITE
 	velocity = Vector2.ZERO
 	# Stop catching bolts; deferred because this can fire mid-physics.
