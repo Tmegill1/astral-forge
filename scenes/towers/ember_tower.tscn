@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/towers/tower.tscn" id="1_tower"]
+[ext_resource type="Script" path="res://scripts/towers/ember_tower.gd" id="2_ember"]
+
+[sub_resource type="Gradient" id="Gradient_embers"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 0.9, 0.5, 1, 1, 0.45, 0.1, 0.9, 0.6, 0.1, 0.05, 0)
+
+[node name="EmberTower" instance=ExtResource("1_tower")]
+script = ExtResource("2_ember")
+
+[node name="Embers" type="CPUParticles2D" parent="."]
+z_index = 1
+emitting = false
+amount = 40
+lifetime = 0.35
+direction = Vector2(1, 0)
+spread = 25.0
+gravity = Vector2(0, -60)
+initial_velocity_min = 250.0
+initial_velocity_max = 430.0
+scale_amount_min = 2.0
+scale_amount_max = 4.0
+color_ramp = SubResource("Gradient_embers")

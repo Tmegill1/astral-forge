@@ -104,7 +104,7 @@ func _physics_process(delta: float) -> void:
 		wants_to_fire = true
 	_aim_at(aim_point)
 	_turn_head(delta)
-	if wants_to_fire and _cooldown <= 0.0 and _head_on_target():
+	if wants_to_fire and _cooldown <= 0.0 and _head_on_target() and _can_fire():
 		_cooldown = 1.0 / fire_rate()
 		_fire_at(aim_point)
 
@@ -200,7 +200,9 @@ func _on_died() -> void:
 	head.visible = false
 	sprite.visible = true
 	sprite.flip_h = false
-	sprite.animation = StringName("lv%d_destroyed" % level)
+	# Some sheets have one wreck for every level.
+	var wreck := StringName("lv%d_destroyed" % level)
+	sprite.animation = wreck if sprite.sprite_frames.has_animation(wreck) else &"destroyed"
 	sprite.stop()
 	sprite.frame = 0
 	queue_redraw()
@@ -234,6 +236,11 @@ func ability_cooldown_left() -> float:
 ## Where an operated tower aims: the mouse. Tower types can clamp it.
 func _operated_aim_point() -> Vector2:
 	return operator.get_global_mouse_position()
+
+
+## False blocks firing (e.g. an Embercaster whose tank ran dry).
+func _can_fire() -> bool:
+	return true
 
 
 ## Nearest living enemy within range.
