@@ -63,8 +63,9 @@ Status: design approved in chat
 - `SpireDefinition extends TowerDefinition`
   (`scripts/towers/spire_definition.gd`) adds `jump_count` (4), `jump_range`
   (120), `jump_falloff` (0.2), `burst_damage_multiplier` (2),
-  `burst_jump_count` (8), `burst_stun` (1.0), `bolt_origin` (the crystal tip
-  relative to the base point, calibrated by screenshot). It reuses
+  `burst_jump_count` (8), `burst_stun` (1.0), `bolt_heights` (how high the
+  crystal tip is above the base point, per level, since the Lv3 crystal is
+  taller; calibrated by screenshot). It reuses
   `attack_damage`, `attacks_per_second`, `attack_range` and the `ability_*`
   fields (`ability_name` "Resonance Burst", `ability_cooldown` 15).
 - `SpireTower extends Tower` (`scripts/towers/spire_tower.gd`;
