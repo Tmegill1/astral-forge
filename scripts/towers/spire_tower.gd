@@ -70,6 +70,12 @@ func chain_from(first: Enemy, jumps: int) -> Array[Enemy]:
 	return chain
 
 
+## Operated, only fire when a bolt would hit something, so holding fire
+## before enemies arrive doesn't waste the recharge.
+func _can_fire() -> bool:
+	return operator == null or _first_target(_operated_aim_point()) != null
+
+
 func _fire_at(point: Vector2) -> void:
 	var first := _first_target(point)
 	if first:
