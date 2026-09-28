@@ -5,6 +5,8 @@ extends Tower
 ## (clamped to its minimum and maximum range) and Q fires a Rune Shell.
 ## It can't hit anything closer than min_range.
 
+const SHELL_SCENE := preload("res://scenes/projectiles/shell.tscn")
+
 var mortar: MortarDefinition
 ## Which way the barrel faces (the art faces right).
 var _facing_left := false
@@ -99,7 +101,7 @@ func use_ability() -> void:
 
 
 func _launch(point: Vector2, shell_damage: float, radius: float, rune_duration: float) -> void:
-	var shell := Shell.new()
+	var shell: Shell = SHELL_SCENE.instantiate()
 	shell.from = _muzzle_base()
 	shell.target = point
 	shell.flight_time = mortar.shell_flight_time

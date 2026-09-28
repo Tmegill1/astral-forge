@@ -9,6 +9,7 @@ extends Tower
 
 ## How long the charge frame shows after a bolt, in seconds.
 const CHARGE_FRAME_TIME := 0.2
+const ARC_SCENE := preload("res://scenes/projectiles/lightning_arc.tscn")
 
 var spire: SpireDefinition
 
@@ -107,7 +108,7 @@ func _strike(chain: Array[Enemy], bolt_damage: float, falloff: float, stun: floa
 		if stun > 0.0:
 			enemy.stun(stun)
 		hit_damage *= 1.0 - falloff
-	var arc := LightningArc.new()
+	var arc: LightningArc = ARC_SCENE.instantiate()
 	arc.points = points
 	arc.burst = stun > 0.0
 	projectile_parent.add_child(arc)

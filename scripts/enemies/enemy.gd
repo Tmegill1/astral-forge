@@ -12,6 +12,7 @@ signal killed(enemy: Enemy)
 
 ## Seconds a body stays on the ground before fading out.
 const CORPSE_TIME := 1.5
+const SPARK_SCENE := preload("res://scenes/effects/armor_spark.tscn")
 ## Paths are recomputed at least this often, in seconds.
 const REPATH_TIME := 0.75
 ## A waypoint counts as reached within this distance, in pixels.
@@ -176,7 +177,7 @@ func _update_tint() -> void:
 func _on_damaged(_dealt: float, type: int, blocked: float) -> void:
 	if type != Health.DamageType.PHYSICAL or blocked <= 0.0:
 		return
-	var spark := ArmorSpark.new()
+	var spark: ArmorSpark = SPARK_SCENE.instantiate()
 	get_parent().add_child(spark)
 	spark.global_position = hurtbox_shape.global_position
 

@@ -20,7 +20,6 @@ var _left := 0.15
 
 
 func _ready() -> void:
-	z_index = 1
 	_life = 0.25 if burst else 0.15
 	_left = _life
 

@@ -9,6 +9,7 @@ extends Node2D
 signal hit(damage: float, killed: bool)
 
 const BLAST_TIME := 0.25
+const RUNE_CIRCLE_SCENE := preload("res://scenes/projectiles/rune_circle.tscn")
 
 var from := Vector2.ZERO
 var target := Vector2.ZERO
@@ -28,7 +29,6 @@ var _blast_left := 0.0
 
 func _ready() -> void:
 	global_position = from
-	z_index = 5
 
 
 func _physics_process(delta: float) -> void:
@@ -54,7 +54,7 @@ func _land() -> void:
 		var dealt := enemy.health.take_damage(damage, Health.DamageType.MAGIC)
 		hit.emit(dealt, enemy.health.is_dead)
 	if rune_duration > 0.0:
-		var circle := RuneCircle.new()
+		var circle: RuneCircle = RUNE_CIRCLE_SCENE.instantiate()
 		circle.radius = radius
 		circle.duration = rune_duration
 		circle.slow = rune_slow

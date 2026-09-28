@@ -11,7 +11,6 @@ var _angles := PackedFloat32Array()
 
 
 func _ready() -> void:
-	z_index = 1
 	for i in RAYS:
 		_angles.append(randf() * TAU)
 
