@@ -108,8 +108,6 @@ func _launch(point: Vector2, shell_damage: float, radius: float, rune_duration: 
 	shell.radius = radius
 	shell.rune_duration = rune_duration
 	shell.rune_slow = mortar.rune_slow
-	if operator:
-		shell.hit.connect(func(dealt: float, _killed: bool) -> void: mastery_xp += dealt)
 	projectile_parent.add_child(shell)
 
 

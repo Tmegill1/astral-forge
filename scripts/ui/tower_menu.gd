@@ -49,8 +49,8 @@ func _refresh() -> void:
 			if wall.health.current < wall.health.max_health:
 				damaged += 1
 	var lost := _slot.walls.size() - standing
-	info.text = "Tower %d / %d health   ·   Mastery %d XP\nWalls: %d standing (%d damaged), %d destroyed" % [
-		ceili(tower.health.current), ceili(tower.health.max_health), floori(tower.mastery_xp),
+	info.text = "Tower %d / %d health\nWalls: %d standing (%d damaged), %d destroyed" % [
+		ceili(tower.health.current), ceili(tower.health.max_health),
 		standing, damaged, lost]
 	_refresh_upgrade(tower)
 	var cost := _slot.repair_cost()

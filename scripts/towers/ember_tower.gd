@@ -156,10 +156,7 @@ func _muzzle_base() -> Vector2:
 func _fire_at(point: Vector2) -> void:
 	var stacks := ember.burn_max_stacks if overpressure_active() else 1
 	for enemy in _enemies_in_cone(point):
-		var before := enemy.health.current
 		enemy.health.take_damage(damage())
-		if operator:
-			mastery_xp += before - enemy.health.current
 		enemy.add_burn(burn_dps(), ember.burn_max_stacks, ember.burn_duration, stacks)
 	var tick_time := 1.0 / fire_rate()
 	_spray_left = tick_time + SPRAY_GRACE

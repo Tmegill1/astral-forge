@@ -21,7 +21,6 @@ extends CanvasLayer
 @onready var operate_title: Label = %OperateTitle
 @onready var operate_stats: Label = %OperateStats
 @onready var ability_text: Label = %AbilityText
-@onready var mastery_text: Label = %MasteryText
 @onready var wave_title: Label = %WaveTitle
 @onready var wave_status: Label = %WaveStatus
 @onready var sector_warnings: SectorWarnings = %SectorWarnings
@@ -46,7 +45,6 @@ func _process(_delta: float) -> void:
 		ability_text.text = "[Q] %s recharging: %ds" % [def.ability_name, ceili(tower.ability_cooldown_left())]
 	else:
 		ability_text.text = "[Q] %s ready" % def.ability_name
-	mastery_text.text = "Mastery %d XP" % floori(tower.mastery_xp)
 
 
 func bind_waves(director: WaveDirector) -> void:

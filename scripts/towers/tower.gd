@@ -5,7 +5,7 @@ extends StaticBody2D
 ##
 ## Automatic: shoots the nearest enemy in range.
 ## Operated (hero pressed Interact on it): aims at the mouse with boosted
-## damage, fire rate and range, can use its ability, and earns Mastery XP.
+## damage, fire rate and range, and can use its ability.
 ## The operating hero can't be hurt; enemies go for the tower instead. If
 ## the tower is destroyed the hero is thrown out and rubble is left behind.
 
@@ -33,8 +33,6 @@ var level := 1
 var projectile_parent: Node
 ## The hero currently operating this tower, or null when automatic.
 var operator: Hero
-## Earned from damage dealt while operated; unlocks evolutions later.
-var mastery_xp := 0.0
 
 var _cooldown := 0.0
 var _aim_frame := 0
@@ -350,8 +348,6 @@ func _fire_at(point: Vector2) -> void:
 	# Operated shots fly exactly the (boosted) range; automatic ones a bit
 	# past it so they can reach a target that walked out while in flight.
 	bolt.max_distance = attack_range() if operator else attack_range() + 60.0
-	if operator:
-		bolt.hit.connect(func(dealt: float, _killed: bool) -> void: mastery_xp += dealt)
 	projectile_parent.add_child(bolt)
 	if _has_head():
 		muzzle_flash.flash(FIRE_FRAME_TIME)
