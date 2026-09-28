@@ -97,7 +97,7 @@ Tuning knobs: respawn time and loss share are on the `World` node (`hero_respawn
 - [x] **[AI]** While controlled: aim with the mouse, **+35% damage, +50% fire rate, +15% range**
 - [x] **[AI]** Camera zooms out **20%** while operating (`operating_zoom` on the Hero)
 - [x] **[AI]** One tower active ability: **Rapid Fire** — Q or right-click, 3× fire rate for 3s, 12s cooldown
-- [x] **[AI]** Tower earns Mastery XP (1 XP per damage dealt while you operate it)
+- [x] ~~**[AI]** Tower earns Mastery XP (1 XP per damage dealt while you operate it)~~ (removed 2026-09-27: replaced by player XP)
 - [x] **[AI]** Clear "you are controlling this" visuals (range ring + operating panel)
 - [ ] **[You]** The big question: **is operating a tower fun?** Would you choose to do it?
 - [ ] **[You]** Balance: range bonus (10–20%?), zoom amount, ability numbers
@@ -156,14 +156,13 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 - [x] **[AI]** Embercaster (short-range flamethrower + burn): 12 Scrap (Lv2 18, Lv3 28 + 3 Aether); 50° cone, 150 px; fuel tank 4 s / 3 s refill, locks out until 40% when dry; burn stacks to 5 × 2/s for 3 s; aims where it hits the most goblins; operated = cone at the mouse; Q = Overpressure (3 s free fuel, bigger cone, max burn)
 - [x] **[AI]** Aether Spire (chain lightning): 14 Scrap (Lv2 20, Lv3 30 + 3 Aether); 10 damage, 0.8/s, 280 range; up to 4 jumps within 120 px, 20% less each jump; nearest goblin first; operated = goblin nearest the mouse; Q = Resonance Burst (2×, 8 jumps, no falloff, 1 s stun)
 - [x] **[AI]** Expand to 12–16 build slots: a ring of 12 (3 per side); 4 open, 8 unlock for 6 Scrap; walls join into one line per side, corners stay open
-- [ ] **[You]** Decide: is Mastery per-tower or per-tower-type?
 - [ ] **[Both]** Playtest after each new tower
 
 ---
 
 ## Phase 9 — More enemies
 
-- [ ] **[AI]** Armored Goblin (resists bullets → need magic)
+- [x] **[AI]** Armored Goblin (resists bullets → need magic) (`goblin_brute` art): takes 30% physical / 60% fire / 100% magic; 60 health, speed 55, 8 per swing; 3–4 Scrap + 10% Aether; waves 3–5. Damage types: Gearshot + hero = physical, Embercaster = fire, Mortar + Spire = magic. Waves are now edited as a node tree in `scenes/waves/first_run.tscn`.
 - [ ] **[AI]** Goblin Shaman (buffs nearby goblins)
 - [ ] **[AI]** Ogre (smashes walls) — *needs art*
 - [ ] **[AI]** Bat (flies over walls) — *needs art*
@@ -177,9 +176,9 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 
 - [ ] **[AI]** Artificer abilities: passive, **Overclock** (boost your tower), **Full Steam** ultimate (share it with all towers)
 - [x] **[AI]** Hero upgrades at the Core (F): Damage, Fire rate, Max health (+20%/rank), Move speed (+8%/rank); 5 ranks costing 12 / 20 / 30 + 1 Aether / 40 + 2 / 55 + 3, from the same stored pool as towers (data in `data/hero_upgrades/`)
-- [ ] **[AI]** Specialized roguelite hero upgrades, picked during a run: chain-lightning shots, flamethrower, and similar
-- [ ] **[AI]** Upgrade choices after waves (pick 1 of 3) — stat ranks now live at the Core; these picks are the specialized ones
-- [ ] **[AI]** One evolution per tower (e.g. Gearshot → Gatling Engine or Rune Cannon)
+- [ ] **[AI]** Player XP earned during a run — **[You]** decide how it's earned (kills, damage, waves survived)
+- [ ] **[AI]** Power-up cards: after waves, pick 1 of 3 cards that make you stronger for the run (chain-lightning shots, flamethrower, and similar)
+- [ ] **[AI]** One evolution per tower (e.g. Gearshot → Gatling Engine or Rune Cannon) — needs a new unlock now Mastery is gone (e.g. a card or Aether)
 - [ ] **[AI]** 10 waves, a mini-boss around wave 6, final boss
 - [ ] **[AI]** Win screen
 - [ ] **[You]** Is a run 12–15 minutes? Do different runs feel different?
@@ -215,7 +214,7 @@ My best guess from looking at them. Names marked **(placeholder)** are the ones 
 | `image-gen-6.png` | `embercaster` — **Embercaster** | lv1–3: idle, fire; destroyed | 8 |
 | `image-gen-7.png` | `aether_spire` — **Aether Spire** | lv1–3: idle, fire; destroyed | 8 |
 | `image-gen-8.png` | `aether_harvester` (placeholder) — swirling crystal tower | lv1–3: idle, pulse; destroyed | 8 |
-| `image-gen-9.png` | `goblin_brute` (placeholder) — brown goblin with blade: Armored Goblin? Saboteur? | idle, walk, attack, hurt, death | 9 |
+| `image-gen-9.png` | `goblin_brute` — **Armored Goblin** (brown goblin with cleaver) | idle, walk, attack, hurt, death | 9 |
 | `image-gen-10.png` | `goblin_shaman` — **Goblin Shaman** | idle, walk, cast, projectile, recover, buff, death | 9 |
 
 ### Art still needed ([You])

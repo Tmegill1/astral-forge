@@ -8,7 +8,7 @@
 script = ExtResource("1_def")
 id = &"rune_mortar"
 display_name = "Rune Mortar"
-description = "Long-range lobbed shells that hit an area. Great against clusters."
+description = "Long-range lobbed rune shells that hit an area. Magic: great against armour and clusters."
 sprite_frames = ExtResource("2_frames")
 sprite_scale = 0.55
 scene = ExtResource("3_scene")
