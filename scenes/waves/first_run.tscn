@@ -1,0 +1,143 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/waves/wave_run.gd" id="1_run"]
+[ext_resource type="Script" path="res://scripts/waves/wave.gd" id="2_wave"]
+[ext_resource type="Script" path="res://scripts/waves/spawn_group.gd" id="3_group"]
+[ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="4_goblin"]
+[ext_resource type="Resource" path="res://data/enemies/armored_goblin.tres" id="5_armored"]
+
+[node name="FirstRun" type="Node"]
+script = ExtResource("1_run")
+
+[node name="Wave1" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 45.0
+
+[node name="GoblinsWest" type="Node" parent="Wave1"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 6
+sector = "west"
+interval = 2.0
+
+[node name="Wave2" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 30.0
+
+[node name="GoblinsWest" type="Node" parent="Wave2"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "west"
+interval = 1.8
+
+[node name="GoblinsNorth" type="Node" parent="Wave2"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "north"
+interval = 1.8
+delay = 4.0
+
+[node name="Wave3" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 30.0
+
+[node name="GoblinsEast" type="Node" parent="Wave3"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 7
+sector = "east"
+interval = 1.5
+
+[node name="GoblinsSouth" type="Node" parent="Wave3"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 7
+sector = "south"
+interval = 1.5
+delay = 3.0
+
+[node name="ArmoredEast" type="Node" parent="Wave3"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 2
+sector = "east"
+interval = 2.5
+
+[node name="Wave4" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 30.0
+
+[node name="GoblinsNorth" type="Node" parent="Wave4"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 6
+sector = "north"
+interval = 1.4
+
+[node name="GoblinsWest" type="Node" parent="Wave4"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 6
+sector = "west"
+interval = 1.4
+delay = 2.0
+
+[node name="GoblinsSouth" type="Node" parent="Wave4"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 6
+sector = "south"
+interval = 1.4
+delay = 4.0
+
+[node name="ArmoredNorth" type="Node" parent="Wave4"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 3
+sector = "north"
+interval = 2.5
+
+[node name="Wave5" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 35.0
+
+[node name="GoblinsNorth" type="Node" parent="Wave5"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 7
+sector = "north"
+interval = 1.2
+
+[node name="GoblinsEast" type="Node" parent="Wave5"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 7
+sector = "east"
+interval = 1.2
+delay = 2.0
+
+[node name="GoblinsSouth" type="Node" parent="Wave5"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 7
+sector = "south"
+interval = 1.2
+delay = 4.0
+
+[node name="GoblinsWest" type="Node" parent="Wave5"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 7
+sector = "west"
+interval = 1.2
+delay = 6.0
+
+[node name="ArmoredSouth" type="Node" parent="Wave5"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 4
+sector = "south"
+interval = 2.5
+delay = 4.0

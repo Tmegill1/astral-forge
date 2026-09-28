@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" path="res://scenes/structures/command_core.tscn" id="4_core"]
 [ext_resource type="Script" uid="uid://dpx3ev83vjtss" path="res://scripts/waves/wave_director.gd" id="5_waves"]
-[ext_resource type="Resource" uid="uid://cadicjoi0g0d2" path="res://data/waves/first_playtest.tres" id="6_run"]
+[ext_resource type="PackedScene" path="res://scenes/waves/first_run.tscn" id="6_waves"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_over.tscn" id="7_game_over"]
 [ext_resource type="PackedScene" path="res://scenes/towers/build_slot.tscn" id="8_build_slot"]
 [ext_resource type="Script" uid="uid://c6q8le2hlir3" path="res://scripts/world/nav_grid.gd" id="9_nav"]
@@ -104,7 +104,7 @@ script = ExtResource("9_nav")
 
 [node name="WaveDirector" type="Node" parent="." unique_id=910477237]
 script = ExtResource("5_waves")
-run = ExtResource("6_run")
+waves_scene = ExtResource("6_waves")
 
 [node name="HUD" parent="." unique_id=55666474 instance=ExtResource("3_hud")]
 

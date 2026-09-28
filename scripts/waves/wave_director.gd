@@ -1,6 +1,6 @@
 class_name WaveDirector
 extends Node
-## Runs the waves in a RunDefinition: a countdown (scavenge and build),
+## Runs the waves from waves_scene: a countdown (scavenge and build),
 ## then the wave's enemies arrive from their sectors; once they're all dead
 ## the next countdown starts. Clearing the last wave wins the run.
 ## Enemies spawn along the middle half of their sector's map edge.
@@ -15,7 +15,12 @@ const ENEMY_SCENE := preload("res://scenes/enemies/enemy.tscn")
 
 enum State { BREAK, WAVE, WON }
 
-@export var run: RunDefinition
+## The run's waves, edited as a node tree (a WaveRun scene in scenes/waves/).
+## Read once when the director is ready.
+@export var waves_scene: PackedScene
+
+## Built from waves_scene.
+var run: RunDefinition
 
 ## Set by the world: the playable map and where enemies go.
 var area: Rect2
@@ -30,6 +35,13 @@ var break_left := 0.0
 var _spawn_queue: Array[Dictionary] = []
 var _wave_time := 0.0
 var _alive: Array[Enemy] = []
+
+
+func _ready() -> void:
+	var tree := waves_scene.instantiate() as WaveRun
+	assert(tree != null, "WaveDirector.waves_scene must be a WaveRun scene")
+	run = tree.to_definition()
+	tree.free()
 
 
 func start() -> void:
