@@ -1,4 +1,4 @@
-# Phase 9, Step 1: Armored Goblin (damage types, and removing Mastery XP)
+# Phase 9, Step 1: Armored Goblin (damage types, editable waves, and removing Mastery XP)
 
 Date: 2026-09-27
 Status: design approved in chat
@@ -12,6 +12,7 @@ Status: design approved in chat
 | Damage types | Physical: Gearshot bullets, hero bolts. Fire: Embercaster flame and burn. Magic: Rune Mortar shells, Aether Spire lightning |
 | Where resistance lives | On `Health`, filled in from the enemy's data |
 | Mastery XP | Removed entirely. Player XP and power-up cards come later (Phase 10), not in this step |
+| Editing waves | A node tree scene (WaveRun → Wave → SpawnGroup) edited in Godot, replacing the nested `.tres` |
 
 ## Design
 
@@ -61,13 +62,53 @@ Status: design approved in chat
   parent, so it outlives the enemy.
 - It never touches the enemy's tint, so it can't clash with burn or stun.
 
-### Waves (`data/waves/first_playtest.tres`)
-Each is a new `WaveGroup` of Armored Goblins in that sector, with the same
-delay as the existing group there and a 2.5 s interval:
-- Wave 3: +2 Armored Goblins, east (delay 0).
-- Wave 4: +3 Armored Goblins, north (delay 0).
-- Wave 5: +4 Armored Goblins, south (delay 4).
-- Waves 1–2 unchanged, leaving time to build a magic tower.
+### Editing waves: a node tree
+Waves move out of `data/waves/first_playtest.tres` (nested sub-resources)
+into a scene you edit in Godot's scene tree and inspector:
+
+```
+FirstRun            (WaveRun: heaps_per_break, max_heaps, aether_* settings)
+├─ Wave1            (Wave: prep_time 45)
+│   └─ GoblinsWest  (SpawnGroup: enemy goblin.tres, count 6, sector west,
+│                    interval 2.0, delay 0)
+├─ Wave2 …
+```
+- `WaveRun extends Node` (`scripts/waves/wave_run.gd`): the scene root. It
+  holds the run-wide settings that `RunDefinition` has today, and its `Wave`
+  children, top to bottom, are the waves in order.
+- `Wave extends Node` (`scripts/waves/wave.gd`): `prep_time`; its
+  `SpawnGroup` children are the wave's groups.
+- `SpawnGroup extends Node` (`scripts/waves/spawn_group.gd`): `enemy`
+  (EnemyDefinition file picker), `count`, `sector` (dropdown: north / east /
+  south / west), `interval`, `delay` — the same fields `WaveGroup` has.
+- Each converts itself to the existing data (`to_definition()` →
+  `RunDefinition` / `WaveDefinition` / `WaveGroup`), so nothing downstream
+  changes (sector warnings, the wave counter, spawning, winning, heaps).
+- `WaveDirector` gets `@export var waves_scene: PackedScene` (set to
+  `scenes/waves/first_run.tscn` in `world.tscn`). In `_ready()` it
+  instantiates the scene, builds `run` from it, and frees the tree. `run`
+  stops being an export. A `SpawnGroup` with no enemy is skipped with a
+  warning in the Output panel; nodes of other types are ignored (so you can
+  park a group under a plain Node to switch it off).
+- `data/waves/first_playtest.tres` is deleted once the scene holds the same
+  waves.
+- Editing: duplicate a wave or group with Ctrl+D, reorder by dragging, pick
+  the enemy file and side in the inspector. Node names are just labels.
+
+### Waves in `scenes/waves/first_run.tscn`
+The existing five waves, exactly as they are now, plus new Armored Goblin
+groups (interval 2.5 s):
+- Wave 1 (prep 45): goblin ×6 west (every 2.0).
+- Wave 2 (prep 30): goblin ×5 west (1.8); goblin ×5 north (1.8, delay 4).
+- Wave 3 (prep 30): goblin ×7 east (1.5); goblin ×7 south (1.5, delay 3);
+  **armored goblin ×2 east (delay 0)**.
+- Wave 4 (prep 30): goblin ×6 north (1.4); goblin ×6 west (1.4, delay 2);
+  goblin ×6 south (1.4, delay 4); **armored goblin ×3 north (delay 0)**.
+- Wave 5 (prep 35): goblin ×7 north (1.2); ×7 east (1.2, delay 2); ×7 south
+  (1.2, delay 4); ×7 west (1.2, delay 6); **armored goblin ×4 south
+  (delay 4)**.
+- Run settings keep today's values (4 heaps per break, max 8; 1–2 Aether
+  crystals per break, max 3, 2–4 Aether each).
 
 ### Removing Mastery XP
 - Delete `Tower.mastery_xp` and every place it's added (Gearshot bolts,
@@ -112,7 +153,12 @@ delay as the existing group there and a 2.5 s interval:
 - Goblin attacks on the Core, a tower and the hero deal the same as before.
 - The Armored Goblin walks, attacks (8 per swing on the swing frame), dies,
   and drops 3–4 Scrap; its animations show at the right size.
+- The waves built from `first_run.tscn` match today's `first_playtest.tres`
+  group for group, plus the new Armored Goblin groups; run settings match.
 - Wave 3 contains 2 Armored Goblins; the wave ends when all are dead.
+- Editing check: duplicating a SpawnGroup (count changed) in the scene adds
+  that group to the wave; a SpawnGroup with no enemy is skipped with a
+  warning, not a crash.
 - No `mastery` references remain in `scripts/` or `scenes/`; the operate
   panel and the F menu show no Mastery text; operating each tower type and
   firing causes no errors.
