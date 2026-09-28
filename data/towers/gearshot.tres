@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="TowerDefinition" load_steps=13 format=3]
+[gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://dk7ysyw6w03im"]
 
-[ext_resource type="Script" path="res://scripts/towers/tower_definition.gd" id="1_def"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/gearshot.tres" id="2_frames"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv1_base.png" id="3_base"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv1_head.png" id="4_head"]
-[ext_resource type="Script" path="res://scripts/towers/turret_head.gd" id="5_head"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv2_base.png" id="6_base2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv2_head.png" id="7_head2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv3_base.png" id="8_base3"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/gearshot_lv3_head.png" id="9_head3"]
+[ext_resource type="Script" uid="uid://bg75n7ym4e1ou" path="res://scripts/towers/tower_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" uid="uid://dj8ebqumbyqy1" path="res://assets/sprites/gearshot.tres" id="2_frames"]
+[ext_resource type="Texture2D" uid="uid://dmumlhqgydmsv" path="res://assets/sprites/towers/gearshot_lv1_base.png" id="3_base"]
+[ext_resource type="Texture2D" uid="uid://cwrbvms3irnka" path="res://assets/sprites/towers/gearshot_lv1_head.png" id="4_head"]
+[ext_resource type="Script" uid="uid://xo0r3s72tg18" path="res://scripts/towers/turret_head.gd" id="5_head"]
+[ext_resource type="Texture2D" uid="uid://citnmpov32p1d" path="res://assets/sprites/towers/gearshot_lv2_base.png" id="6_base2"]
+[ext_resource type="Texture2D" uid="uid://uljp6rcpk25a" path="res://assets/sprites/towers/gearshot_lv2_head.png" id="7_head2"]
+[ext_resource type="Texture2D" uid="uid://bex65kpkkx36q" path="res://assets/sprites/towers/gearshot_lv3_base.png" id="8_base3"]
+[ext_resource type="Texture2D" uid="uid://bih5xmgtanvjg" path="res://assets/sprites/towers/gearshot_lv3_head.png" id="9_head3"]
 
 [sub_resource type="Resource" id="TurretHead_lv1"]
 script = ExtResource("5_head")
@@ -40,7 +40,6 @@ id = &"gearshot"
 display_name = "Gearshot Turret"
 description = "Fast single-target shots. Reliable against swarms of basic goblins."
 sprite_frames = ExtResource("2_frames")
-sprite_scale = 0.55
 cost = Dictionary[StringName, int]({
 &"scrap": 10
 })
@@ -48,16 +47,9 @@ lv2_cost = Dictionary[StringName, int]({
 &"scrap": 15
 })
 lv3_cost = Dictionary[StringName, int]({
-&"scrap": 25,
-&"aether": 3
+&"aether": 3,
+&"scrap": 25
 })
-max_health = 150.0
-attack_damage = 8.0
-attacks_per_second = 1.5
-attack_range = 260.0
-projectile_speed = 650.0
 heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv1"), SubResource("TurretHead_lv2"), SubResource("TurretHead_lv3")])
-head_turn_speed = 720.0
-aim_angles = PackedFloat32Array(-63, -45, -90, -149)
 muzzle_height = 50.0
 barrel_length = 30.0
