@@ -42,9 +42,16 @@ func _ready() -> void:
 	assert(tree != null, "WaveDirector.waves_scene must be a WaveRun scene")
 	run = tree.to_definition()
 	tree.free()
+	if run.waves.is_empty():
+		push_error("Waves: %s has no Wave nodes, so there's nothing to play" % waves_scene.resource_path)
 
 
 func start() -> void:
+	if run.waves.is_empty():
+		# Nothing to play (the error above says why): end the run instead of crashing.
+		state = State.WON
+		run_won.emit()
+		return
 	_begin_break()
 
 

@@ -133,7 +133,7 @@ All operated bonuses and the ability live in each tower's data file (`operated_*
 - [x] **[AI]** Bigger map: 40×26 tiles with the Core in the middle
 - [x] **[AI]** [Enter] starts the next wave early
 
-The waves live in `data/waves/first_playtest.tres` (break length, and per group: enemy, count, side, spacing, delay).
+The waves live in `scenes/waves/first_run.tscn`: edit them in Godot's scene tree (Wave nodes → SpawnGroup nodes: break length, and per group: enemy, count, side, spacing, delay).
 
 ### 🎯 FIRST PLAYTEST MILESTONE
 
