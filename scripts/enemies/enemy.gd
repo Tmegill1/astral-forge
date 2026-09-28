@@ -66,6 +66,7 @@ func _ready() -> void:
 	health.reset(definition.max_health)
 	health.damage_taken = PackedFloat32Array([
 			definition.physical_taken, definition.fire_taken, definition.magic_taken])
+	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
 
 
@@ -169,6 +170,15 @@ func _update_tint() -> void:
 		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), 0.25 + 0.1 * flicker)
 	else:
 		sprite.modulate = Color.WHITE
+
+
+## A physical hit that armour partly blocked throws sparks.
+func _on_damaged(_dealt: float, type: int, blocked: float) -> void:
+	if type != Health.DamageType.PHYSICAL or blocked <= 0.0:
+		return
+	var spark := ArmorSpark.new()
+	get_parent().add_child(spark)
+	spark.global_position = hurtbox_shape.global_position
 
 
 func _tick_burn(delta: float) -> void:

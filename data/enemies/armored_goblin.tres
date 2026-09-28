@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/goblin_brute.tres" id="2_frames"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"armored_goblin"
+display_name = "Armored Goblin"
+sprite_frames = ExtResource("2_frames")
+sprite_scale = 0.32
+max_health = 60.0
+move_speed = 55.0
+attack_damage = 8.0
+attacks_per_second = 0.8
+attack_range = 20.0
+aggro_range = 140.0
+attack_hit_frame = 3
+physical_taken = 0.3
+fire_taken = 0.6
+magic_taken = 1.0
+drops = Dictionary[StringName, Vector2i]({
+&"scrap": Vector2i(3, 4)
+})
+rare_drops = Dictionary[StringName, float]({
+&"aether": 0.1
+})
