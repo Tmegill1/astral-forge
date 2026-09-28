@@ -3,6 +3,8 @@ extends CanvasLayer
 ## Pop-up for choosing what to build on a pad. Pauses the game while open.
 ## Click a card's Build button or press its number; Esc (or E) closes.
 
+const CARD_SCENE := preload("res://scenes/ui/build_card.tscn")
+
 @onready var title: Label = %Title
 @onready var cards: HBoxContainer = %Cards
 
@@ -36,63 +38,10 @@ func _fill_cards() -> void:
 	var stored := _slot.core().stored
 	for i in _slot.buildable.size():
 		var tower := _slot.buildable[i]
-		cards.add_child(_card(i + 1, tower, stored))
-
-
-func _card(number: int, tower: TowerDefinition, stored: ResourceBag) -> Control:
-	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(190, 0)
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.16, 0.17, 0.21)
-	style.set_corner_radius_all(4)
-	card.add_theme_stylebox_override(&"panel", style)
-	var margin := MarginContainer.new()
-	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 10)
-	card.add_child(margin)
-	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override("separation", 6)
-	margin.add_child(rows)
-
-	var icon := TextureRect.new()
-	icon.texture = tower.icon()
-	icon.custom_minimum_size = Vector2(0, 90)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	rows.add_child(icon)
-	rows.add_child(_label("%d. %s" % [number, tower.display_name], 16, Color(1, 0.92, 0.6)))
-	var desc := _label(tower.description, 12, Color(0.85, 0.85, 0.9))
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.custom_minimum_size = Vector2(170, 48)
-	rows.add_child(desc)
-	if tower.available:
-		rows.add_child(_label("Damage %.0f · %.1f/s · Range %.0f" % [
-				tower.attack_damage, tower.attacks_per_second, tower.attack_range], 12, Color(0.75, 0.9, 1)))
-
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(0, 34)
-	var missing := stored.shortfall(tower.cost)
-	if not tower.available:
-		button.text = "Coming soon"
-		button.disabled = true
-	elif not missing.is_empty():
-		button.text = "Need %s more" % Loot.describe(missing)
-		button.disabled = true
-	else:
-		button.text = "Build — %s" % Loot.describe(tower.cost)
-		button.pressed.connect(_choose.bind(tower))
-	rows.add_child(button)
-	if not tower.available or not missing.is_empty():
-		card.modulate = Color(1, 1, 1, 0.55)
-	return card
-
-
-func _label(text: String, size: int, color: Color) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.add_theme_font_size_override("font_size", size)
-	label.add_theme_color_override("font_color", color)
-	return label
+		var card: BuildCard = CARD_SCENE.instantiate()
+		cards.add_child(card)
+		card.show_tower(i + 1, tower, stored)
+		card.chosen.connect(_choose)
 
 
 func _choose(tower: TowerDefinition) -> void:

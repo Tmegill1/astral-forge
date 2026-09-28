@@ -3,6 +3,8 @@ extends CanvasLayer
 ## Pop-up at the Command Core for buying hero stat ranks with stored
 ## resources. Pauses the game while open. Esc or F closes.
 
+const ROW_SCENE := preload("res://scenes/ui/upgrade_row.tscn")
+
 @onready var title: Label = %Title
 @onready var stored_text: Label = %StoredText
 @onready var list: VBoxContainer = %List
@@ -40,40 +42,28 @@ func _refresh() -> void:
 	for child in list.get_children():
 		child.queue_free()
 	for upgrade in _hero.definition.upgrades:
-		list.add_child(_row(upgrade))
+		var row: UpgradeRow = ROW_SCENE.instantiate()
+		list.add_child(row)
+		_show_row(row, upgrade)
 
 
 ## One upgrade: "Damage — Rank 2/5 · 12 → 14" and its buy button.
-func _row(upgrade: HeroUpgrade) -> Control:
+func _show_row(row: UpgradeRow, upgrade: HeroUpgrade) -> void:
 	var rank := _hero.rank_of(upgrade)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 12)
-	var label := Label.new()
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.add_theme_font_size_override(&"font_size", 14)
 	var now := _value(upgrade, rank)
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(210, 32)
 	if rank >= upgrade.max_rank():
-		label.text = "%s — Rank %d/%d · %s" % [upgrade.display_name, rank, upgrade.max_rank(), now]
-		button.text = "Maxed"
-		button.disabled = true
-	else:
-		label.text = "%s — Rank %d/%d · %s → %s" % [
-			upgrade.display_name, rank, upgrade.max_rank(), now, _value(upgrade, rank + 1)]
-		var cost := upgrade.cost_for(rank + 1)
-		var missing := _core.stored.shortfall(cost)
-		button.disabled = not missing.is_empty()
-		if missing.is_empty():
-			button.text = "Upgrade — %s" % Loot.describe(cost)
-		else:
-			button.text = "Need %s more" % Loot.describe(missing)
-		button.pressed.connect(func() -> void:
-			_core.buy_upgrade(_hero, upgrade)
-			_refresh())
-	row.add_child(label)
-	row.add_child(button)
-	return row
+		row.show_upgrade("%s — Rank %d/%d · %s" % [upgrade.display_name, rank, upgrade.max_rank(), now],
+				"Maxed", false)
+		return
+	var cost := upgrade.cost_for(rank + 1)
+	var missing := _core.stored.shortfall(cost)
+	row.show_upgrade("%s — Rank %d/%d · %s → %s" % [
+			upgrade.display_name, rank, upgrade.max_rank(), now, _value(upgrade, rank + 1)],
+			"Upgrade — %s" % Loot.describe(cost) if missing.is_empty() else "Need %s more" % Loot.describe(missing),
+			missing.is_empty())
+	row.bought.connect(func() -> void:
+		_core.buy_upgrade(_hero, upgrade)
+		_refresh())
 
 
 ## The stat's value at `rank`, e.g. "14" or "1.4/s".
