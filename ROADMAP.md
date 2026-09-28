@@ -148,14 +148,13 @@ You can: leave the Core → kill goblins → carry Scrap home → build a Gearsh
 
 ## Phase 8 — More stuff to build
 
-Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) Spire ✅ 6) Harvester. Each step: design → build → playtest.
+Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) Spire ✅. Each step: design → build → playtest.
 
 - [x] **[AI]** Aether (2nd resource: rare, found far from base): crystals 800+ px from the Core each break (1–2, max 3, 2–4 Aether each) + 5% goblin drop
 - [x] **[AI]** Tower levels 1 → 2 → 3: upgrade in the F menu (Gearshot Lv2 15 Scrap, Lv3 25 Scrap + 3 Aether); ×1.3 damage, ×1.15 fire rate, ×1.1 range, ×1.4 health per level; walls level up too (120/180/260)
 - [x] **[AI]** Rune Mortar (long-range splash): 15 Scrap (Lv2 20, Lv3 30 + 3 Aether); shells the biggest clump and leads it, can't hit inside 110 px; operated = shells land on the mouse; Q = Rune Shell (2× blast + 4 s slowing circle)
 - [x] **[AI]** Embercaster (short-range flamethrower + burn): 12 Scrap (Lv2 18, Lv3 28 + 3 Aether); 50° cone, 150 px; fuel tank 4 s / 3 s refill, locks out until 40% when dry; burn stacks to 5 × 2/s for 3 s; aims where it hits the most goblins; operated = cone at the mouse; Q = Overpressure (3 s free fuel, bigger cone, max burn)
 - [x] **[AI]** Aether Spire (chain lightning): 14 Scrap (Lv2 20, Lv3 30 + 3 Aether); 10 damage, 0.8/s, 280 range; up to 4 jumps within 120 px, 20% less each jump; nearest goblin first; operated = goblin nearest the mouse; Q = Resonance Burst (2×, 8 jumps, no falloff, 1 s stun)
-- [ ] **[AI]** Aether Harvester (pulls Scrap toward it; Lv3 auto-deposits)
 - [x] **[AI]** Expand to 12–16 build slots: a ring of 12 (3 per side); 4 open, 8 unlock for 6 Scrap; walls join into one line per side, corners stay open
 - [ ] **[You]** Decide: is Mastery per-tower or per-tower-type?
 - [ ] **[Both]** Playtest after each new tower
