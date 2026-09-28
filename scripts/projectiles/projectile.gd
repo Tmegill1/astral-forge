@@ -14,6 +14,8 @@ var direction := Vector2.RIGHT
 var speed := 700.0
 var damage := 10.0
 var max_distance := 500.0
+## Gearshot bullets and hero bolts are physical.
+var damage_type := Health.DamageType.PHYSICAL
 
 var _travelled := 0.0
 var _spent := false
@@ -43,8 +45,8 @@ func _on_hit(target: Node) -> void:
 		return
 	# Two overlaps can report in the same frame; only the first one counts.
 	_spent = true
-	health.take_damage(damage)
-	hit.emit(damage, health.is_dead)
+	var dealt := health.take_damage(damage, damage_type)
+	hit.emit(dealt, health.is_dead)
 	queue_free()
 
 

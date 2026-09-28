@@ -103,7 +103,7 @@ func _strike(chain: Array[Enemy], bolt_damage: float, falloff: float, stun: floa
 	var hit_damage := bolt_damage
 	for enemy in chain:
 		points.append(_aim_point(enemy))
-		enemy.health.take_damage(hit_damage)
+		enemy.health.take_damage(hit_damage, Health.DamageType.MAGIC)
 		if stun > 0.0:
 			enemy.stun(stun)
 		hit_damage *= 1.0 - falloff

@@ -26,6 +26,12 @@ extends Resource
 ## Frame of the attack animation where the hit lands.
 @export var attack_hit_frame := 3
 
+@export_group("Armour")
+## Share of each kind of damage that gets through (1 = all, 0.3 = 30%).
+@export var physical_taken := 1.0
+@export var fire_taken := 1.0
+@export var magic_taken := 1.0
+
 @export_group("Loot")
 ## Resource type -> (min, max) dropped on death, e.g. {"scrap": (1, 2)}.
 @export var drops: Dictionary[StringName, Vector2i] = {}

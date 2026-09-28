@@ -51,8 +51,8 @@ func _land() -> void:
 		var enemy := node as Enemy
 		if enemy.health.is_dead or enemy.global_position.distance_to(target) > radius:
 			continue
-		enemy.health.take_damage(damage)
-		hit.emit(damage, enemy.health.is_dead)
+		var dealt := enemy.health.take_damage(damage, Health.DamageType.MAGIC)
+		hit.emit(dealt, enemy.health.is_dead)
 	if rune_duration > 0.0:
 		var circle := RuneCircle.new()
 		circle.radius = radius

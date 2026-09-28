@@ -64,6 +64,8 @@ func _ready() -> void:
 	health_bar.place_above(sprite)
 	_fit_hurtbox()
 	health.reset(definition.max_health)
+	health.damage_taken = PackedFloat32Array([
+			definition.physical_taken, definition.fire_taken, definition.magic_taken])
 	health.died.connect(_on_died)
 
 
@@ -170,7 +172,7 @@ func _update_tint() -> void:
 
 
 func _tick_burn(delta: float) -> void:
-	health.take_damage(_burn_stacks * _burn_dps * minf(delta, _burn_left))
+	health.take_damage(_burn_stacks * _burn_dps * minf(delta, _burn_left), Health.DamageType.FIRE)
 	_burn_left -= delta
 	if _burn_left <= 0.0:
 		_burn_stacks = 0

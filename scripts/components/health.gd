@@ -5,10 +5,19 @@ extends Node
 
 signal changed(current: float, maximum: float)
 signal died
+## Emitted whenever damage is applied: what got through, its type, and the
+## part the target's resistance blocked.
+signal damaged(dealt: float, type: int, blocked: float)
+
+## What kind of harm a hit does. Enemies can resist some kinds.
+enum DamageType { PHYSICAL, FIRE, MAGIC }
 
 @export var max_health: float = 100.0
 ## While true, damage is ignored (e.g. a hero safely operating a tower).
 var invulnerable := false
+## Share of each DamageType's damage that gets through (1 = all of it),
+## indexed by DamageType.
+var damage_taken := PackedFloat32Array([1.0, 1.0, 1.0])
 
 var current: float
 var is_dead: bool:
@@ -37,13 +46,19 @@ func grow_max(new_max: float) -> void:
 	changed.emit(current, max_health)
 
 
-func take_damage(amount: float) -> void:
+## Applies damage of `type`, reduced by damage_taken, and returns how much
+## health it actually took (0 if it was ignored).
+func take_damage(amount: float, type := DamageType.PHYSICAL) -> float:
 	if is_dead or invulnerable or amount <= 0.0:
-		return
-	current = maxf(current - amount, 0.0)
+		return 0.0
+	var scaled := amount * damage_taken[type]
+	var dealt := minf(scaled, current)
+	current = maxf(current - scaled, 0.0)
 	changed.emit(current, max_health)
+	damaged.emit(dealt, type, amount - scaled)
 	if is_dead:
 		died.emit()
+	return dealt
 
 
 func heal(amount: float) -> void:
