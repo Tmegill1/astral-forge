@@ -23,7 +23,8 @@ func _ready() -> void:
 ## Little hop from where it dropped to where it lands.
 func pop_to(landing: Vector2) -> void:
 	_popping = true
-	var tween := create_tween()
+	# Physics ticks, so physics interpolation smooths the hop.
+	var tween := create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	tween.tween_property(self, "position", landing, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(sprite, "position:y", sprite.position.y - 14.0, 0.17).set_ease(Tween.EASE_OUT)
 	tween.chain().tween_property(sprite, "position:y", sprite.position.y, 0.18).set_ease(Tween.EASE_IN)

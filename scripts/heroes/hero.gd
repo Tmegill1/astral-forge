@@ -256,6 +256,7 @@ func start_operating(tower: Tower) -> void:
 	queue_redraw()
 	tower.set_operator(self)
 	global_position = tower.operator_position()
+	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	_zoom_to(operating_zoom)
 	operating_changed.emit(tower)
@@ -266,6 +267,7 @@ func stop_operating() -> void:
 		return
 	operating.set_operator(null)
 	global_position = operating.exit_position()
+	reset_physics_interpolation()
 	operating = null
 	health.invulnerable = false
 	_zoom_to(1.0)
@@ -351,6 +353,7 @@ func add_rank(upgrade: HeroUpgrade) -> void:
 ## Brings a dead hero back at full health.
 func revive(at: Vector2) -> void:
 	global_position = at
+	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	_cooldown = 0.0
 	health.reset(stats.max_health)

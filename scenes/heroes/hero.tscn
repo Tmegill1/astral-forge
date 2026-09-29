@@ -39,4 +39,5 @@ monitorable = false
 shape = SubResource("CircleShape2D_interact")
 
 [node name="Camera" type="Camera2D" parent="."]
+process_callback = 0
 position_smoothing_enabled = true
