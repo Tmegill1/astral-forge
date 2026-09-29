@@ -230,70 +230,6 @@ region = Rect2(1728, 1568, 288, 224)
 atlas = ExtResource("1")
 region = Rect2(2016, 1568, 288, 224)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_66"]
-atlas = ExtResource("1")
-region = Rect2(0, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_67"]
-atlas = ExtResource("1")
-region = Rect2(288, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_68"]
-atlas = ExtResource("1")
-region = Rect2(576, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_69"]
-atlas = ExtResource("1")
-region = Rect2(864, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_70"]
-atlas = ExtResource("1")
-region = Rect2(1152, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_71"]
-atlas = ExtResource("1")
-region = Rect2(1440, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_72"]
-atlas = ExtResource("1")
-region = Rect2(1728, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_73"]
-atlas = ExtResource("1")
-region = Rect2(2016, 2016, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_58"]
-atlas = ExtResource("1")
-region = Rect2(0, 1792, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_59"]
-atlas = ExtResource("1")
-region = Rect2(288, 1792, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_60"]
-atlas = ExtResource("1")
-region = Rect2(576, 1792, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_61"]
-atlas = ExtResource("1")
-region = Rect2(864, 1792, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_62"]
-atlas = ExtResource("1")
-region = Rect2(1152, 1792, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_63"]
-atlas = ExtResource("1")
-region = Rect2(1440, 1792, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_64"]
-atlas = ExtResource("1")
-region = Rect2(1728, 1792, 288, 224)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_65"]
-atlas = ExtResource("1")
-region = Rect2(2016, 1792, 288, 224)
-
 [resource]
 animations = [{
 "frames": [{
@@ -505,64 +441,6 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walk_right",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_66")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_67")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_68")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_69")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_70")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_71")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_72")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_73")
-}],
-"loop": 1,
-"name": &"walk_up",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_58")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_59")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_60")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_61")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_62")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_63")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_64")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_65")
-}],
-"loop": 1,
-"name": &"walk_up_right",
 "speed": 10.0
 }]
 metadata/foot_offset = Vector2(0, 105)
