@@ -7,3 +7,6 @@
 
 # Python
 __pycache__/
+
+# Web export (built by CI, see .github/workflows/deploy-pages.yml)
+export/
