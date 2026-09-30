@@ -8,8 +8,8 @@ signal closed
 const ROW_SCENE := preload("res://scenes/ui/binding_row.tscn")
 
 @onready var bindings: VBoxContainer = %Bindings
-@onready var fullscreen_box: CheckBox = %Fullscreen
-@onready var auto_fire_box: CheckBox = %AutoFire
+@onready var fullscreen_box: CheckButton = %Fullscreen
+@onready var auto_fire_box: CheckButton = %AutoFire
 @onready var sliders: Dictionary[StringName, HSlider] = {
 	&"Master": %Master, &"Music": %Music, &"Effects": %Effects}
 @onready var reset_button: Button = %Reset
@@ -51,6 +51,9 @@ func close() -> void:
 func _refresh() -> void:
 	fullscreen_box.set_pressed_no_signal(Settings.fullscreen)
 	auto_fire_box.set_pressed_no_signal(Settings.auto_fire)
+	# Spelled out too: the theme's "off" switch is easy to miss.
+	fullscreen_box.text = "Fullscreen (F11): " + ("On" if Settings.fullscreen else "Off")
+	auto_fire_box.text = "Auto-fire: " + ("On" if Settings.auto_fire else "Off")
 	for bus in sliders:
 		sliders[bus].set_value_no_signal(Settings.volumes[bus] * 100.0)
 

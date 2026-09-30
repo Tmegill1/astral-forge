@@ -124,7 +124,12 @@ func event_label(event: InputEvent) -> String:
 		var physical: Key = event.physical_keycode
 		if KEY_NAMES.has(physical):
 			return KEY_NAMES[physical]
-		return OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(physical))
+		# Show the key as printed on this keyboard's layout. The web can't look
+		# that up (it logs an error), so there it's the US-layout name.
+		var keycode := physical
+		if not OS.has_feature("web"):
+			keycode = DisplayServer.keyboard_get_keycode_from_physical(physical)
+		return OS.get_keycode_string(keycode)
 	if event is InputEventMouseButton:
 		return MOUSE_NAMES.get(event.button_index, "Mouse %d" % event.button_index)
 	return "—"

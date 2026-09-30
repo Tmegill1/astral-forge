@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/build_menu.tscn" id="10_build_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/tower_menu.tscn" id="11_tower_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hero_upgrade_menu.tscn" id="12_hero_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="20_pause"]
 
 [node name="World" type="Node2D" unique_id=164071451]
 script = ExtResource("2_world")
@@ -115,3 +116,5 @@ waves_scene = ExtResource("6_waves")
 [node name="TowerMenu" parent="." unique_id=904009705 instance=ExtResource("11_tower_menu")]
 
 [node name="HeroUpgradeMenu" parent="." unique_id=47535532 instance=ExtResource("12_hero_menu")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("20_pause")]
