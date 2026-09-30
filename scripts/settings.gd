@@ -48,7 +48,11 @@ func _ready() -> void:
 			slots.append(_clean(events[i]) if i < events.size() else null)
 		_defaults[action] = slots
 	_load()
+	if OS.has_feature("web"):
+		# Browsers only allow fullscreen after a click, so a page starts windowed.
+		fullscreen = false
 	_apply_all()
+	get_tree().root.size_changed.connect(_sync_fullscreen)
 
 
 ## Binds `event` to `slot` (0 = primary, 1 = secondary) of `action`.
@@ -133,6 +137,16 @@ func event_label(event: InputEvent) -> String:
 	if event is InputEventMouseButton:
 		return MOUSE_NAMES.get(event.button_index, "Mouse %d" % event.button_index)
 	return "—"
+
+
+## Keeps the setting true to the window when something else changes it (the
+## browser's Esc, the window manager).
+func _sync_fullscreen() -> void:
+	var is_fullscreen := DisplayServer.window_get_mode() >= DisplayServer.WINDOW_MODE_FULLSCREEN
+	if is_fullscreen != fullscreen:
+		fullscreen = is_fullscreen
+		_save()
+		changed.emit()
 
 
 func _input_changed() -> void:

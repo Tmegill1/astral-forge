@@ -1,8 +1,9 @@
 class_name BindingRow
 extends HBoxContainer
 ## One action in the Options controls list: its name and two binding slots.
-## Click a slot, then press a key or mouse button to bind it. Esc cancels;
-## Delete or Backspace clears the slot.
+## Click a slot, then press a key to bind it, or click the slot again with the
+## mouse button you want. Esc or a click anywhere else cancels; Delete or
+## Backspace clears the slot.
 
 const AMBER := Color(1.0, 0.75, 0.3)
 
@@ -65,7 +66,10 @@ func _input(event: InputEvent) -> void:
 			_:
 				Settings.bind(action, _listening_slot, event)
 	elif event is InputEventMouseButton:
-		Settings.bind(action, _listening_slot, event)
+		# Only a press on the waiting slot binds a mouse button; clicking or
+		# scrolling anywhere else cancels, so you can always click away.
+		if slot_buttons[_listening_slot].get_global_rect().has_point(event.position):
+			Settings.bind(action, _listening_slot, event)
 	else:
 		return
 	get_viewport().set_input_as_handled()
