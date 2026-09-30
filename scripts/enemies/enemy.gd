@@ -41,6 +41,11 @@ var _burn_dps := 0.0
 var _burn_left := 0.0
 ## While above 0 it can't move or attack.
 var _stun_left := 0.0
+## Frenzy (from a Shaman's pulse): extra speed and damage until
+## _frenzy_left runs out.
+var _frenzy_speed := 0.0
+var _frenzy_damage := 0.0
+var _frenzy_left := 0.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var health: Health = $Health
@@ -85,6 +90,11 @@ func _physics_process(delta: float) -> void:
 		_slow_left -= delta
 		if _slow_left <= 0.0:
 			_slow_factor = 1.0
+	if _frenzy_left > 0.0:
+		_frenzy_left -= delta
+		if _frenzy_left <= 0.0:
+			_frenzy_speed = 0.0
+			_frenzy_damage = 0.0
 	if _stun_left > 0.0:
 		_stun_left -= delta
 		velocity = Vector2.ZERO
@@ -117,7 +127,7 @@ func _physics_process(delta: float) -> void:
 
 	var step_to := _next_waypoint()
 	var direction := (step_to - global_position).normalized()
-	velocity = direction * definition.move_speed * _slow_factor
+	velocity = direction * definition.move_speed * speed_multiplier()
 	move_and_slide()
 	if absf(direction.x) > 0.1:
 		sprite.flip_h = direction.x < 0.0
@@ -133,7 +143,28 @@ func slow(factor: float, seconds: float) -> void:
 
 
 func speed_multiplier() -> float:
-	return _slow_factor
+	return _slow_factor * (1.0 + _frenzy_speed)
+
+
+## Frenzy: moves `speed_bonus` faster and hits `damage_bonus` harder
+## (0.3 = +30%) for `seconds`. A new frenzy restarts the time and keeps the
+## stronger bonuses; it never stacks.
+func frenzy(speed_bonus: float, damage_bonus: float, seconds: float) -> void:
+	if health.is_dead:
+		return
+	var active := _frenzy_left > 0.0
+	_frenzy_speed = maxf(_frenzy_speed, speed_bonus) if active else speed_bonus
+	_frenzy_damage = maxf(_frenzy_damage, damage_bonus) if active else damage_bonus
+	_frenzy_left = maxf(_frenzy_left, seconds)
+
+
+func is_frenzied() -> bool:
+	return _frenzy_left > 0.0
+
+
+## Damage of one hit, including any frenzy.
+func attack_damage() -> float:
+	return definition.attack_damage * (1.0 + _frenzy_damage)
 
 
 ## Sets it burning: adds `stacks` (capped at max_stacks), each dealing
@@ -162,11 +193,13 @@ func is_stunned() -> bool:
 	return _stun_left > 0.0
 
 
-## Stun (pale blue) shows over burn (orange); both flicker.
+## Stun (pale blue) shows over frenzy (red) over burn (orange); all flicker.
 func _update_tint() -> void:
 	var flicker := sin(Time.get_ticks_msec() * 0.02)
 	if _stun_left > 0.0:
 		sprite.modulate = Color.WHITE.lerp(Color(0.6, 0.85, 1.0), 0.45 + 0.15 * flicker)
+	elif _frenzy_left > 0.0:
+		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.4, 0.35), 0.35 + 0.15 * flicker)
 	elif _burn_stacks > 0:
 		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), 0.25 + 0.1 * flicker)
 	else:
@@ -296,7 +329,7 @@ func _on_frame_changed() -> void:
 		return
 	var target_health := _target.get_node(^"Health") as Health
 	if not target_health.is_dead:
-		target_health.take_damage(definition.attack_damage)
+		target_health.take_damage(attack_damage())
 
 
 func _on_animation_finished() -> void:
@@ -310,6 +343,9 @@ func _on_animation_finished() -> void:
 func _on_died() -> void:
 	_burn_stacks = 0
 	_stun_left = 0.0
+	_frenzy_left = 0.0
+	_frenzy_speed = 0.0
+	_frenzy_damage = 0.0
 	sprite.modulate = Color.WHITE
 	velocity = Vector2.ZERO
 	# Stop catching bolts; deferred because this can fire mid-physics.
