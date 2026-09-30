@@ -16,7 +16,7 @@ corner_radius_bottom_left = 6
 
 [node name="CodexToast" type="CanvasLayer"]
 process_mode = 3
-layer = 5
+layer = 4
 script = ExtResource("1_toast")
 
 [node name="Top" type="VBoxContainer" parent="."]

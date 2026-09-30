@@ -54,6 +54,11 @@ func _init() -> void:
 		check("%s strengths" % enemy.id, enemy.codex_strengths.size() > 0, true)
 		check("%s weaknesses" % enemy.id, enemy.codex_weaknesses.size() > 0, true)
 		check("%s tip" % enemy.id, enemy.codex_tip != "", true)
+	# The Codex notice sits above the HUD (layer 1) but below every menu.
+	var toast_layer := _layer("res://scenes/ui/codex_toast.tscn")
+	for menu in ["build_menu", "tower_menu", "hero_upgrade_menu", "game_over", "pause_menu"]:
+		check("toast below %s" % menu, toast_layer < _layer("res://scenes/ui/%s.tscn" % menu), true)
+	check("toast above hud", toast_layer > 1, true)
 	print("help_text: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -64,3 +69,12 @@ func check(label: String, got: Variant, want: Variant) -> void:
 	else:
 		failed += 1
 		print("FAIL %s: got %s, want %s" % [label, got, want])
+
+
+## A CanvasLayer scene's `layer` without instancing it (1 when not set).
+func _layer(path: String) -> int:
+	var state := (load(path) as PackedScene).get_state()
+	for i in state.get_node_property_count(0):
+		if state.get_node_property_name(0, i) == &"layer":
+			return state.get_node_property_value(0, i)
+	return 1
