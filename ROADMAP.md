@@ -192,7 +192,7 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 - [ ] **[You]** Sound effects + music (put them in `sound/`)
 - [ ] **[AI]** Hook up sounds
 - [x] **[AI]** Main menu (Play / Options / Quit), Esc pause menu (Resume / Options / Help / Quit), Options (rebind every action incl. mouse, two slots each; fullscreen, auto-fire, volume), saved to `user://settings.cfg`
-- [ ] **[AI]** Help: tower guide with upgrade paths, and an enemy Codex (part 2)
+- [x] **[AI]** Help (main and pause menus): tower guide (what each does, damage type, ability, operated bonus, upgrade path with costs) and an enemy Codex (unlocks when first seen on screen, "???" until then, number-free strengths / weaknesses / tip; saved in `user://codex.cfg`)
 - [ ] **[AI]** Hero select screen
 - [ ] **[AI]** Controller support
 - [ ] **[Both]** Juice: screen shake, hit flashes, particles

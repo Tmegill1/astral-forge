@@ -1,5 +1,5 @@
 extends Control
-## The first screen: Play, Options and Quit. Quit is hidden on the web,
+## The first screen: Play, Options, Help and Quit. Quit is hidden on the web,
 ## where a page can't close itself.
 
 const WORLD := "res://scenes/world.tscn"
@@ -9,6 +9,8 @@ const WORLD := "res://scenes/world.tscn"
 @onready var options_button: Button = %Options
 @onready var quit_button: Button = %Quit
 @onready var options: OptionsMenu = $OptionsMenu
+@onready var help_button: Button = %Help
+@onready var help: HelpMenu = $HelpMenu
 
 
 func _ready() -> void:
@@ -17,6 +19,8 @@ func _ready() -> void:
 	quit_button.pressed.connect(get_tree().quit)
 	quit_button.visible = not OS.has_feature("web")
 	options.closed.connect(_on_options_closed)
+	help_button.pressed.connect(_open_help)
+	help.closed.connect(_on_help_closed)
 	play_button.grab_focus()
 
 
@@ -32,3 +36,13 @@ func _open_options() -> void:
 func _on_options_closed() -> void:
 	buttons.visible = true
 	options_button.grab_focus()
+
+
+func _open_help() -> void:
+	buttons.visible = false
+	help.open()
+
+
+func _on_help_closed() -> void:
+	buttons.visible = true
+	help_button.grab_focus()

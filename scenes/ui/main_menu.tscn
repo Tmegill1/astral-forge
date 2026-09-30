@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Texture2D" path="res://assets/ui/menu_background.png" id="2_bg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/options_menu.tscn" id="3_options"]
+[ext_resource type="PackedScene" path="res://scenes/ui/help_menu.tscn" id="4_help"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -74,6 +75,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Options"
 
+[node name="Help" type="Button" parent="Center/Rows/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Help"
+
 [node name="Quit" type="Button" parent="Center/Rows/Buttons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 46)
@@ -82,3 +90,5 @@ theme_override_font_sizes/font_size = 20
 text = "Quit"
 
 [node name="OptionsMenu" parent="." instance=ExtResource("3_options")]
+
+[node name="HelpMenu" parent="." instance=ExtResource("4_help")]

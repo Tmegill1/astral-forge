@@ -16,6 +16,7 @@ const MAIN_MENU := "res://scenes/ui/main_menu.tscn"
 @onready var abandon_button: Button = %Abandon
 @onready var cancel_button: Button = %Cancel
 @onready var options: OptionsMenu = $OptionsMenu
+@onready var help: HelpMenu = $HelpMenu
 
 
 func _ready() -> void:
@@ -26,8 +27,8 @@ func _ready() -> void:
 	abandon_button.pressed.connect(_abandon)
 	cancel_button.pressed.connect(_show_panel)
 	options.closed.connect(_show_panel)
-	help_button.disabled = true
-	help_button.tooltip_text = "Coming soon"
+	help_button.pressed.connect(_open_help)
+	help.closed.connect(_show_panel)
 
 
 func open() -> void:
@@ -52,6 +53,11 @@ func _open_options() -> void:
 	options.open()
 
 
+func _open_help() -> void:
+	panel.visible = false
+	help.open()
+
+
 func _ask_quit() -> void:
 	panel.visible = false
 	confirm.visible = true
@@ -71,7 +77,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if get_tree().paused:
 			return
 		open()
-	elif options.visible:
+	elif options.visible or help.visible:
 		return
 	elif confirm.visible:
 		_show_panel()
