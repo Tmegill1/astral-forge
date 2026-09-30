@@ -119,7 +119,7 @@ func _physics_process(delta: float) -> void:
 		sprite.flip_h = _target.global_position.x < global_position.x
 		if _cooldown <= 0.0:
 			_cooldown = 1.0 / definition.attacks_per_second
-			sprite.play(&"attack")
+			sprite.play(definition.attack_animation)
 			sprite.frame = 0
 		elif not _is_attacking():
 			sprite.play(&"idle")
@@ -318,18 +318,37 @@ func _in_reach(target: Node2D) -> bool:
 
 
 func _is_attacking() -> bool:
-	return sprite.animation == &"attack" and sprite.is_playing()
+	return sprite.animation == definition.attack_animation and sprite.is_playing()
 
 
 func _on_frame_changed() -> void:
-	if sprite.animation != &"attack" or sprite.frame != definition.attack_hit_frame:
+	if sprite.animation != definition.attack_animation or sprite.frame != definition.attack_hit_frame:
 		return
 	# The target may have moved away or died during the wind-up.
 	if not is_instance_valid(_target) or not _in_reach(_target):
 		return
 	var target_health := _target.get_node(^"Health") as Health
-	if not target_health.is_dead:
+	if target_health.is_dead:
+		return
+	if definition.projectile_scene:
+		_shoot(_target)
+	else:
 		target_health.take_damage(attack_damage())
+
+
+## Throws the definition's projectile from the body at `target`'s current
+## position; it flies a little past it, then fades out.
+func _shoot(target: Node2D) -> void:
+	var from := hurtbox_shape.global_position
+	var to_target := target.global_position - from
+	var shot: Projectile = definition.projectile_scene.instantiate()
+	shot.global_position = from
+	shot.direction = to_target.normalized()
+	shot.speed = definition.projectile_speed
+	shot.damage = attack_damage()
+	shot.damage_type = Health.DamageType.MAGIC
+	shot.max_distance = to_target.length() + 60.0
+	get_parent().add_child(shot)
 
 
 func _on_animation_finished() -> void:

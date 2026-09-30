@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/goblin_shaman.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/enemy_orb.tscn" id="3_orb"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"goblin_shaman"
+display_name = "Goblin Shaman"
+sprite_frames = ExtResource("2_frames")
+sprite_scale = 0.3
+max_health = 40.0
+move_speed = 60.0
+attack_damage = 6.0
+attacks_per_second = 0.5
+attack_range = 220.0
+aggro_range = 220.0
+attack_hit_frame = 3
+attack_animation = &"cast"
+projectile_scene = ExtResource("3_orb")
+magic_taken = 0.7
+drops = Dictionary[StringName, Vector2i]({
+&"scrap": Vector2i(2, 3)
+})
+rare_drops = Dictionary[StringName, float]({
+&"aether": 0.15
+})

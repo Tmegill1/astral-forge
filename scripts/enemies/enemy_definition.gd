@@ -2,7 +2,8 @@ class_name EnemyDefinition
 extends Resource
 ## Everything that makes one enemy type different. To add an enemy, create a
 ## new .tres in data/enemies/ — no code changes needed. Sprites must face
-## right and have idle, walk, attack and death animations.
+## right and have idle, walk and death animations, plus the attack animation
+## (`attack` unless set below).
 
 @export var id: StringName
 @export var display_name: String
@@ -25,6 +26,13 @@ extends Resource
 @export var aggro_range := 140.0
 ## Frame of the attack animation where the hit lands.
 @export var attack_hit_frame := 3
+## Animation played for each attack; the hit (or shot) comes on attack_hit_frame.
+@export var attack_animation: StringName = &"attack"
+## When set, each attack throws this projectile (magic damage) at the target
+## instead of hitting it directly. Empty = melee.
+@export var projectile_scene: PackedScene
+## Pixels per second.
+@export var projectile_speed := 260.0
 
 @export_group("Armour")
 ## Share of each kind of damage that gets through (1 = all, 0.3 = 30%).
