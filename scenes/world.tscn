@@ -108,16 +108,18 @@ script = ExtResource("9_nav")
 script = ExtResource("5_waves")
 waves_scene = ExtResource("6_waves")
 
-[node name="HUD" parent="." unique_id=55666474 instance=ExtResource("3_hud")]
+[node name="UI" type="Node" parent="."]
 
-[node name="GameOver" parent="." unique_id=2034743841 instance=ExtResource("7_game_over")]
+[node name="HUD" parent="UI" unique_id=55666474 instance=ExtResource("3_hud")]
 
-[node name="BuildMenu" parent="." unique_id=851941954 instance=ExtResource("10_build_menu")]
+[node name="GameOver" parent="UI" unique_id=2034743841 instance=ExtResource("7_game_over")]
 
-[node name="TowerMenu" parent="." unique_id=904009705 instance=ExtResource("11_tower_menu")]
+[node name="BuildMenu" parent="UI" unique_id=851941954 instance=ExtResource("10_build_menu")]
 
-[node name="HeroUpgradeMenu" parent="." unique_id=47535532 instance=ExtResource("12_hero_menu")]
+[node name="TowerMenu" parent="UI" unique_id=904009705 instance=ExtResource("11_tower_menu")]
 
-[node name="PauseMenu" parent="." instance=ExtResource("20_pause")]
+[node name="HeroUpgradeMenu" parent="UI" unique_id=47535532 instance=ExtResource("12_hero_menu")]
 
-[node name="CodexToast" parent="." instance=ExtResource("21_toast")]
+[node name="PauseMenu" parent="UI" instance=ExtResource("20_pause")]
+
+[node name="CodexToast" parent="UI" instance=ExtResource("21_toast")]

@@ -36,8 +36,8 @@ var _respawn_left := 0.0
 @onready var hero_spawn: Marker2D = $HeroSpawn
 @onready var waves: WaveDirector = $WaveDirector
 @onready var nav: NavGrid = $NavGrid
-@onready var hud: HUD = $HUD
-@onready var game_over: GameOverScreen = $GameOver
+@onready var hud: HUD = $UI/HUD
+@onready var game_over: GameOverScreen = $UI/GameOver
 
 
 func _ready() -> void:
