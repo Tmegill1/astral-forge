@@ -37,3 +37,5 @@ shape = SubResource("RectangleShape2D_hurtbox")
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("2_health")
+
+[node name="OnScreen" type="VisibleOnScreenNotifier2D" parent="."]

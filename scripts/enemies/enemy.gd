@@ -57,6 +57,7 @@ var _pulsing := false
 @onready var health_bar: HealthBar = $HealthBar
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var hurtbox_shape: CollisionShape2D = $Hurtbox/Shape
+@onready var on_screen: VisibleOnScreenNotifier2D = $OnScreen
 
 
 ## Call before adding the enemy to the scene tree.
@@ -74,6 +75,7 @@ func _ready() -> void:
 	sprite.animation_finished.connect(_on_animation_finished)
 	health_bar.place_above(sprite)
 	_fit_hurtbox()
+	on_screen.screen_entered.connect(_on_screen_entered, CONNECT_ONE_SHOT)
 	health.reset(definition.max_health)
 	health.damage_taken = PackedFloat32Array([
 			definition.physical_taken, definition.fire_taken, definition.magic_taken])
@@ -326,6 +328,12 @@ func _fit_hurtbox() -> void:
 	shape.size = visible.size * definition.hurtbox_padding
 	hurtbox_shape.shape = shape
 	hurtbox_shape.position = visible.get_center()
+	on_screen.rect = visible
+
+
+## The first time any enemy of this type is on screen, it joins the Codex.
+func _on_screen_entered() -> void:
+	Codex.mark_seen(definition)
 
 
 func _pick_target() -> Node2D:
