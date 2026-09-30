@@ -60,3 +60,11 @@ extends Resource
 @export var pulse_damage_bonus := 0.3
 ## Played while casting a pulse (must not loop); the frenzy lands when it ends.
 @export var pulse_animation: StringName = &"buff"
+
+@export_group("Codex")
+## One line saying what this enemy is.
+@export var codex_summary := ""
+## Hand-written lines, shown after the ones worked out from resistances.
+@export var codex_strengths: PackedStringArray = []
+@export var codex_weaknesses: PackedStringArray = []
+@export var codex_tip := ""

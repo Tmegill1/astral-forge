@@ -85,6 +85,15 @@ func max_health_at(tower_level: int) -> float:
 @export var ability_cooldown := 12.0
 @export var ability_fire_rate_multiplier := 3.0
 
+@export_group("Help")
+## Shown in the Help screen; the damage type itself is set in each tower's code.
+@export var damage_type_label := "Physical"
+## One short line each for the Help screen.
+@export var good_against := ""
+@export var weak_against := ""
+## What the ability does, in words.
+@export var ability_text := ""
+
 @export_group("Rotating head")
 ## Optional, per level (index 0 = Lv1): a static base plus a head that turns
 ## to face any direction. A level with an entry uses it instead of its

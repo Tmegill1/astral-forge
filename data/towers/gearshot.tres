@@ -39,6 +39,10 @@ script = ExtResource("1_def")
 id = &"gearshot"
 display_name = "Gearshot Turret"
 description = "Fast single-target shots. Reliable against swarms of basic goblins."
+damage_type_label = "Physical"
+good_against = "Swarms of basic goblins"
+weak_against = "Armour (bullets glance off)"
+ability_text = "Triples the fire rate for 3 s."
 sprite_frames = ExtResource("2_frames")
 cost = Dictionary[StringName, int]({
 &"scrap": 10
