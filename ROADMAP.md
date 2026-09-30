@@ -37,7 +37,7 @@ Known small glitches (fine for placeholders): Mortar/Spire/Embercaster fire fram
 - [x] **[You]** Decide: aim with the **mouse**, shooting is **automatic** for now (`auto_fire` on the Hero can be turned off → hold left click to shoot)
 - [x] **[Both]** Play it — does moving feel good? (hero shrunk 30%, faces the way it walks, HUD + health bars added)
 
-- [x] **[Both]** Running in 8 directions: `assets/source/artificer_run.png` (5 directions, left ones mirrored); the hero picks the walk art by direction, leans into turns, and lines frames up by the body so the run doesn't jitter
+- [x] **[Both]** Running in 8 directions: `assets/source/artificer_run.png` has run art for right, down-right and down (left ones mirrored); running up and up-diagonal uses the side-on run with a lean until that art is redone (its frames were nearly identical). The hero picks the walk art by direction, leans into turns, and lines frames up by the body so the run doesn't jitter
 
 **How heroes work:** every hero shares `scripts/heroes/hero.gd`. Baseline stats are the defaults in `scripts/heroes/hero_stats.gd`. Each hero is a data file in `data/heroes/` (art, size, and stat multipliers, e.g. Artificer = 0.9× health). `Game.selected_hero` picks who spawns; a hero-select screen will set it later. New hero = new `.tres` file, no code.
 
@@ -163,7 +163,7 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 ## Phase 9 — More enemies
 
 - [x] **[AI]** Armored Goblin (resists bullets → need magic) (`goblin_brute` art): takes 30% physical / 60% fire / 100% magic; 60 health, speed 55, 8 per swing; 3–4 Scrap + 10% Aether; waves 3–5. Damage types: Gearshot + hero = physical, Embercaster = fire, Mortar + Spire = magic. Waves are now edited as a node tree in `scenes/waves/first_run.tscn`.
-- [ ] **[AI]** Goblin Shaman (buffs nearby goblins)
+- [x] **[AI]** Goblin Shaman (buffs nearby goblins): hangs back and throws slow magic orbs (6 dmg / 2 s, 220 range; walls block them); every 6 s pulses Frenzy on goblins within 160 px (+30% speed and damage for 4 s; stuns and kills cancel the cast); 40 health, speed 60, takes 70% magic; 2–3 Scrap + 15% Aether; 1–2 per wave in waves 2–5.
 - [ ] **[AI]** Ogre (smashes walls) — *needs art*
 - [ ] **[AI]** Bat (flies over walls) — *needs art*
 - [ ] **[You]** Decide: how do flying enemies look/work in top-down?
