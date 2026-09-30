@@ -9,10 +9,13 @@ extends CharacterBody2D
 ## completely, it breaks through the nearest wall or tower.
 
 signal killed(enemy: Enemy)
+## A pulse cast ended: `landed` is false when a stun or death cut it short.
+signal pulse_finished(landed: bool)
 
 ## Seconds a body stays on the ground before fading out.
 const CORPSE_TIME := 1.5
 const SPARK_SCENE := preload("res://scenes/effects/armor_spark.tscn")
+const FRENZY_PULSE_SCENE := preload("res://scenes/enemies/frenzy_pulse.tscn")
 ## Paths are recomputed at least this often, in seconds.
 const REPATH_TIME := 0.75
 ## A waypoint counts as reached within this distance, in pixels.
@@ -46,6 +49,8 @@ var _stun_left := 0.0
 var _frenzy_speed := 0.0
 var _frenzy_damage := 0.0
 var _frenzy_left := 0.0
+## True while standing still casting a pulse.
+var _pulsing := false
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var health: Health = $Health
@@ -74,6 +79,8 @@ func _ready() -> void:
 			definition.physical_taken, definition.fire_taken, definition.magic_taken])
 	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
+	if definition.pulse_interval > 0.0:
+		add_child(FRENZY_PULSE_SCENE.instantiate())
 
 
 func _physics_process(delta: float) -> void:
@@ -99,6 +106,9 @@ func _physics_process(delta: float) -> void:
 		_stun_left -= delta
 		velocity = Vector2.ZERO
 		sprite.play(&"idle")
+		return
+	if _pulsing:
+		velocity = Vector2.ZERO
 		return
 	var goal := _pick_target()
 	if goal == null:
@@ -187,10 +197,30 @@ func stun(seconds: float) -> void:
 	if health.is_dead:
 		return
 	_stun_left = maxf(_stun_left, seconds)
+	_cancel_pulse()
 
 
 func is_stunned() -> bool:
 	return _stun_left > 0.0
+
+
+## True when it could stop and cast a pulse right now.
+func can_pulse() -> bool:
+	return not health.is_dead and _stun_left <= 0.0 and not _pulsing and not _is_attacking()
+
+
+## Stands still playing the pulse animation; pulse_finished follows.
+func start_pulse() -> void:
+	_pulsing = true
+	velocity = Vector2.ZERO
+	sprite.play(definition.pulse_animation)
+	sprite.frame = 0
+
+
+func _cancel_pulse() -> void:
+	if _pulsing:
+		_pulsing = false
+		pulse_finished.emit(false)
 
 
 ## Stun (pale blue) shows over frenzy (red) over burn (orange); all flicker.
@@ -352,6 +382,10 @@ func _shoot(target: Node2D) -> void:
 
 
 func _on_animation_finished() -> void:
+	if sprite.animation == definition.pulse_animation and _pulsing:
+		_pulsing = false
+		pulse_finished.emit(true)
+		return
 	if sprite.animation == &"death":
 		var fade := create_tween()
 		fade.tween_interval(CORPSE_TIME)
@@ -360,6 +394,7 @@ func _on_animation_finished() -> void:
 
 
 func _on_died() -> void:
+	_cancel_pulse()
 	_burn_stacks = 0
 	_stun_left = 0.0
 	_frenzy_left = 0.0

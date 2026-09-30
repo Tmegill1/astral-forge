@@ -105,7 +105,7 @@ FPS = {"idle": 6, "walk": 10, "death": 8, "destroyed": 1, "destroy": 10}
 BODY_ALIGNED = {"artificer": {"walk", "walk_down", "walk_down_right", "walk_right",
                               "walk_up_right", "walk_up"},
                 "goblin": {"walk"}, "goblin_shaman": {"walk"}, "goblin_brute": {"walk"}}
-NO_LOOP = ("death", "destroy", "destroyed", "hurt", "attack", "cast", "fire", "build")
+NO_LOOP = ("death", "destroy", "destroyed", "hurt", "attack", "cast", "fire", "build", "buff")
 
 
 def runs(profile):

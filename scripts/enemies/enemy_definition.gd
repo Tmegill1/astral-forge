@@ -46,3 +46,17 @@ extends Resource
 ## Resource type -> chance (0 to 1) of also dropping exactly one on death,
 ## e.g. {"aether": 0.05}.
 @export var rare_drops: Dictionary[StringName, float] = {}
+
+@export_group("Frenzy pulse")
+## Seconds between pulses that frenzy nearby enemies. 0 = never pulses.
+@export var pulse_interval := 0.0
+## How far a pulse reaches, in pixels.
+@export var pulse_radius := 160.0
+## Seconds each pulse's frenzy lasts.
+@export var pulse_duration := 4.0
+## Extra move speed while frenzied (0.3 = +30%).
+@export var pulse_speed_bonus := 0.3
+## Extra attack damage while frenzied (0.3 = +30%).
+@export var pulse_damage_bonus := 0.3
+## Played while casting a pulse (must not loop); the frenzy lands when it ends.
+@export var pulse_animation: StringName = &"buff"

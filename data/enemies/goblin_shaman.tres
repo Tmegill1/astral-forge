@@ -20,6 +20,7 @@ attack_hit_frame = 3
 attack_animation = &"cast"
 projectile_scene = ExtResource("3_orb")
 magic_taken = 0.7
+pulse_interval = 6.0
 drops = Dictionary[StringName, Vector2i]({
 &"scrap": Vector2i(2, 3)
 })
