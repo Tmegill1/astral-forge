@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/binding_row.gd" id="1_row"]
+
+[node name="BindingRow" type="HBoxContainer"]
+theme_override_constants/separation = 10
+script = ExtResource("1_row")
+
+[node name="Name" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Move Up"
+
+[node name="Primary" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "W"
+clip_text = true
+
+[node name="Secondary" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Up Arrow"
+clip_text = true
