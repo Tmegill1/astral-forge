@@ -10,9 +10,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 
-## F11 switches between a window and fullscreen.
+## F11 switches between a window and fullscreen (saved in Settings).
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"toggle_fullscreen"):
-		var fullscreen := DisplayServer.window_get_mode() >= DisplayServer.WINDOW_MODE_FULLSCREEN
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if fullscreen else DisplayServer.WINDOW_MODE_FULLSCREEN)
+		Settings.set_fullscreen(not Settings.fullscreen)
 		get_viewport().set_input_as_handled()

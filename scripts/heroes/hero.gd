@@ -27,7 +27,8 @@ const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
 const WALK_BY_DIRECTION: Array[StringName] = [
 	&"walk_up", &"walk_up_right", &"walk_right", &"walk_down_right", &"walk_down"]
 
-## When false, the hero only shoots while the "fire" action is held.
+## When false, the hero only shoots while the "fire" action is held. Set from
+## Settings (Options → Auto-fire).
 @export var auto_fire := true
 ## How far from the hero's feet enemies can hit it from, in pixels.
 @export var hit_radius := 12.0
@@ -97,6 +98,13 @@ func _ready() -> void:
 	health_bar.place_above(sprite)
 	health.reset(stats.max_health)
 	health.died.connect(_on_died)
+	auto_fire = Settings.auto_fire
+	Settings.changed.connect(_on_settings_changed)
+
+
+## Auto-fire follows the Options setting, even mid-run.
+func _on_settings_changed() -> void:
+	auto_fire = Settings.auto_fire
 
 
 func _process(_delta: float) -> void:
