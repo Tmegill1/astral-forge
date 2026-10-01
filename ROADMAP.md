@@ -179,7 +179,7 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 - [x] **[AI]** Power-up cards: each level-up pauses and offers 3 of 14 run-long cards (hero / tower / fortress stats; Arc Bolts, Split Shot, Ember Rounds hero mods); data in `data/cards/`
 - [ ] **[AI]** Hero-specific ability cards (each hero gets its own cards that only appear in its offers) — prototype later
 - [ ] **[AI]** One evolution per tower (e.g. Gearshot → Gatling Engine or Rune Cannon) — needs a new unlock now Mastery is gone (e.g. a card or Aether)
-- [ ] **[AI]** 10 waves, a mini-boss around wave 6, final boss
+- [x] **[AI]** 10 waves (≈ 510 XP): placeholder Goblin Warchief mini-boss (wave 6: smashes walls, war cry) and Goblin Shaman-King final boss (wave 10: orb fans, summons, phase-2 shield that drops while you operate a tower in range; its death wins the run); boss health bar and wave banners. Real boss art: see `docs/art/2026-09-30-boss-and-evolution-art-brief.md`
 - [x] **[AI]** Win screen: one end screen for victory and defeat — time, waves, kills by type, level and cards, towers standing, Scrap/Aether gathered; Play Again (R) / Main Menu; a win plays a 2 s slow-motion "The Core holds!" banner first
 - [ ] **[You]** Is a run 12–15 minutes? Do different runs feel different?
 

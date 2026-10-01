@@ -27,6 +27,8 @@ extends CanvasLayer
 @onready var wave_title: Label = %WaveTitle
 @onready var wave_status: Label = %WaveStatus
 @onready var sector_warnings: SectorWarnings = %SectorWarnings
+@onready var boss_bar: BossBar = $BossBar
+@onready var wave_banner: WaveBanner = $WaveBanner
 
 var _hero: Hero
 var _director: WaveDirector
@@ -53,6 +55,9 @@ func _process(_delta: float) -> void:
 func bind_waves(director: WaveDirector) -> void:
 	_director = director
 	sector_warnings.director = director
+	director.wave_started.connect(func(number: int) -> void:
+		var wave := director.run.waves[number - 1]
+		wave_banner.show_text(wave.banner if wave.banner != "" else "Wave %d" % number, wave.banner_outline))
 
 
 func _update_wave_panel() -> void:
