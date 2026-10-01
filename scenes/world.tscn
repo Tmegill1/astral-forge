@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hero_upgrade_menu.tscn" id="12_hero_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="20_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/codex_toast.tscn" id="21_toast"]
+[ext_resource type="Script" path="res://scripts/cards/run_cards.gd" id="22_run_cards"]
 
 [node name="World" type="Node2D" unique_id=164071451]
 script = ExtResource("2_world")
@@ -107,6 +108,9 @@ script = ExtResource("9_nav")
 [node name="WaveDirector" type="Node" parent="." unique_id=910477237]
 script = ExtResource("5_waves")
 waves_scene = ExtResource("6_waves")
+
+[node name="RunCards" type="Node" parent="."]
+script = ExtResource("22_run_cards")
 
 [node name="UI" type="Node" parent="."]
 

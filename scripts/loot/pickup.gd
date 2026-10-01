@@ -44,7 +44,7 @@ func _physics_process(delta: float) -> void:
 	var hero := get_tree().get_first_node_in_group(&"hero") as Hero
 	if hero == null or hero.health.is_dead:
 		return
-	if global_position.distance_to(hero.global_position) <= magnet_radius:
+	if global_position.distance_to(hero.global_position) <= magnet_radius * RunCards.multiplier(self, &"pull_radius"):
 		global_position = global_position.move_toward(hero.global_position, magnet_speed * delta)
 
 

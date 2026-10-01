@@ -22,6 +22,7 @@ drops = Dictionary[StringName, Vector2i]({
 rare_drops = Dictionary[StringName, float]({
 &"aether": 0.05
 })
+xp_value = 1
 codex_summary = "The basic raider: comes in numbers and goes for the Core."
 codex_strengths = PackedStringArray("Arrives in large groups")
 codex_weaknesses = PackedStringArray("Fragile on its own")

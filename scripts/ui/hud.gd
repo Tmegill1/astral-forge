@@ -9,6 +9,9 @@ extends CanvasLayer
 @onready var health_bar: ProgressBar = %HealthBar
 @onready var health_text: Label = %HealthText
 @onready var stats_text: Label = %StatsText
+@onready var level_text: Label = %LevelText
+@onready var xp_bar: ProgressBar = %XpBar
+@onready var xp_text: Label = %XpText
 @onready var core_health_bar: ProgressBar = %CoreHealthBar
 @onready var core_health_text: Label = %CoreHealthText
 @onready var carried_text: Label = %CarriedText
@@ -86,6 +89,17 @@ func bind_hero(hero: Hero) -> void:
 	show_carried.call()
 	hero.interact_prompt_changed.connect(func(text: String) -> void: prompt.text = text)
 	prompt.text = ""
+
+
+func bind_run_cards(cards: RunCards) -> void:
+	var update := func() -> void:
+		var needed := RunCards.xp_for_level(cards.level)
+		level_text.text = "Lv %d" % cards.level
+		xp_bar.max_value = needed
+		xp_bar.value = cards.xp
+		xp_text.text = "%d / %d XP" % [cards.xp, needed]
+	cards.xp_changed.connect(update)
+	update.call()
 
 
 func bind_core(core: CommandCore) -> void:

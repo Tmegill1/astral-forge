@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/lodestone.gd" id="1_stone"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_stone"]
+radius = 12.0
+
+[node name="Lodestone" type="Area2D" groups=["lodestones"]]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_stone")
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+position = Vector2(0, -6)
+shape = SubResource("CircleShape2D_stone")

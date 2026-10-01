@@ -5,6 +5,8 @@ extends Node2D
 ## the run when the Command Core falls (defeat) or the last wave is cleared
 ## (victory).
 
+## Chance per kill of a Lodestone, unless one is already on the map.
+const LODESTONE_CHANCE := 0.03
 const HERO_SCENE := preload("res://scenes/heroes/hero.tscn")
 const HEAP_SCENE := preload("res://scenes/loot/resource_heap.tscn")
 ## Scrap heaps never appear closer to the Core than this, in pixels.
@@ -35,6 +37,7 @@ var _respawn_left := 0.0
 @onready var core: CommandCore = $Units/CommandCore
 @onready var hero_spawn: Marker2D = $HeroSpawn
 @onready var waves: WaveDirector = $WaveDirector
+@onready var run_cards: RunCards = $RunCards
 @onready var nav: NavGrid = $NavGrid
 @onready var hud: HUD = $UI/HUD
 @onready var game_over: GameOverScreen = $UI/GameOver
@@ -53,6 +56,7 @@ func _ready() -> void:
 	hero.died.connect(_on_hero_died)
 	hud.bind_hero(hero)
 	hud.bind_core(core)
+	hud.bind_run_cards(run_cards)
 	core.destroyed.connect(_on_core_destroyed)
 
 	nav.setup(map)
@@ -126,13 +130,21 @@ func _place_heaps(map: Rect2, type: StringName, count: int, min_distance: float,
 
 func _on_enemy_killed(enemy: Enemy) -> void:
 	kills += 1
+	var at := enemy.global_position
 	var drops := enemy.definition.drops
 	for type in drops:
-		Loot.drop(units, enemy.global_position, type, randi_range(drops[type].x, drops[type].y))
+		var amount := randi_range(drops[type].x, drops[type].y)
+		if type == Loot.SCRAP:
+			amount = maxi(amount, roundi(amount * RunCards.multiplier(self, &"scrap_drops")))
+		Loot.drop(units, at, type, amount)
 	var rare := enemy.definition.rare_drops
 	for type in rare:
 		if randf() < rare[type]:
-			Loot.drop(units, enemy.global_position, type, 1)
+			Loot.drop(units, at, type, 1)
+	XpOrb.drop(units, at, enemy.definition.xp_value)
+	if randf() < LODESTONE_CHANCE and not Lodestone.is_dropping() \
+			and get_tree().get_nodes_in_group(&"lodestones").is_empty():
+		Lodestone.drop(units, at)
 
 
 func _on_hero_died() -> void:

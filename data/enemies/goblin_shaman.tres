@@ -27,6 +27,7 @@ drops = Dictionary[StringName, Vector2i]({
 rare_drops = Dictionary[StringName, float]({
 &"aether": 0.15
 })
+xp_value = 3
 codex_summary = "A caster that hangs back, throws magic orbs and drives nearby goblins into a frenzy."
 codex_strengths = PackedStringArray("Makes nearby goblins faster and deadlier", "Attacks from range", "Walls don't stop it casting")
 codex_weaknesses = PackedStringArray("Frail", "Stuns and kills interrupt its frenzy")

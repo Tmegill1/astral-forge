@@ -46,6 +46,8 @@ extends Resource
 ## Resource type -> chance (0 to 1) of also dropping exactly one on death,
 ## e.g. {"aether": 0.05}.
 @export var rare_drops: Dictionary[StringName, float] = {}
+## XP in the orb this enemy drops when killed.
+@export var xp_value := 1
 
 @export_group("Frenzy pulse")
 ## Seconds between pulses that frenzy nearby enemies. 0 = never pulses.
