@@ -1,7 +1,7 @@
 # Phase 10 proposal: tower evolutions, a 10-wave run, and the Win screen
 
 Date: 2026-09-30
-Status: **proposal — for your review.** Nothing here is built yet. Each of the
+Status: **decided 2026-09-30 — all recommendations accepted** (Win screen: summary as listed, no run grade, slow-motion victory beat; run: placeholder bosses now, mechanics as listed, the final boss's death ends the run, wave banners yes; evolutions: unlock A (Lv3 + Aether), 6 Aether, all 8 branches, placeholder look with the unused sheets where they fit). Originally a proposal for your review. Nothing here is built yet. Each of the
 three parts would go through the usual flow (short design chat → spec → plan →
 build) once you've marked this up. Every "**Decide:**" line is a question for
 you; my recommendation is listed first.
