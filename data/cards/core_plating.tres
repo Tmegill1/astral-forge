@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_definition.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+id = &"core_plating"
+title = "Core Plating"
+description = "Command Core +20% max health (and heals that much)."
+category = "Fortress"
+max_rank = 3
+stat_bonuses = Dictionary[StringName, float]({
+&"core_max_health": 0.2
+})

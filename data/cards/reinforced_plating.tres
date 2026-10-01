@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_definition.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+id = &"reinforced_plating"
+title = "Reinforced Plating"
+description = "Towers and walls +25% max health."
+category = "Towers"
+max_rank = 3
+stat_bonuses = Dictionary[StringName, float]({
+&"structure_health": 0.25
+})

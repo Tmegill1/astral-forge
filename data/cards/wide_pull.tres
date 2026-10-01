@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_definition.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+id = &"wide_pull"
+title = "Wide Pull"
+description = "XP orbs and Scrap drift to you from 50% further away."
+category = "Fortress"
+max_rank = 2
+stat_bonuses = Dictionary[StringName, float]({
+&"pull_radius": 0.5
+})

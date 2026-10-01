@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_definition.gd" id="1_card"]
+
+[resource]
+script = ExtResource("1_card")
+id = &"sharpened_bolts"
+title = "Sharpened Bolts"
+description = "+20% hero damage."
+category = "Hero"
+max_rank = 5
+stat_bonuses = Dictionary[StringName, float]({
+&"hero_damage": 0.2
+})
