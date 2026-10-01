@@ -65,8 +65,11 @@ func _find_target() -> Enemy:
 	return best
 
 
-func _target_ok(enemy: Enemy) -> bool:
-	return enemy != null and is_instance_valid(enemy) and not enemy.health.is_dead \
+## Untyped on purpose: a freed enemy passed to a typed parameter is a script
+## error, so the validity check has to come first. Fleeing (invulnerable)
+## enemies don't count.
+func _target_ok(enemy) -> bool:
+	return is_instance_valid(enemy) and not enemy.health.is_dead and not enemy.health.invulnerable \
 			and global_position.distance_to(enemy.global_position) <= attack_range()
 
 

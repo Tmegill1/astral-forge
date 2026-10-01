@@ -79,6 +79,18 @@ func _init() -> void:
 	else:
 		check("focus lens data exists", false, true)
 
+	# Oil's fire bonus is kept apart from damage_taken, so code that resets
+	# damage_taken (the Shaman-King's shield) can't strand or lose it.
+	var health = load("res://scripts/components/health.gd").new()
+	health.reset(1000.0)
+	health.damage_taken = PackedFloat32Array([0.3, 0.6, 1.0])
+	health.bonus_taken[1] = 1.5
+	check("bonus applies", is_equal_approx(health.take_damage(100.0, 1), 90.0), true)
+	health.damage_taken = PackedFloat32Array([0.3, 0.6, 1.0])
+	health.bonus_taken[1] = 1.0
+	check("reset keeps base", is_equal_approx(health.take_damage(100.0, 1), 60.0), true)
+	health.free()
+
 	print("evolutions: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 

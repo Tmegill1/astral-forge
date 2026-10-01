@@ -50,8 +50,6 @@ var _stun_left := 0.0
 ## Oil from an Oil Sprayer: slower, and more fire damage taken while it lasts.
 var _oiled := false
 var _oil_left := 0.0
-## The extra fire damage this oil added (0.5 = +50%), so it can be taken off.
-var _oil_bonus := 0.0
 ## The wall or tower an ignores_walls enemy walked into.
 var _smash: Node2D
 ## True once it has fled (the run was won): no loot, no "killed".
@@ -263,8 +261,7 @@ func oil(seconds: float, slow_share: float, fire_bonus: float) -> void:
 		return
 	if not _oiled:
 		_oiled = true
-		_oil_bonus = fire_bonus
-		health.damage_taken[Health.DamageType.FIRE] *= 1.0 + fire_bonus
+		health.bonus_taken[Health.DamageType.FIRE] = 1.0 + fire_bonus
 	_oil_left = maxf(_oil_left, seconds)
 	slow(1.0 - slow_share, seconds)
 
@@ -279,8 +276,7 @@ func clear_oil() -> void:
 		return
 	_oiled = false
 	_oil_left = 0.0
-	health.damage_taken[Health.DamageType.FIRE] /= 1.0 + _oil_bonus
-	_oil_bonus = 0.0
+	health.bonus_taken[Health.DamageType.FIRE] = 1.0
 
 
 ## True when it could stop and channel (pulse, summon, phase shift) now.

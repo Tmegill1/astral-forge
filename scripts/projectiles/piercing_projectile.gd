@@ -12,6 +12,15 @@ var splash_radius := 50.0
 ## Instance ids of the enemies already hit, so overlapping shapes on the same
 ## enemy never count twice.
 var _hit_ids := {}
+## Splashes from this frame's hits, [centre, damage], dealt at the start of
+## the next physics frame so enemies hit in the same frame (stacked on one
+## spot) are left out of each other's splash.
+var _pending_splash: Array = []
+
+
+func _physics_process(delta: float) -> void:
+	_flush_splash()
+	super(delta)
 
 
 func _on_hit(target: Node) -> void:
@@ -20,25 +29,30 @@ func _on_hit(target: Node) -> void:
 	var health := _health_of(target)
 	if health == null or health.is_dead or health.invulnerable:
 		return
-	var victim := health.get_parent()
+	var victim := health.get_parent() as Node2D
 	if _hit_ids.has(victim.get_instance_id()):
 		return
 	_hit_ids[victim.get_instance_id()] = true
 	var dealt := health.take_damage(damage, damage_type)
 	struck.emit(victim)
 	hit.emit(dealt, health.is_dead)
-	_splash(victim as Node2D)
+	_pending_splash.append([victim.global_position, damage * splash_share])
 	if pierce > 0 and _hit_ids.size() >= pierce:
 		_spent = true
+		# Nothing else can be hit now, so splash at once before freeing.
+		_flush_splash()
 		queue_free()
 
 
-## Damages every other living enemy within splash_radius of `centre`.
-func _splash(centre: Node2D) -> void:
-	for node in get_tree().get_nodes_in_group(&"enemies"):
-		var enemy := node as Enemy
-		if enemy == centre or enemy.health.is_dead:
-			continue
-		if enemy.global_position.distance_to(centre.global_position) <= splash_radius:
-			var dealt := enemy.health.take_damage(damage * splash_share, damage_type)
-			hit.emit(dealt, enemy.health.is_dead)
+## Deals the queued splashes: each to every living enemy within
+## splash_radius of its centre that the round hasn't hit itself.
+func _flush_splash() -> void:
+	for splash in _pending_splash:
+		for node in get_tree().get_nodes_in_group(&"enemies"):
+			var enemy := node as Enemy
+			if _hit_ids.has(enemy.get_instance_id()) or enemy.health.is_dead:
+				continue
+			if enemy.global_position.distance_to(splash[0]) <= splash_radius:
+				var dealt := enemy.health.take_damage(splash[1], damage_type)
+				hit.emit(dealt, enemy.health.is_dead)
+	_pending_splash.clear()
