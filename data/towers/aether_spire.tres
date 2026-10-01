@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://xo0r3s72tg18" path="res://scripts/towers/turret_head.gd" id="1_pxyrn"]
 [ext_resource type="SpriteFrames" uid="uid://crg8tchpdh1n5" path="res://assets/sprites/aether_spire.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/towers/spire_tower.tscn" id="3_scene"]
+[ext_resource type="Resource" path="res://data/towers/storm_array.tres" id="4_storm"]
 
 [resource]
 script = ExtResource("1_def")
@@ -33,3 +34,4 @@ operated_fire_rate_multiplier = 1.0
 ability_name = "Resonance Burst"
 ability_cooldown = 15.0
 ability_fire_rate_multiplier = 1.0
+evolutions = Array[ExtResource("1_def")]([ExtResource("4_storm")])
