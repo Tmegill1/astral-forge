@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/goblin_shaman.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/enemy_orb.tscn" id="3_orb"]
+[ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="4_goblin"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"goblin_shaman_king"
+display_name = "Goblin Shaman-King"
+sprite_frames = ExtResource("2_frames")
+sprite_scale = 0.66
+max_health = 2500.0
+move_speed = 40.0
+attack_damage = 8.0
+attacks_per_second = 0.333
+attack_range = 300.0
+aggro_range = 300.0
+attack_hit_frame = 3
+attack_animation = &"cast"
+projectile_scene = ExtResource("3_orb")
+magic_taken = 0.6
+drops = Dictionary[StringName, Vector2i]({
+&"scrap": Vector2i(40, 50)
+})
+xp_value = 60
+codex_summary = "Master of the shamans, floating on a ring of runes."
+codex_strengths = PackedStringArray("Fans of magic orbs", "Summons goblins and frenzies them", "Shields itself when wounded")
+codex_weaknesses = PackedStringArray("Slow", "Its shield drops while you operate a tower in range")
+codex_tip = "Below half health, man a tower that can reach it."
+pulse_interval = 6.0
+pulse_radius = 300.0
+pulse_duration = 4.0
+pulse_animation = &"buff"
+is_boss = true
+ends_run = true
+tint = Color(0.8, 0.6, 1, 1)
+aura = Color(0.6, 0.3, 1, 0.4)
+projectile_count = 5
+projectile_spread_deg = 40.0
+summon_interval = 12.0
+summon_count = 4
+summon_enemy = ExtResource("4_goblin")
+summon_animation = &"buff"
+phase2_at = 0.5
+phase_shift_animation = &"buff"

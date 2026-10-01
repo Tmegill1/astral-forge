@@ -70,3 +70,37 @@ extends Resource
 @export var codex_strengths: PackedStringArray = []
 @export var codex_weaknesses: PackedStringArray = []
 @export var codex_tip := ""
+
+@export_group("Boss")
+## Shows the boss health bar and joins the "bosses" group.
+@export var is_boss := false
+## Killing it wins the run (every other enemy flees).
+@export var ends_run := false
+## Multiplies the sprite's colour (white = none). Placeholder bosses use it.
+@export var tint := Color.WHITE
+## A glowing ring drawn under the feet; transparent = none.
+@export var aura := Color(0, 0, 0, 0)
+## Ranged attacks fire this many projectiles, fanned over projectile_spread_deg.
+@export var projectile_count := 1
+@export var projectile_spread_deg := 0.0
+## Walks straight at its goal and smashes the first wall or tower it bumps into.
+@export var ignores_walls := false
+## Damage × this against walls and towers.
+@export var structure_damage_multiplier := 1.0
+## Always dropped on death, on top of `drops`.
+@export var guaranteed_drops: Dictionary[StringName, int] = {}
+@export var drops_lodestone := false
+
+@export_group("Summon")
+## Seconds between summons; 0 = never summons.
+@export var summon_interval := 0.0
+@export var summon_count := 4
+@export var summon_enemy: EnemyDefinition
+## Played while summoning (must not loop).
+@export var summon_animation: StringName = &"summon"
+
+@export_group("Phase 2")
+## Health share (0-1) at which phase 2 starts; 0 = no phase 2.
+@export var phase2_at := 0.0
+## Played during the phase change (must not loop).
+@export var phase_shift_animation: StringName = &"phase_shift"

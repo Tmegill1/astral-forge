@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/waves/wave_run.gd" id="1_run"]
 [ext_resource type="Script" path="res://scripts/waves/wave.gd" id="2_wave"]
@@ -6,6 +6,8 @@
 [ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="4_goblin"]
 [ext_resource type="Resource" path="res://data/enemies/armored_goblin.tres" id="5_armored"]
 [ext_resource type="Resource" path="res://data/enemies/goblin_shaman.tres" id="6_shaman"]
+[ext_resource type="Resource" path="res://data/enemies/goblin_warchief.tres" id="7_warchief"]
+[ext_resource type="Resource" path="res://data/enemies/goblin_shaman_king.tres" id="8_king"]
 
 [node name="FirstRun" type="Node"]
 script = ExtResource("1_run")
@@ -190,3 +192,484 @@ count = 1
 sector = "west"
 interval = 2.0
 delay = 9.0
+
+[node name="Wave6" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 35.0
+banner = "Wave 6 — The Warchief approaches"
+banner_outline = Color(0.85, 0.2, 0.15, 1)
+
+[node name="GoblinsWest" type="Node" parent="Wave6"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "west"
+interval = 1.2
+delay = 0.0
+
+[node name="GoblinsEast" type="Node" parent="Wave6"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 6
+sector = "east"
+interval = 1.2
+delay = 2.0
+
+[node name="ShamanWest" type="Node" parent="Wave6"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "west"
+interval = 2.0
+delay = 4.0
+
+[node name="ShamanEast" type="Node" parent="Wave6"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "east"
+interval = 2.0
+delay = 6.0
+
+[node name="Warchief" type="Node" parent="Wave6"]
+script = ExtResource("3_group")
+enemy = ExtResource("7_warchief")
+count = 1
+sector = "east"
+interval = 2.0
+delay = 10.0
+
+[node name="Wave7" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 30.0
+
+[node name="GoblinsNorth" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "north"
+interval = 1.0
+delay = 0.0
+
+[node name="GoblinsEast" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "east"
+interval = 1.0
+delay = 2.0
+
+[node name="GoblinsSouth" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "south"
+interval = 1.0
+delay = 4.0
+
+[node name="ArmoredNorth" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 3
+sector = "north"
+interval = 2.5
+delay = 3.0
+
+[node name="ArmoredSouth" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 3
+sector = "south"
+interval = 2.5
+delay = 6.0
+
+[node name="ShamanNorth" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "north"
+interval = 2.0
+delay = 8.0
+
+[node name="ShamanEast" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "east"
+interval = 2.0
+delay = 8.0
+
+[node name="ShamanSouth" type="Node" parent="Wave7"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "south"
+interval = 2.0
+delay = 8.0
+
+[node name="Wave8" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 30.0
+
+[node name="GoblinsNorth" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 9
+sector = "north"
+interval = 1.0
+delay = 0.0
+
+[node name="GoblinsEast" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 9
+sector = "east"
+interval = 1.0
+delay = 2.0
+
+[node name="GoblinsSouth" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 8
+sector = "south"
+interval = 1.0
+delay = 4.0
+
+[node name="GoblinsWest" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 8
+sector = "west"
+interval = 1.0
+delay = 6.0
+
+[node name="ArmoredEast" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 3
+sector = "east"
+interval = 2.5
+delay = 3.0
+
+[node name="ArmoredWest" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 3
+sector = "west"
+interval = 2.5
+delay = 5.0
+
+[node name="ShamanNorth" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "north"
+interval = 2.0
+delay = 8.0
+
+[node name="ShamanEast" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "east"
+interval = 2.0
+delay = 8.0
+
+[node name="ShamanSouth" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "south"
+interval = 2.0
+delay = 8.0
+
+[node name="ShamanWest" type="Node" parent="Wave8"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "west"
+interval = 2.0
+delay = 8.0
+
+[node name="Wave9" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 25.0
+banner = "Wave 9 — They're everywhere"
+
+[node name="GoblinsNorth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "north"
+interval = 0.8
+delay = 0.0
+
+[node name="ArmoredNorth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 2
+sector = "north"
+interval = 2.0
+delay = 0.0
+
+[node name="GoblinsEast" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "east"
+interval = 0.8
+delay = 0.0
+
+[node name="ArmoredEast" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 2
+sector = "east"
+interval = 2.0
+delay = 0.0
+
+[node name="GoblinsSouth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "south"
+interval = 0.8
+delay = 0.0
+
+[node name="ArmoredSouth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 2
+sector = "south"
+interval = 2.0
+delay = 0.0
+
+[node name="GoblinsWest" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 10
+sector = "west"
+interval = 0.8
+delay = 0.0
+
+[node name="ArmoredWest" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 2
+sector = "west"
+interval = 2.0
+delay = 0.0
+
+[node name="ShamanNorth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "north"
+interval = 2.0
+delay = 6.0
+
+[node name="ShamanSouth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "south"
+interval = 2.0
+delay = 6.0
+
+[node name="Burst2GoblinsNorth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "north"
+interval = 0.8
+delay = 22.0
+
+[node name="Burst2ArmoredNorth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 1
+sector = "north"
+interval = 2.0
+delay = 22.0
+
+[node name="Burst2GoblinsEast" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "east"
+interval = 0.8
+delay = 22.0
+
+[node name="Burst2ArmoredEast" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 1
+sector = "east"
+interval = 2.0
+delay = 22.0
+
+[node name="Burst2GoblinsSouth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "south"
+interval = 0.8
+delay = 22.0
+
+[node name="Burst2ArmoredSouth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 1
+sector = "south"
+interval = 2.0
+delay = 22.0
+
+[node name="Burst2GoblinsWest" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "west"
+interval = 0.8
+delay = 22.0
+
+[node name="Burst2ArmoredWest" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 1
+sector = "west"
+interval = 2.0
+delay = 22.0
+
+[node name="Burst2ShamanEast" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "east"
+interval = 2.0
+delay = 26.0
+
+[node name="Burst2ShamanWest" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "west"
+interval = 2.0
+delay = 26.0
+
+[node name="Burst2ShamanNorth" type="Node" parent="Wave9"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "north"
+interval = 2.0
+delay = 26.0
+
+[node name="Wave10" type="Node" parent="."]
+script = ExtResource("2_wave")
+prep_time = 45.0
+banner = "Final wave — The Shaman-King"
+banner_outline = Color(0.55, 0.25, 0.9, 1)
+
+[node name="King" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("8_king")
+count = 1
+sector = "north"
+interval = 2.0
+delay = 4.0
+
+[node name="GoblinsWest" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "west"
+interval = 1.5
+delay = 8.0
+
+[node name="GoblinsEast" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "east"
+interval = 1.5
+delay = 16.0
+
+[node name="GoblinsSouth" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "south"
+interval = 1.5
+delay = 24.0
+
+[node name="GoblinsNorth" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("4_goblin")
+count = 5
+sector = "north"
+interval = 1.5
+delay = 32.0
+
+[node name="ArmoredEast" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 2
+sector = "east"
+interval = 3.0
+delay = 20.0
+
+[node name="ArmoredWest" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 2
+sector = "west"
+interval = 3.0
+delay = 20.0
+
+[node name="ArmoredNorth" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 1
+sector = "north"
+interval = 3.0
+delay = 30.0
+
+[node name="ArmoredSouth" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("5_armored")
+count = 1
+sector = "south"
+interval = 3.0
+delay = 30.0
+
+[node name="ShamanNorth" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "north"
+interval = 2.0
+delay = 14.0
+
+[node name="ShamanEast" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "east"
+interval = 2.0
+delay = 14.0
+
+[node name="ShamanSouth" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "south"
+interval = 2.0
+delay = 14.0
+
+[node name="ShamanWest" type="Node" parent="Wave10"]
+script = ExtResource("3_group")
+enemy = ExtResource("6_shaman")
+count = 1
+sector = "west"
+interval = 2.0
+delay = 14.0

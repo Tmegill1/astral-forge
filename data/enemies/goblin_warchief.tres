@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/goblin_brute.tres" id="2_frames"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"goblin_warchief"
+display_name = "Goblin Warchief"
+sprite_frames = ExtResource("2_frames")
+sprite_scale = 0.58
+max_health = 600.0
+move_speed = 45.0
+attack_damage = 20.0
+attacks_per_second = 0.6
+attack_range = 24.0
+aggro_range = 140.0
+attack_hit_frame = 3
+physical_taken = 0.3
+fire_taken = 0.6
+magic_taken = 1.0
+drops = Dictionary[StringName, Vector2i]({
+&"scrap": Vector2i(20, 25)
+})
+xp_value = 25
+codex_summary = "The armoured goblins' warlord: a hulking brute with a steam-cleaver."
+codex_strengths = PackedStringArray("Smashes straight through walls and towers", "War cry frenzies nearby goblins")
+codex_weaknesses = PackedStringArray("Slow", "Alone once his escort falls")
+codex_tip = "Pile magic on him before he reaches your walls."
+pulse_interval = 8.0
+pulse_radius = 250.0
+pulse_duration = 5.0
+pulse_animation = &"hurt"
+is_boss = true
+tint = Color(1, 0.62, 0.55, 1)
+aura = Color(1, 0.3, 0.2, 0.35)
+ignores_walls = true
+structure_damage_multiplier = 3.0
+guaranteed_drops = Dictionary[StringName, int]({
+&"aether": 5
+})
+drops_lodestone = true

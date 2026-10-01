@@ -5,6 +5,10 @@ extends Resource
 
 ## Seconds of calm before this wave starts (shown as a countdown).
 @export var prep_time := 30.0
+## Big text at the wave's start; empty shows "Wave N".
+@export var banner := ""
+## Outline for the banner's gold text on boss waves; transparent = plain white.
+@export var banner_outline := Color(0, 0, 0, 0)
 @export var groups: Array[WaveGroup] = []
 
 

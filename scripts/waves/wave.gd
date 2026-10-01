@@ -6,11 +6,17 @@ extends Node
 
 ## Seconds of calm before this wave starts (shown as a countdown).
 @export var prep_time := 30.0
+## Big text at the wave's start; empty shows "Wave N".
+@export var banner := ""
+## Outline colour for the banner's gold text (boss waves); transparent = plain white text.
+@export var banner_outline := Color(0, 0, 0, 0)
 
 
 func to_definition() -> WaveDefinition:
 	var wave := WaveDefinition.new()
 	wave.prep_time = prep_time
+	wave.banner = banner
+	wave.banner_outline = banner_outline
 	for child in get_children():
 		if child is SpawnGroup:
 			var group := (child as SpawnGroup).to_definition()
