@@ -145,6 +145,11 @@ func _on_enemy_killed(enemy: Enemy) -> void:
 	for type in rare:
 		if randf() < rare[type]:
 			Loot.drop(units, at, type, 1)
+	var guaranteed := enemy.definition.guaranteed_drops
+	for type in guaranteed:
+		Loot.drop(units, at, type, guaranteed[type])
+	if enemy.definition.drops_lodestone:
+		Lodestone.drop(units, at)
 	XpOrb.drop(units, at, enemy.definition.xp_value)
 	if randf() < LODESTONE_CHANCE and not Lodestone.is_dropping() \
 			and get_tree().get_nodes_in_group(&"lodestones").is_empty():

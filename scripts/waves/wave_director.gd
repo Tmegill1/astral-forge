@@ -139,6 +139,7 @@ func _spawn(enemy: EnemyDefinition, sector: StringName) -> Enemy:
 	e.setup(enemy)
 	e.position = spawn_point(sector)
 	e.set_meta(&"sector", sector)
+	e.killed.connect(_on_enemy_killed)
 	container.add_child(e)
 	_alive.append(e)
 	enemy_spawned.emit(e)
@@ -166,6 +167,28 @@ func spawn_at(enemy: EnemyDefinition, at: Vector2) -> Enemy:
 	e.setup(enemy)
 	e.position = at
 	e.set_meta(&"sector", &"west")
+	e.killed.connect(_on_enemy_killed)
 	container.add_child(e)
 	enemy_spawned.emit(e)
 	return e
+
+
+func _on_enemy_killed(enemy: Enemy) -> void:
+	if enemy.definition.ends_run and state != State.WON:
+		# Deferred: the world counts the kill (and drops its loot) first.
+		win_now.call_deferred()
+
+
+## Ends the run as a victory now: everything else flees, nothing more spawns.
+func win_now() -> void:
+	if state == State.WON:
+		return
+	_spawn_queue.clear()
+	for node in get_tree().get_nodes_in_group(&"enemies"):
+		var other := node as Enemy
+		if other and not other.health.is_dead:
+			other.flee()
+	_alive.clear()
+	wave_index = run.waves.size()
+	state = State.WON
+	run_won.emit()

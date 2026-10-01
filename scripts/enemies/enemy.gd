@@ -44,6 +44,10 @@ var _burn_dps := 0.0
 var _burn_left := 0.0
 ## While above 0 it can't move or attack.
 var _stun_left := 0.0
+## The wall or tower an ignores_walls enemy walked into.
+var _smash: Node2D
+## True once it has fled (the run was won): no loot, no "killed".
+var fled := false
 ## Frenzy (from a Shaman's pulse): extra speed and damage until
 ## _frenzy_left runs out.
 var _frenzy_speed := 0.0
@@ -69,6 +73,7 @@ func _ready() -> void:
 	assert(definition != null, "Call Enemy.setup() before adding the enemy to the tree")
 	sprite.sprite_frames = definition.sprite_frames
 	sprite.scale = Vector2.ONE * definition.sprite_scale
+	sprite.modulate = definition.tint
 	sprite.offset = -definition.sprite_frames.get_meta("foot_offset", Vector2.ZERO)
 	sprite.play(&"walk")
 	sprite.frame_changed.connect(_on_frame_changed)
@@ -81,6 +86,9 @@ func _ready() -> void:
 			definition.physical_taken, definition.fire_taken, definition.magic_taken])
 	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
+	if definition.is_boss:
+		add_to_group(&"bosses")
+	queue_redraw()
 	if definition.pulse_interval > 0.0:
 		add_child(FRENZY_PULSE_SCENE.instantiate())
 
@@ -117,13 +125,23 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		sprite.play(&"idle")
 		return
-	if _needs_repath(goal):
-		_repath(goal)
-	_target = goal
-	if _blocked and not _in_reach(goal):
-		var breakable := _nearest_breakable()
-		if breakable:
-			_target = breakable
+	if definition.ignores_walls:
+		# Straight at the goal; smash whatever wall or tower it walked into.
+		_path = PackedVector2Array()
+		_path_goal = goal
+		_target = goal
+		if is_instance_valid(_smash) and not _smash.get_node(^"Health").is_dead:
+			_target = _smash
+		else:
+			_smash = null
+	else:
+		if _needs_repath(goal):
+			_repath(goal)
+		_target = goal
+		if _blocked and not _in_reach(goal):
+			var breakable := _nearest_breakable()
+			if breakable:
+				_target = breakable
 
 	if _in_reach(_target):
 		# Standing still to attack (towers read velocity to lead their shots).
@@ -141,6 +159,12 @@ func _physics_process(delta: float) -> void:
 	var direction := (step_to - global_position).normalized()
 	velocity = direction * definition.move_speed * speed_multiplier()
 	move_and_slide()
+	if definition.ignores_walls and _smash == null:
+		for i in get_slide_collision_count():
+			var collider := get_slide_collision(i).get_collider() as Node2D
+			if collider and collider.is_in_group(&"breakables"):
+				_smash = collider
+				break
 	if absf(direction.x) > 0.1:
 		sprite.flip_h = direction.x < 0.0
 	if not _is_attacking():
@@ -229,13 +253,13 @@ func _cancel_pulse() -> void:
 func _update_tint() -> void:
 	var flicker := sin(Time.get_ticks_msec() * 0.02)
 	if _stun_left > 0.0:
-		sprite.modulate = Color.WHITE.lerp(Color(0.6, 0.85, 1.0), 0.45 + 0.15 * flicker)
+		sprite.modulate = Color.WHITE.lerp(Color(0.6, 0.85, 1.0), 0.45 + 0.15 * flicker) * definition.tint
 	elif _frenzy_left > 0.0:
-		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.4, 0.35), 0.35 + 0.15 * flicker)
+		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.4, 0.35), 0.35 + 0.15 * flicker) * definition.tint
 	elif _burn_stacks > 0:
-		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), 0.25 + 0.1 * flicker)
+		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), 0.25 + 0.1 * flicker) * definition.tint
 	else:
-		sprite.modulate = Color.WHITE
+		sprite.modulate = definition.tint
 
 
 ## A physical hit that armour partly blocked throws sparks.
@@ -371,7 +395,10 @@ func _on_frame_changed() -> void:
 	if definition.projectile_scene:
 		_shoot(_target)
 	else:
-		target_health.take_damage(attack_damage())
+		var hit := attack_damage()
+		if _target.is_in_group(&"breakables"):
+			hit *= definition.structure_damage_multiplier
+		target_health.take_damage(hit)
 
 
 ## Throws the definition's projectile from the body at `target`'s current
@@ -379,14 +406,19 @@ func _on_frame_changed() -> void:
 func _shoot(target: Node2D) -> void:
 	var from := hurtbox_shape.global_position
 	var to_target := target.global_position - from
-	var shot: Projectile = definition.projectile_scene.instantiate()
-	shot.global_position = from
-	shot.direction = to_target.normalized()
-	shot.speed = definition.projectile_speed
-	shot.damage = attack_damage()
-	shot.damage_type = Health.DamageType.MAGIC
-	shot.max_distance = to_target.length() + 60.0
-	get_parent().add_child(shot)
+	var count := maxi(definition.projectile_count, 1)
+	for i in count:
+		# Fanned evenly over projectile_spread_deg, centred on the target.
+		var spread := 0.0 if count == 1 \
+				else lerpf(-0.5, 0.5, float(i) / (count - 1)) * definition.projectile_spread_deg
+		var shot: Projectile = definition.projectile_scene.instantiate()
+		shot.global_position = from
+		shot.direction = to_target.normalized().rotated(deg_to_rad(spread))
+		shot.speed = definition.projectile_speed
+		shot.damage = attack_damage()
+		shot.damage_type = Health.DamageType.MAGIC
+		shot.max_distance = to_target.length() + 60.0
+		get_parent().add_child(shot)
 
 
 func _on_animation_finished() -> void:
@@ -408,10 +440,36 @@ func _on_died() -> void:
 	_frenzy_left = 0.0
 	_frenzy_speed = 0.0
 	_frenzy_damage = 0.0
-	sprite.modulate = Color.WHITE
+	sprite.modulate = definition.tint
+	queue_redraw()
 	velocity = Vector2.ZERO
 	# Stop catching bolts; deferred because this can fire mid-physics.
 	hurtbox.set_deferred(&"collision_layer", 0)
 	z_index = -1
 	sprite.play(&"death")
 	killed.emit(self)
+
+
+## Leaves the field: fades out and is freed, without dying or dropping loot.
+func flee() -> void:
+	if health.is_dead or fled:
+		return
+	fled = true
+	set_physics_process(false)
+	velocity = Vector2.ZERO
+	hurtbox.set_deferred(&"collision_layer", 0)
+	health.invulnerable = true
+	var fade := create_tween()
+	fade.tween_property(self, "modulate:a", 0.0, 0.6)
+	fade.tween_callback(queue_free)
+
+
+## The placeholder bosses' glowing ring under the feet.
+func _draw() -> void:
+	if definition == null or definition.aura.a <= 0.0 or health.is_dead:
+		return
+	var radius := 18.0 * definition.sprite_scale / 0.3
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, 0.45))
+	draw_circle(Vector2.ZERO, radius, Color(definition.aura, definition.aura.a * 0.5))
+	draw_arc(Vector2.ZERO, radius, 0.0, TAU, 40, definition.aura, 3.0)
+	draw_set_transform(Vector2.ZERO)
