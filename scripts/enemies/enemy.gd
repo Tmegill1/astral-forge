@@ -47,6 +47,11 @@ var _burn_dps := 0.0
 var _burn_left := 0.0
 ## While above 0 it can't move or attack.
 var _stun_left := 0.0
+## Oil from an Oil Sprayer: slower, and more fire damage taken while it lasts.
+var _oiled := false
+var _oil_left := 0.0
+## The extra fire damage this oil added (0.5 = +50%), so it can be taken off.
+var _oil_bonus := 0.0
 ## The wall or tower an ignores_walls enemy walked into.
 var _smash: Node2D
 ## True once it has fled (the run was won): no loot, no "killed".
@@ -113,6 +118,10 @@ func _physics_process(delta: float) -> void:
 		_tick_burn(delta)
 		if health.is_dead:
 			return
+	if _oiled:
+		_oil_left -= delta
+		if _oil_left <= 0.0:
+			clear_oil()
 	_update_tint()
 	_cooldown -= delta
 	_repath_left -= delta
@@ -246,6 +255,34 @@ func is_stunned() -> bool:
 	return _stun_left > 0.0
 
 
+## Oils it for `seconds`: `slow_share` slower (0.3 = 30%) and `fire_bonus`
+## more fire damage taken (0.5 = +50%). Oiling it again only refreshes the
+## time; the bonus never stacks.
+func oil(seconds: float, slow_share: float, fire_bonus: float) -> void:
+	if health.is_dead:
+		return
+	if not _oiled:
+		_oiled = true
+		_oil_bonus = fire_bonus
+		health.damage_taken[Health.DamageType.FIRE] *= 1.0 + fire_bonus
+	_oil_left = maxf(_oil_left, seconds)
+	slow(1.0 - slow_share, seconds)
+
+
+func is_oiled() -> bool:
+	return _oiled
+
+
+## Takes the oil off (it burned away or wore off).
+func clear_oil() -> void:
+	if not _oiled:
+		return
+	_oiled = false
+	_oil_left = 0.0
+	health.damage_taken[Health.DamageType.FIRE] /= 1.0 + _oil_bonus
+	_oil_bonus = 0.0
+
+
 ## True when it could stop and channel (pulse, summon, phase shift) now.
 func can_channel() -> bool:
 	return not health.is_dead and _stun_left <= 0.0 and _channel_by == null and not _is_attacking()
@@ -280,13 +317,16 @@ func _finish_channel() -> void:
 	channel_finished.emit(by, true)
 
 
-## Stun (pale blue) shows over frenzy (red) over burn (orange); all flicker.
+## Stun (pale blue) shows over frenzy (red) over oil (dark) over burn
+## (orange); all flicker.
 func _update_tint() -> void:
 	var flicker := sin(Time.get_ticks_msec() * 0.02)
 	if _stun_left > 0.0:
 		sprite.modulate = Color.WHITE.lerp(Color(0.6, 0.85, 1.0), 0.45 + 0.15 * flicker) * definition.tint
 	elif _frenzy_left > 0.0:
 		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.4, 0.35), 0.35 + 0.15 * flicker) * definition.tint
+	elif _oiled:
+		sprite.modulate = Color.WHITE.lerp(Color(0.35, 0.3, 0.15), 0.45 + 0.1 * flicker) * definition.tint
 	elif _burn_stacks > 0:
 		sprite.modulate = Color.WHITE.lerp(Color(1.0, 0.55, 0.25), 0.25 + 0.1 * flicker) * definition.tint
 	else:

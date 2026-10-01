@@ -5,6 +5,7 @@
 [ext_resource type="SpriteFrames" uid="uid://do5cvntf3j6ih" path="res://assets/sprites/embercaster.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/towers/ember_tower.tscn" id="3_scene"]
 [ext_resource type="Resource" path="res://data/towers/inferno.tres" id="4_inferno"]
+[ext_resource type="Resource" path="res://data/towers/oil_sprayer.tres" id="5_oil"]
 
 [resource]
 script = ExtResource("1_def")
@@ -35,4 +36,4 @@ operated_fire_rate_multiplier = 1.0
 ability_name = "Overpressure"
 ability_cooldown = 15.0
 ability_fire_rate_multiplier = 1.0
-evolutions = Array[ExtResource("1_def")]([ExtResource("4_inferno")])
+evolutions = Array[ExtResource("1_def")]([ExtResource("4_inferno"), ExtResource("5_oil")])
