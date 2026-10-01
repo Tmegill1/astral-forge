@@ -38,6 +38,7 @@ var _alive: Array[Enemy] = []
 
 
 func _ready() -> void:
+	add_to_group(&"wave_director")
 	var tree := waves_scene.instantiate() as WaveRun
 	assert(tree != null, "WaveDirector.waves_scene must be a WaveRun scene")
 	run = tree.to_definition()
@@ -170,6 +171,14 @@ func spawn_at(enemy: EnemyDefinition, at: Vector2) -> Enemy:
 	e.killed.connect(_on_enemy_killed)
 	container.add_child(e)
 	enemy_spawned.emit(e)
+	return e
+
+
+## A boss raises `enemy` at `at`; it counts toward the current wave.
+func summon(enemy: EnemyDefinition, at: Vector2) -> Enemy:
+	var e := spawn_at(enemy, at)
+	if state == State.WAVE:
+		_alive.append(e)
 	return e
 
 

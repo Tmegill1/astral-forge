@@ -18,7 +18,7 @@ var _ring_left := 0.0
 
 
 func _ready() -> void:
-	enemy.pulse_finished.connect(_on_pulse_finished)
+	enemy.channel_finished.connect(_on_channel_finished)
 
 
 func _physics_process(delta: float) -> void:
@@ -28,12 +28,14 @@ func _physics_process(delta: float) -> void:
 	if _casting or enemy.health.is_dead:
 		return
 	_left -= delta
-	if _left <= 0.0 and enemy.can_pulse():
+	if _left <= 0.0 and enemy.can_channel():
 		_casting = true
-		enemy.start_pulse()
+		enemy.start_channel(enemy.definition.pulse_animation, self)
 
 
-func _on_pulse_finished(landed: bool) -> void:
+func _on_channel_finished(by: Node, landed: bool) -> void:
+	if by != self:
+		return
 	_casting = false
 	var def := enemy.definition
 	_left = def.pulse_interval

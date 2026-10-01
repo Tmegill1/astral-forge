@@ -9,13 +9,16 @@ extends CharacterBody2D
 ## completely, it breaks through the nearest wall or tower.
 
 signal killed(enemy: Enemy)
-## A pulse cast ended: `landed` is false when a stun or death cut it short.
-signal pulse_finished(landed: bool)
+## A channel (pulse, summon, phase shift) ended: `landed` is false when a
+## stun or death cut it short. `by` is the node that started it.
+signal channel_finished(by: Node, landed: bool)
 
 ## Seconds a body stays on the ground before fading out.
 const CORPSE_TIME := 1.5
 const SPARK_SCENE := preload("res://scenes/effects/armor_spark.tscn")
 const FRENZY_PULSE_SCENE := preload("res://scenes/enemies/frenzy_pulse.tscn")
+const SUMMONER_SCENE := preload("res://scenes/enemies/summoner.tscn")
+const BOSS_PHASE_SCENE := preload("res://scenes/enemies/boss_phase.tscn")
 ## Paths are recomputed at least this often, in seconds.
 const REPATH_TIME := 0.75
 ## A waypoint counts as reached within this distance, in pixels.
@@ -53,8 +56,14 @@ var fled := false
 var _frenzy_speed := 0.0
 var _frenzy_damage := 0.0
 var _frenzy_left := 0.0
-## True while standing still casting a pulse.
-var _pulsing := false
+## The node whose channel is playing, or null.
+var _channel_by: Node
+var _channel_animation: StringName
+## Seconds the channel must still last even after its animation ends.
+var _channel_left := 0.0
+var _channel_anim_done := false
+## Movement × this (phase 2 sets it to 1.3).
+var phase_speed := 1.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var health: Health = $Health
@@ -91,6 +100,10 @@ func _ready() -> void:
 	queue_redraw()
 	if definition.pulse_interval > 0.0:
 		add_child(FRENZY_PULSE_SCENE.instantiate())
+	if definition.summon_interval > 0.0 and definition.summon_enemy:
+		add_child(SUMMONER_SCENE.instantiate())
+	if definition.phase2_at > 0.0:
+		add_child(BOSS_PHASE_SCENE.instantiate())
 
 
 func _physics_process(delta: float) -> void:
@@ -117,8 +130,11 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		sprite.play(&"idle")
 		return
-	if _pulsing:
+	if _channel_by:
 		velocity = Vector2.ZERO
+		_channel_left -= delta
+		if _channel_anim_done and _channel_left <= 0.0:
+			_finish_channel()
 		return
 	var goal := _pick_target()
 	if goal == null:
@@ -179,7 +195,7 @@ func slow(factor: float, seconds: float) -> void:
 
 
 func speed_multiplier() -> float:
-	return _slow_factor * (1.0 + _frenzy_speed)
+	return _slow_factor * (1.0 + _frenzy_speed) * phase_speed
 
 
 ## Frenzy: moves `speed_bonus` faster and hits `damage_bonus` harder
@@ -223,30 +239,45 @@ func stun(seconds: float) -> void:
 	if health.is_dead:
 		return
 	_stun_left = maxf(_stun_left, seconds)
-	_cancel_pulse()
+	_cancel_channel()
 
 
 func is_stunned() -> bool:
 	return _stun_left > 0.0
 
 
-## True when it could stop and cast a pulse right now.
-func can_pulse() -> bool:
-	return not health.is_dead and _stun_left <= 0.0 and not _pulsing and not _is_attacking()
+## True when it could stop and channel (pulse, summon, phase shift) now.
+func can_channel() -> bool:
+	return not health.is_dead and _stun_left <= 0.0 and _channel_by == null and not _is_attacking()
 
 
-## Stands still playing the pulse animation; pulse_finished follows.
-func start_pulse() -> void:
-	_pulsing = true
+func is_channeling() -> bool:
+	return _channel_by != null
+
+
+## Stands still playing `animation` for at least `min_time` seconds;
+## channel_finished(by, true) follows.
+func start_channel(animation: StringName, by: Node, min_time := 0.0) -> void:
+	_channel_by = by
+	_channel_animation = animation
+	_channel_left = min_time
+	_channel_anim_done = false
 	velocity = Vector2.ZERO
-	sprite.play(definition.pulse_animation)
+	sprite.play(animation)
 	sprite.frame = 0
 
 
-func _cancel_pulse() -> void:
-	if _pulsing:
-		_pulsing = false
-		pulse_finished.emit(false)
+func _cancel_channel() -> void:
+	if _channel_by:
+		var by := _channel_by
+		_channel_by = null
+		channel_finished.emit(by, false)
+
+
+func _finish_channel() -> void:
+	var by := _channel_by
+	_channel_by = null
+	channel_finished.emit(by, true)
 
 
 ## Stun (pale blue) shows over frenzy (red) over burn (orange); all flicker.
@@ -422,9 +453,10 @@ func _shoot(target: Node2D) -> void:
 
 
 func _on_animation_finished() -> void:
-	if sprite.animation == definition.pulse_animation and _pulsing:
-		_pulsing = false
-		pulse_finished.emit(true)
+	if _channel_by and sprite.animation == _channel_animation:
+		_channel_anim_done = true
+		if _channel_left <= 0.0:
+			_finish_channel()
 		return
 	if sprite.animation == &"death":
 		var fade := create_tween()
@@ -434,7 +466,7 @@ func _on_animation_finished() -> void:
 
 
 func _on_died() -> void:
-	_cancel_pulse()
+	_cancel_channel()
 	_burn_stacks = 0
 	_stun_left = 0.0
 	_frenzy_left = 0.0
