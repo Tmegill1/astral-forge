@@ -66,9 +66,16 @@ func _show_row(row: UpgradeRow, upgrade: HeroUpgrade) -> void:
 		_refresh())
 
 
-## The stat's value at `rank`, e.g. "14" or "1.4/s".
+## Hero stat -> the power-up card bonus that also scales it.
+const CARD_STATS := {&"attack_damage": &"hero_damage", &"attacks_per_second": &"hero_fire_rate",
+		&"move_speed": &"hero_move_speed", &"max_health": &"hero_max_health"}
+
+
+## The stat's value at `rank` with any card bonus, e.g. "14" or "1.4/s".
 func _value(upgrade: HeroUpgrade, rank: int) -> String:
 	var value: float = _hero.base_stats.get(upgrade.stat) * upgrade.multiplier(rank)
+	if CARD_STATS.has(upgrade.stat):
+		value *= RunCards.multiplier(self, CARD_STATS[upgrade.stat])
 	if upgrade.stat == &"attacks_per_second":
 		return "%.1f/s" % value
 	return "%.0f" % value

@@ -5,12 +5,16 @@ extends CanvasLayer
 ## does nothing). Never opens once the run is over.
 
 const CARD_SCENE := preload("res://scenes/ui/power_card.tscn")
+## Picks are ignored this long after an offer appears, so a key press or
+## double-click meant for something else can't take a card unseen.
+const PICK_DELAY_MS := 350
 
 ## Level-ups still waiting for a pick (not counting the one on screen).
 var pending := 0
 
 var _cards: RunCards
 var _shown: Array[PowerCard] = []
+var _shown_at := 0
 
 @onready var title: Label = %Title
 @onready var row: HBoxContainer = %Cards
@@ -30,6 +34,8 @@ func is_open() -> bool:
 ## Takes the card at `index` (0-2) of the current offer.
 func pick(index: int) -> void:
 	if not visible or index < 0 or index >= _shown.size():
+		return
+	if Time.get_ticks_msec() - _shown_at < PICK_DELAY_MS:
 		return
 	_cards.take(_shown[index].card)
 	_show_next()
@@ -62,6 +68,7 @@ func _show_next() -> void:
 			power_card.chosen.connect(pick.bind(i))
 			_shown.append(power_card)
 		visible = true
+		_shown_at = Time.get_ticks_msec()
 		get_tree().paused = true
 		_shown[0].choose_button.grab_focus()
 		return

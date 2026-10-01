@@ -72,11 +72,16 @@ func _refresh_upgrade(tower: Tower) -> void:
 		return
 	var def := tower.definition
 	var next := tower.level + 1
+	# Power-up card bonuses apply to every level.
+	var damage := RunCards.multiplier(self, &"tower_damage")
+	var rate := RunCards.multiplier(self, &"tower_fire_rate")
+	var reach := RunCards.multiplier(self, &"tower_range")
+	var toughness := RunCards.multiplier(self, &"structure_health")
 	info.text += "\nNext: damage %.0f → %.0f · %.1f → %.1f shots/s · range %.0f → %.0f · health %.0f → %.0f" % [
-		def.damage_at(tower.level), def.damage_at(next),
-		def.fire_rate_at(tower.level), def.fire_rate_at(next),
-		def.range_at(tower.level), def.range_at(next),
-		def.max_health_at(tower.level), def.max_health_at(next)]
+		def.damage_at(tower.level) * damage, def.damage_at(next) * damage,
+		def.fire_rate_at(tower.level) * rate, def.fire_rate_at(next) * rate,
+		def.range_at(tower.level) * reach, def.range_at(next) * reach,
+		def.max_health_at(tower.level) * toughness, def.max_health_at(next) * toughness]
 	var cost := def.upgrade_cost(next)
 	var missing := _slot.core().stored.shortfall(cost)
 	upgrade_button.disabled = not missing.is_empty()
