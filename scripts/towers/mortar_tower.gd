@@ -101,6 +101,11 @@ func use_ability() -> void:
 
 
 func _launch(point: Vector2, shell_damage: float, radius: float, rune_duration: float) -> void:
+	projectile_parent.add_child(_make_shell(point, shell_damage, radius, rune_duration))
+
+
+## A shell from the muzzle to `point`, set up but not fired yet.
+func _make_shell(point: Vector2, shell_damage: float, radius: float, rune_duration: float) -> Shell:
 	var shell: Shell = SHELL_SCENE.instantiate()
 	shell.from = _muzzle_base()
 	shell.target = point
@@ -110,7 +115,7 @@ func _launch(point: Vector2, shell_damage: float, radius: float, rune_duration: 
 	shell.radius = radius
 	shell.rune_duration = rune_duration
 	shell.rune_slow = mortar.rune_slow
-	projectile_parent.add_child(shell)
+	return shell
 
 
 ## Idle frames show the reload: frame 0 just fired, the last frame ready.

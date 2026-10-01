@@ -9,6 +9,7 @@ extends SceneTree
 ## its pair here.
 const EXPECTED := {
 	&"gearshot": [&"gatling_engine", &"rune_cannon"],
+	&"rune_mortar": [&"siege_battery"],
 }
 ## Stats an evolution copies unchanged from its base tower, so it starts at
 ## exactly the base tower's Lv3 numbers.
