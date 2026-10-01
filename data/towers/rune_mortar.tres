@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="MortarDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="MortarDefinition" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/towers/mortar_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/rune_mortar.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/towers/mortar_tower.tscn" id="3_scene"]
 [ext_resource type="Resource" path="res://data/towers/siege_battery.tres" id="4_siege"]
+[ext_resource type="Resource" path="res://data/towers/frost_mortar.tres" id="5_frost"]
 
 [resource]
 script = ExtResource("1_def")
@@ -36,4 +37,4 @@ operated_fire_rate_multiplier = 1.0
 operated_range_multiplier = 1.15
 ability_name = "Rune Shell"
 ability_cooldown = 15.0
-evolutions = Array[ExtResource("1_def")]([ExtResource("4_siege")])
+evolutions = Array[ExtResource("1_def")]([ExtResource("4_siege"), ExtResource("5_frost")])

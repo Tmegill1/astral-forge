@@ -2,8 +2,9 @@ class_name Shell
 extends Node2D
 ## A mortar shell: flies from `from` to `target` over flight_time on an arc,
 ## with a shadow on the ground and a faint circle marking where it lands. On
-## landing it damages every living enemy within `radius`, flashes, and can
-## leave a RuneCircle that slows enemies.
+## landing it damages every living enemy within `radius`, flashes, can
+## leave a RuneCircle that slows enemies, and can freeze the ones closest to
+## the impact.
 
 ## Emitted once per enemy damaged; `killed` if that finished it.
 signal hit(damage: float, killed: bool)
@@ -21,6 +22,10 @@ var radius := 70.0
 var rune_duration := 0.0
 ## Share of speed taken away inside the circle (0.4 = 40% slower).
 var rune_slow := 0.0
+## Enemies within this of the landing spot are frozen (stunned)...
+var freeze_radius := 0.0
+## ...for this many seconds; 0 = no freeze.
+var freeze_time := 0.0
 var color := Color(0.45, 0.85, 1.0)
 
 var _time := 0.0
@@ -49,10 +54,13 @@ func _physics_process(delta: float) -> void:
 func _land() -> void:
 	for node in get_tree().get_nodes_in_group(&"enemies"):
 		var enemy := node as Enemy
-		if enemy.health.is_dead or enemy.global_position.distance_to(target) > radius:
+		var distance := enemy.global_position.distance_to(target)
+		if enemy.health.is_dead or distance > radius:
 			continue
 		var dealt := enemy.health.take_damage(damage, Health.DamageType.MAGIC)
 		hit.emit(dealt, enemy.health.is_dead)
+		if freeze_time > 0.0 and distance <= freeze_radius:
+			enemy.stun(freeze_time)
 	if rune_duration > 0.0:
 		var circle: RuneCircle = RUNE_CIRCLE_SCENE.instantiate()
 		circle.radius = radius
