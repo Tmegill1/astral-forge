@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/towers/spire_tower.tscn" id="1_spire"]
+[ext_resource type="Script" path="res://scripts/towers/lens_tower.gd" id="2_lens"]
+
+[node name="LensTower" instance=ExtResource("1_spire")]
+script = ExtResource("2_lens")

@@ -11,7 +11,7 @@ const EXPECTED := {
 	&"gearshot": [&"gatling_engine", &"rune_cannon"],
 	&"rune_mortar": [&"siege_battery", &"frost_mortar"],
 	&"embercaster": [&"inferno", &"oil_sprayer"],
-	&"aether_spire": [&"storm_array"],
+	&"aether_spire": [&"storm_array", &"focus_lens"],
 }
 ## Stats an evolution copies unchanged from its base tower, so it starts at
 ## exactly the base tower's Lv3 numbers.
@@ -69,6 +69,15 @@ func _init() -> void:
 		check("spin x4", gatling.spin_multiplier(1.0), 4.0)
 	else:
 		check("gatling data exists", false, true)
+
+	var lens = load("res://data/towers/focus_lens.tres")
+	if lens:
+		check("ramp x1", lens.ramp_multiplier(0.0), 1.0)
+		check("ramp x3", lens.ramp_multiplier(0.5), 3.0)
+		check("ramp x5", lens.ramp_multiplier(1.0), 5.0)
+		check("ramp clamped", lens.ramp_multiplier(2.0), 5.0)
+	else:
+		check("focus lens data exists", false, true)
 
 	print("evolutions: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
