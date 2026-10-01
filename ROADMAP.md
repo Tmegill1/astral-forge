@@ -176,8 +176,8 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 
 - [ ] **[AI]** Artificer abilities: passive, **Overclock** (boost your tower), **Full Steam** ultimate (share it with all towers)
 - [x] **[AI]** Hero upgrades at the Core (F): Damage, Fire rate, Max health (+20%/rank), Move speed (+8%/rank); 5 ranks costing 12 / 20 / 30 + 1 Aether / 40 + 2 / 55 + 3, from the same stored pool as towers (data in `data/hero_upgrades/`)
-- [ ] **[AI]** Player XP earned during a run — **[You]** decide how it's earned (kills, damage, waves survived)
-- [ ] **[AI]** Power-up cards: after waves, pick 1 of 3 cards that make you stronger for the run (chain-lightning shots, flamethrower, and similar)
+- [x] **[AI]** Player XP: enemies drop XP orbs (Goblin 1, Shaman 3, Armored 3) you pick up; levels cost 8 × 1.5^(level−1); a rare Lodestone (3%) pulls every orb on the map to you
+- [x] **[AI]** Power-up cards: each level-up pauses and offers 3 of 14 run-long cards (hero / tower / fortress stats; Arc Bolts, Split Shot, Ember Rounds hero mods); data in `data/cards/`
 - [ ] **[AI]** One evolution per tower (e.g. Gearshot → Gatling Engine or Rune Cannon) — needs a new unlock now Mastery is gone (e.g. a card or Aether)
 - [ ] **[AI]** 10 waves, a mini-boss around wave 6, final boss
 - [ ] **[AI]** Win screen

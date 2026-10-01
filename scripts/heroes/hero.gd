@@ -22,6 +22,11 @@ signal operating_changed(tower: Tower)
 signal stats_changed
 
 const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
+const ARC_SCENE := preload("res://scenes/projectiles/lightning_arc.tscn")
+## Arc Bolts: how far lightning can jump from one enemy to the next, in pixels.
+const ARC_RANGE := 120.0
+## Split Shot: degrees between neighbouring bolts.
+const SPLIT_ANGLE := 12.0
 ## Walk animations from straight up to straight down, 45 degrees apart.
 ## Moving left plays these mirrored. Any the art doesn't have fall back to "walk".
 const WALK_BY_DIRECTION: Array[StringName] = [
@@ -385,13 +390,64 @@ func _fire() -> void:
 	var aim := get_global_mouse_position() - muzzle.global_position
 	if aim.is_zero_approx():
 		aim = Vector2.LEFT if _facing_left else Vector2.RIGHT
-	var bolt: Projectile = BOLT_SCENE.instantiate()
-	bolt.global_position = muzzle.global_position
-	bolt.direction = aim.normalized()
-	bolt.speed = stats.projectile_speed
-	bolt.damage = stats.attack_damage
-	bolt.max_distance = stats.attack_range
-	get_parent().add_child(bolt)
+	var split := _mod_rank(&"split_shot")
+	for i in range(-split, split + 1):
+		var bolt: Projectile = BOLT_SCENE.instantiate()
+		bolt.global_position = muzzle.global_position
+		bolt.direction = aim.normalized().rotated(deg_to_rad(SPLIT_ANGLE * i))
+		bolt.speed = stats.projectile_speed
+		bolt.damage = stats.attack_damage
+		bolt.max_distance = stats.attack_range
+		bolt.struck.connect(_on_bolt_struck.bind(bolt.damage))
+		get_parent().add_child(bolt)
+
+
+func _mod_rank(mod: StringName) -> int:
+	var cards := get_tree().get_first_node_in_group(&"run_cards") as RunCards
+	return cards.mod_rank(mod) if cards else 0
+
+
+## Ember Rounds burns the enemy hit; Arc Bolts chains lightning from it.
+func _on_bolt_struck(target: Node, bolt_damage: float) -> void:
+	var enemy := target as Enemy
+	if enemy == null:
+		return
+	var embers := _mod_rank(&"ember_rounds")
+	if embers > 0 and not enemy.health.is_dead:
+		enemy.add_burn(2.0, 5, 3.0, embers)
+	var jumps := _mod_rank(&"arc_bolts")
+	if jumps > 0:
+		_chain_lightning(enemy, jumps, bolt_damage * 0.5)
+
+
+## Lightning from `from` to up to `jumps` more enemies, each the nearest
+## living one within ARC_RANGE of the last, never the same one twice.
+func _chain_lightning(from: Enemy, jumps: int, arc_damage: float) -> void:
+	var hit: Array[Enemy] = [from]
+	var points := PackedVector2Array([from.hurtbox_shape.global_position])
+	var last := from
+	for i in jumps:
+		var next: Enemy = null
+		var best := ARC_RANGE
+		for node in get_tree().get_nodes_in_group(&"enemies"):
+			var other := node as Enemy
+			if other in hit or other.health.is_dead:
+				continue
+			var distance := last.global_position.distance_to(other.global_position)
+			if distance <= best:
+				next = other
+				best = distance
+		if next == null:
+			break
+		next.health.take_damage(arc_damage, Health.DamageType.MAGIC)
+		hit.append(next)
+		points.append(next.hurtbox_shape.global_position)
+		last = next
+	if points.size() < 2:
+		return
+	var arc: LightningArc = ARC_SCENE.instantiate()
+	arc.points = points
+	get_parent().add_child(arc)
 
 
 func _on_died() -> void:

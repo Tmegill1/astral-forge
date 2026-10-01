@@ -7,6 +7,8 @@ extends Area2D
 
 ## Emitted when the bolt damages something; `killed` if that finished it.
 signal hit(damage: float, killed: bool)
+## Emitted with the node that owns the Health it damaged (e.g. the Enemy).
+signal struck(target: Node)
 
 @export var color := Color(0.45, 0.85, 1.0)
 @export var radius := 5.0
@@ -50,6 +52,7 @@ func _on_hit(target: Node) -> void:
 	# Two overlaps can report in the same frame; only the first one counts.
 	_spent = true
 	var dealt := health.take_damage(damage, damage_type)
+	struck.emit(health.get_parent())
 	hit.emit(dealt, health.is_dead)
 	queue_free()
 
