@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://dk7ysyw6w03im"]
+[gd_resource type="Resource" script_class="CannonDefinition" format=3]
 
-[ext_resource type="Script" uid="uid://bg75n7ym4e1ou" path="res://scripts/towers/tower_definition.gd" id="1_def"]
+[ext_resource type="Script" path="res://scripts/towers/cannon_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" uid="uid://dj8ebqumbyqy1" path="res://assets/sprites/gearshot.tres" id="2_frames"]
 [ext_resource type="Texture2D" uid="uid://dmumlhqgydmsv" path="res://assets/sprites/towers/gearshot_lv1_base.png" id="3_base"]
 [ext_resource type="Texture2D" uid="uid://cwrbvms3irnka" path="res://assets/sprites/towers/gearshot_lv1_head.png" id="4_head"]
@@ -9,8 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://uljp6rcpk25a" path="res://assets/sprites/towers/gearshot_lv2_head.png" id="7_head2"]
 [ext_resource type="Texture2D" uid="uid://bex65kpkkx36q" path="res://assets/sprites/towers/gearshot_lv3_base.png" id="8_base3"]
 [ext_resource type="Texture2D" uid="uid://bih5xmgtanvjg" path="res://assets/sprites/towers/gearshot_lv3_head.png" id="9_head3"]
-[ext_resource type="Resource" path="res://data/towers/gatling_engine.tres" id="10_gatling"]
-[ext_resource type="Resource" path="res://data/towers/rune_cannon.tres" id="11_cannon"]
+[ext_resource type="PackedScene" path="res://scenes/towers/rune_cannon_tower.tscn" id="10_scene"]
 
 [sub_resource type="Resource" id="TurretHead_lv1"]
 script = ExtResource("5_head")
@@ -38,25 +37,26 @@ barrel_length = 85.0
 
 [resource]
 script = ExtResource("1_def")
-id = &"gearshot"
-display_name = "Gearshot Turret"
-description = "Fast single-target shots. Reliable against swarms of basic goblins."
-damage_type_label = "Physical"
-good_against = "Swarms of basic goblins"
-weak_against = "Armour (bullets glance off)"
-ability_text = "Triples the fire rate for 3 s."
+id = &"rune_cannon"
+display_name = "Rune Cannon"
+description = "Slow, heavy magic rounds that punch through a line of enemies."
+evolved = true
+evolve_cost = Dictionary[StringName, int]({
+&"aether": 6
+})
+help_line = "Slow, heavy magic rounds that pierce 3 enemies and splash each hit. Answers armour."
+damage_type_label = "Magic"
+good_against = "Armour and enemies coming in a line"
+weak_against = "Fast swarms (few shots)"
+ability_name = "Overcharge Round"
+ability_text = "One 4× round that pierces every enemy in its path and flies 1.5× as far."
+ability_cooldown = 12.0
+ability_fire_rate_multiplier = 1.0
+tint = Color(0.78, 0.55, 1, 1)
+glow = Color(0.78, 0.55, 1, 0.8)
 sprite_frames = ExtResource("2_frames")
-cost = Dictionary[StringName, int]({
-&"scrap": 10
-})
-lv2_cost = Dictionary[StringName, int]({
-&"scrap": 15
-})
-lv3_cost = Dictionary[StringName, int]({
-&"aether": 3,
-&"scrap": 25
-})
+sprite_scale = 0.605
+scene = ExtResource("10_scene")
 heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv1"), SubResource("TurretHead_lv2"), SubResource("TurretHead_lv3")])
-evolutions = Array[ExtResource("1_def")]([ExtResource("10_gatling"), ExtResource("11_cannon")])
 muzzle_height = 50.0
 barrel_length = 30.0

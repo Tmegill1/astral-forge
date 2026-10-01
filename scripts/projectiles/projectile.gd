@@ -43,9 +43,7 @@ func _physics_process(delta: float) -> void:
 func _on_hit(target: Node) -> void:
 	if _spent:
 		return
-	var health := target.get_node_or_null(^"Health") as Health
-	if health == null:
-		health = target.get_parent().get_node_or_null(^"Health") as Health
+	var health := _health_of(target)
 	# Dead or untouchable (an operating hero): fly on through.
 	if health == null or health.is_dead or health.invulnerable:
 		return
@@ -55,6 +53,14 @@ func _on_hit(target: Node) -> void:
 	struck.emit(health.get_parent())
 	hit.emit(dealt, health.is_dead)
 	queue_free()
+
+
+## The Health on the hit body/area or on its parent, or null.
+static func _health_of(target: Node) -> Health:
+	var health := target.get_node_or_null(^"Health") as Health
+	if health == null:
+		health = target.get_parent().get_node_or_null(^"Health") as Health
+	return health
 
 
 func _draw() -> void:

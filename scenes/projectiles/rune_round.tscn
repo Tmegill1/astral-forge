@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/projectiles/piercing_projectile.gd" id="1_round"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_round"]
+radius = 8.0
+
+[node name="RuneRound" type="Area2D"]
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+script = ExtResource("1_round")
+color = Color(0.78, 0.55, 1, 1)
+radius = 7.0
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_round")
