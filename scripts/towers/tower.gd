@@ -12,6 +12,7 @@ extends StaticBody2D
 signal destroyed(tower: Tower)
 
 const BOLT_SCENE := preload("res://scenes/projectiles/hero_bolt.tscn")
+const GLOW_SCENE := preload("res://scenes/towers/tower_glow.tscn")
 ## How long the firing frame shows after each shot, in seconds.
 const FIRE_FRAME_TIME := 0.12
 ## The operating hero stands this far to the tower's Core-facing side (and a
@@ -47,6 +48,8 @@ var _head_rest := Vector2.ZERO
 var _inward := Vector2.RIGHT
 ## This level's rotating head, or null for frame-based art.
 var _head: TurretHead
+## An evolution's glow ring, or null.
+var _glow: TowerGlow
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var base_sprite: Sprite2D = $Base
@@ -70,6 +73,7 @@ func _ready() -> void:
 	health_bar.place_above(sprite)
 	_head = definition.head_for(level)
 	_setup_head()
+	_apply_look()
 	health.reset(_max_health())
 	health.died.connect(_on_died)
 	var core := get_tree().get_first_node_in_group(&"core") as Node2D
@@ -147,6 +151,19 @@ func refresh_max_health() -> void:
 		health.grow_max(_max_health())
 
 
+## Evolutions' placeholder look: their tint on every part of the art, and a
+## glow ring on the ground underneath.
+func _apply_look() -> void:
+	for part: CanvasItem in [sprite, base_sprite, head]:
+		part.modulate = definition.tint
+	if definition.glow.a > 0.0:
+		_glow = GLOW_SCENE.instantiate()
+		_glow.color = definition.glow
+		add_child(_glow)
+		# First child: drawn under the tower's art.
+		move_child(_glow, 0)
+
+
 ## Switches to another level: stats, health (keeping the damage taken) and
 ## art. BuildSlot.upgrade() pays for it.
 func set_level(new_level: int) -> void:
@@ -203,6 +220,8 @@ func is_destroyed() -> bool:
 func _on_died() -> void:
 	if operator:
 		operator.stop_operating()
+	if _glow:
+		_glow.visible = false
 	set_physics_process(false)
 	for group in [&"towers", &"nav_blockers", &"breakables"]:
 		remove_from_group(group)

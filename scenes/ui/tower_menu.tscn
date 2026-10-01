@@ -87,3 +87,27 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Close (Esc)"
+
+[node name="EvolveView" type="VBoxContainer" parent="Center/Panel/Margin/Rows"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EvolveHint" type="Label" parent="Center/Panel/Margin/Rows/EvolveView"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Choose one evolution. It can't be undone."
+horizontal_alignment = 1
+
+[node name="Branches" type="HBoxContainer" parent="Center/Panel/Margin/Rows/EvolveView"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="BackButton" type="Button" parent="Center/Panel/Margin/Rows/EvolveView"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Back (Esc)"

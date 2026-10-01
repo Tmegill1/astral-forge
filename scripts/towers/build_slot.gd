@@ -7,7 +7,7 @@ extends Node2D
 ## out at right angles to the Core direction, then turn back toward the
 ## middle, funnelling enemies around them.
 ## Built: Interact operates the tower; Manage (F) opens repair / upgrade /
-## sell. Upgrading a tower levels up its walls too (art and health).
+## evolve / sell. Upgrading a tower levels up its walls too (art and health).
 ## Destroyed: the wreckage clears after a few seconds; walls stay up.
 ## Locked: Interact pays unlock_cost (Scrap) to open the pad.
 
@@ -132,12 +132,7 @@ func build(tower: TowerDefinition) -> bool:
 	if built or locked or not tower.available or not core().stored.spend_all(tower.cost):
 		return false
 	invested = tower.cost.duplicate()
-	built = (tower.scene if tower.scene else TOWER_SCENE).instantiate()
-	built.setup(tower)
-	built.position = tower_offset
-	built.projectile_parent = get_parent()
-	built.destroyed.connect(_on_tower_destroyed)
-	add_child(built)
+	built = _spawn_tower(tower, 1)
 	_raise_walls()
 	get_tree().call_group(&"nav_grid", &"mark_dirty")
 	return true
@@ -211,8 +206,55 @@ func upgrade() -> bool:
 	return true
 
 
+## True when the tower can evolve now (cost aside): standing, Lv3, not yet
+## evolved, and it has branches.
+func can_evolve() -> bool:
+	return built != null and not built.is_destroyed() \
+			and built.level >= TowerDefinition.MAX_LEVEL \
+			and not built.definition.evolved and not built.definition.evolutions.is_empty()
+
+
+## Pays for `branch` and swaps the tower for it, in place: same spot, Lv3,
+## the same damage taken, walls untouched, and an operating hero stays on.
+## False if it can't evolve, `branch` isn't one of its branches, or the Core
+## can't afford it (nothing is spent then).
+func evolve(branch: TowerDefinition) -> bool:
+	if not can_evolve() or branch not in built.definition.evolutions:
+		return false
+	if not core().stored.spend_all(branch.evolve_cost):
+		return false
+	for type in branch.evolve_cost:
+		invested[type] = invested.get(type, 0) + branch.evolve_cost[type]
+	var old := built
+	var missing := old.health.max_health - old.health.current
+	var hero := old.operator
+	if hero:
+		hero.stop_operating()
+	remove_child(old)
+	old.queue_free()
+	built = _spawn_tower(branch, TowerDefinition.MAX_LEVEL)
+	if missing > 0.0:
+		built.health.take_damage(minf(missing, built.health.max_health - 1.0))
+	if hero:
+		hero.start_operating(built)
+	get_tree().call_group(&"nav_grid", &"mark_dirty")
+	return true
+
+
 func _on_tower_destroyed(_tower: Tower) -> void:
 	_wreckage_left = WRECKAGE_TIME
+
+
+## Creates `tower` at `tower_level` on this pad and hooks it up.
+func _spawn_tower(tower: TowerDefinition, tower_level: int) -> Tower:
+	var spawned: Tower = (tower.scene if tower.scene else TOWER_SCENE).instantiate()
+	spawned.setup(tower)
+	spawned.level = tower_level
+	spawned.position = tower_offset
+	spawned.projectile_parent = get_parent()
+	spawned.destroyed.connect(_on_tower_destroyed)
+	add_child(spawned)
+	return spawned
 
 
 func _clear_tower() -> void:

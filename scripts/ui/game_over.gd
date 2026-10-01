@@ -112,7 +112,8 @@ func _fill(summary: Dictionary) -> void:
 		towers_row.add_child(_note("No towers standing"))
 	for tower in summary.towers:
 		var definition: TowerDefinition = tower[0]
-		towers_row.add_child(_icon_entry(definition.icon(), "Lv%d" % tower[1]))
+		towers_row.add_child(_icon_entry(definition.icon(),
+				"Evolved" if definition.evolved else "Lv%d" % tower[1], definition.tint))
 	gathered_label.text = "Gathered: " + gathered_text(summary.gathered)
 
 
@@ -151,7 +152,7 @@ static func _clear(container: Node) -> void:
 
 
 ## A small picture (cropped to its visible pixels) with a caption.
-func _icon_entry(texture: Texture2D, caption: String) -> HBoxContainer:
+func _icon_entry(texture: Texture2D, caption: String, tint := Color.WHITE) -> HBoxContainer:
 	var entry := HBoxContainer.new()
 	entry.add_theme_constant_override(&"separation", 4)
 	var icon := TextureRect.new()
@@ -159,6 +160,7 @@ func _icon_entry(texture: Texture2D, caption: String) -> HBoxContainer:
 	icon.custom_minimum_size = Vector2(30, 30)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.modulate = tint
 	entry.add_child(icon)
 	entry.add_child(_note(caption))
 	return entry
