@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="20_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/codex_toast.tscn" id="21_toast"]
 [ext_resource type="Script" path="res://scripts/cards/run_cards.gd" id="22_run_cards"]
+[ext_resource type="PackedScene" path="res://scenes/ui/card_menu.tscn" id="23_card_menu"]
 
 [node name="World" type="Node2D" unique_id=164071451]
 script = ExtResource("2_world")
@@ -127,3 +128,5 @@ script = ExtResource("22_run_cards")
 [node name="PauseMenu" parent="UI" instance=ExtResource("20_pause")]
 
 [node name="CodexToast" parent="UI" instance=ExtResource("21_toast")]
+
+[node name="CardMenu" parent="UI" instance=ExtResource("23_card_menu")]

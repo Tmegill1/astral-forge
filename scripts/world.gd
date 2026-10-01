@@ -158,10 +158,12 @@ func _on_hero_died() -> void:
 
 
 func _on_core_destroyed() -> void:
+	run_cards.end_run()
 	game_over.show_defeat(_elapsed, kills, waves.wave_index)
 
 
 func _on_run_won() -> void:
+	run_cards.end_run()
 	game_over.show_victory(_elapsed, kills)
 
 
