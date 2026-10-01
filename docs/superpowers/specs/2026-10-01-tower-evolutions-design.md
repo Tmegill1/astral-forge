@@ -75,11 +75,11 @@ the placeholder look is described under "Look". The art brief is
 ### Look (placeholder)
 - **Gatling Engine:** the `blaster_turret` sheet. It faces right and is
   mirrored for left (like the Mortar); idle = its first idle frame, fire =
-  fire frames 1–5, wreck = last destroy frame. `tools/slice_sprites.py` writes
-  an evolution-ready `assets/sprites/gatling_engine.tres` with animations
+  fire frames 1–5, wreck = last destroy frame. A small tool,
+  `tools/alias_frames.py`, writes an evolution-ready `assets/sprites/gatling_engine.tres` with animations
   named `lv3_idle`, `lv3_fire`, `destroyed`.
 - **Storm Array:** the `aether_harvester` sheet's Lv3 row; its `pulse` plays
-  as the firing animation. The slicer writes `assets/sprites/storm_array.tres`
+  as the firing animation. The same tool writes `assets/sprites/storm_array.tres`
   (`lv3_idle`, `lv3_fire` = pulse, `destroyed`).
 - **The other six** use their base tower's Lv3 art with the branch `tint`, a
   soft `glow` ring drawn under the tower, and 10% larger scale:
