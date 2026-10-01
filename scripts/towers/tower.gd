@@ -70,7 +70,7 @@ func _ready() -> void:
 	health_bar.place_above(sprite)
 	_head = definition.head_for(level)
 	_setup_head()
-	health.reset(definition.max_health_at(level))
+	health.reset(_max_health())
 	health.died.connect(_on_died)
 	var core := get_tree().get_first_node_in_group(&"core") as Node2D
 	if core:
@@ -115,7 +115,7 @@ func damage() -> float:
 	var value := definition.damage_at(level)
 	if operator:
 		value *= definition.operated_damage_multiplier
-	return value
+	return value * RunCards.multiplier(self, &"tower_damage")
 
 
 func fire_rate() -> float:
@@ -124,23 +124,34 @@ func fire_rate() -> float:
 		value *= definition.operated_fire_rate_multiplier
 	if _ability_left > 0.0:
 		value *= definition.ability_fire_rate_multiplier
-	return value
+	return value * RunCards.multiplier(self, &"tower_fire_rate")
 
 
 func attack_range() -> float:
 	var value := definition.range_at(level)
 	if operator:
 		value *= definition.operated_range_multiplier
-	return value
+	return value * RunCards.multiplier(self, &"tower_range")
 
 
 # --- Levels ---
+
+## This level's max health with Reinforced Plating.
+func _max_health() -> float:
+	return definition.max_health_at(level) * RunCards.multiplier(self, &"structure_health")
+
+
+## Re-applies card bonuses to max health (adds the difference to current).
+func refresh_max_health() -> void:
+	if not health.is_dead and not is_equal_approx(health.max_health, _max_health()):
+		health.grow_max(_max_health())
+
 
 ## Switches to another level: stats, health (keeping the damage taken) and
 ## art. BuildSlot.upgrade() pays for it.
 func set_level(new_level: int) -> void:
 	level = clampi(new_level, 1, TowerDefinition.MAX_LEVEL)
-	health.grow_max(definition.max_health_at(level))
+	health.grow_max(_max_health())
 	_head = definition.head_for(level)
 	sprite.visible = true
 	_setup_head()

@@ -42,7 +42,7 @@ func _ready() -> void:
 	body.position = Vector2(0, -footprint.y / 2.0)
 	health.changed.connect(_on_health_changed)
 	health.died.connect(_on_died)
-	health.reset(max_health)
+	health.reset(max_health * RunCards.multiplier(self, &"structure_health"))
 
 
 ## Switches to another level's art and maximum health, keeping the damage
@@ -52,7 +52,7 @@ func restyle(intact: Texture2D, damaged: Texture2D, new_max: float) -> void:
 	damaged_texture = damaged
 	max_health = new_max
 	sprite.offset = Vector2(0, -intact_texture.get_height() / 2.0)
-	health.grow_max(new_max)
+	health.grow_max(new_max * RunCards.multiplier(self, &"structure_health"))
 	_on_health_changed(health.current, health.max_health)
 
 
@@ -69,3 +69,10 @@ func _on_died() -> void:
 	destroyed.emit(self)
 	get_tree().call_group(&"nav_grid", &"mark_dirty")
 	queue_free()
+
+
+## Re-applies card bonuses to max health (adds the difference to current).
+func refresh_max_health() -> void:
+	var target := max_health * RunCards.multiplier(self, &"structure_health")
+	if not health.is_dead and not is_equal_approx(health.max_health, target):
+		health.grow_max(target)

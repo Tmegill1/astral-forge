@@ -57,6 +57,7 @@ func _ready() -> void:
 	hud.bind_hero(hero)
 	hud.bind_core(core)
 	hud.bind_run_cards(run_cards)
+	run_cards.changed.connect(_on_cards_changed)
 	core.destroyed.connect(_on_core_destroyed)
 
 	nav.setup(map)
@@ -145,6 +146,12 @@ func _on_enemy_killed(enemy: Enemy) -> void:
 	if randf() < LODESTONE_CHANCE and not Lodestone.is_dropping() \
 			and get_tree().get_nodes_in_group(&"lodestones").is_empty():
 		Lodestone.drop(units, at)
+
+
+## A card was taken: re-apply max-health bonuses to everything built.
+func _on_cards_changed() -> void:
+	core.refresh_max_health()
+	get_tree().call_group(&"breakables", &"refresh_max_health")
 
 
 func _on_hero_died() -> void:

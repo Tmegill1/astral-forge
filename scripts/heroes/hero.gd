@@ -100,6 +100,9 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	auto_fire = Settings.auto_fire
 	Settings.changed.connect(_on_settings_changed)
+	var cards := get_tree().get_first_node_in_group(&"run_cards") as RunCards
+	if cards:
+		cards.changed.connect(rebuild_stats)
 
 
 ## Auto-fire follows the Options setting, even mid-run.
@@ -348,11 +351,21 @@ func rank_of(upgrade: HeroUpgrade) -> int:
 ## health is added on top of the current health.
 func add_rank(upgrade: HeroUpgrade) -> void:
 	upgrade_ranks[upgrade.id] = rank_of(upgrade) + 1
+	rebuild_stats()
+
+
+## Stats = base × Core upgrades × power-up cards. Extra max health is added
+## on top of the current health.
+func rebuild_stats() -> void:
 	stats = base_stats.duplicate()
 	for owned in definition.upgrades:
 		var rank := rank_of(owned)
 		if rank > 0:
 			stats.set(owned.stat, base_stats.get(owned.stat) * owned.multiplier(rank))
+	stats.attack_damage *= RunCards.multiplier(self, &"hero_damage")
+	stats.attacks_per_second *= RunCards.multiplier(self, &"hero_fire_rate")
+	stats.move_speed *= RunCards.multiplier(self, &"hero_move_speed")
+	stats.max_health *= RunCards.multiplier(self, &"hero_max_health")
 	if not is_equal_approx(stats.max_health, health.max_health):
 		health.grow_max(stats.max_health)
 	stats_changed.emit()

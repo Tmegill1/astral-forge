@@ -87,3 +87,10 @@ func _on_health_changed(current: float, maximum: float) -> void:
 		sprite.texture = damaged_texture
 	else:
 		sprite.texture = ruined_texture
+
+
+## Re-applies Core Plating to max health (adds the difference to current).
+func refresh_max_health() -> void:
+	var target := max_health * RunCards.multiplier(self, &"core_max_health")
+	if not health.is_dead and not is_equal_approx(health.max_health, target):
+		health.grow_max(target)
