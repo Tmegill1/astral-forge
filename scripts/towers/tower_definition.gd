@@ -2,7 +2,9 @@ class_name TowerDefinition
 extends Resource
 ## Everything that makes one tower type different. To add a tower, create a
 ## new .tres in data/towers/. Sprites need lv1_idle and lv1_fire animations
-## (and lv2_/lv3_ for levels) and must face right.
+## (and lv2_/lv3_ for levels) and must face right. An evolution (evolved =
+## true) is its own .tres too: it always runs at Lv3, so it only needs
+## lv3_idle, lv3_fire and a wreck.
 
 const MAX_LEVEL := 3
 
@@ -21,9 +23,9 @@ const MAX_LEVEL := 3
 ## Stored resources spent to build it, e.g. {"scrap": 10}.
 @export var cost: Dictionary[StringName, int] = {}
 
-## Picture for menus: the first idle frame.
+## Picture for menus: the first idle frame (Lv3 for evolutions).
 func icon() -> Texture2D:
-	return sprite_frames.get_frame_texture(&"lv1_idle", 0)
+	return sprite_frames.get_frame_texture(&"lv3_idle" if evolved else &"lv1_idle", 0)
 
 
 ## This level's rotating head, or null to use the frame-based art.
@@ -93,6 +95,22 @@ func max_health_at(tower_level: int) -> float:
 @export var weak_against := ""
 ## What the ability does, in words.
 @export var ability_text := ""
+
+@export_group("Evolution")
+## The two branches a Lv3 tower can evolve into (base towers only).
+@export var evolutions: Array[TowerDefinition] = []
+## True for an evolution: it runs at Lv3, never shows in the build menu and
+## can't evolve again. It copies its base tower's stats; its own changes
+## live in its own fields.
+@export var evolved := false
+## Stored resources spent to evolve into this branch, e.g. {"aether": 6}.
+@export var evolve_cost: Dictionary[StringName, int] = {}
+## One line for the evolve choice and the Help screen.
+@export var help_line := ""
+## Placeholder look until evolution art exists: colours the tower's art...
+@export var tint := Color.WHITE
+## ...and draws a glow ring of this colour underneath (transparent = none).
+@export var glow := Color(0, 0, 0, 0)
 
 @export_group("Rotating head")
 ## Optional, per level (index 0 = Lv1): a static base plus a head that turns

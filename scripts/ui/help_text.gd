@@ -41,6 +41,19 @@ static func upgrade_lines(t: TowerDefinition) -> PackedStringArray:
 	])
 
 
+## A base tower's evolutions for the Help screen; empty if it has none.
+static func evolution_lines(t: TowerDefinition) -> PackedStringArray:
+	var lines := PackedStringArray()
+	if t.evolutions.is_empty():
+		return lines
+	lines.append("[b]Evolutions[/b] (at Lv3, %s, pick one)" % cost_text(t.evolutions[0].evolve_cost))
+	for branch in t.evolutions:
+		lines.append("  [b]%s[/b] — %s" % [branch.display_name, branch.help_line])
+		lines.append("    Q: %s — %s (Cooldown: %s s)" % [
+				branch.ability_name, branch.ability_text, _number(branch.ability_cooldown)])
+	return lines
+
+
 static func tower_bbcode(t: TowerDefinition) -> String:
 	var lines: PackedStringArray = [t.description, ""]
 	lines.append("[b]Damage:[/b] " + t.damage_type_label)
@@ -56,6 +69,10 @@ static func tower_bbcode(t: TowerDefinition) -> String:
 	lines.append("[b]Upgrade path[/b]")
 	for line in upgrade_lines(t):
 		lines.append("  " + line)
+	var evolutions := evolution_lines(t)
+	if not evolutions.is_empty():
+		lines.append("")
+		lines.append_array(evolutions)
 	return "\n".join(lines)
 
 
