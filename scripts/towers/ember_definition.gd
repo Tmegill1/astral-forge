@@ -8,6 +8,8 @@ extends TowerDefinition
 @export var cone_angle := 50.0
 ## Where the flame leaves from, relative to the base point, facing right.
 @export var muzzle_offset := Vector2(44, -50)
+## Multiplies how far the flame reaches (the Inferno's longer cone).
+@export var cone_length_multiplier := 1.0
 
 @export_group("Fuel")
 ## Seconds of spraying a full tank holds.

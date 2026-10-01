@@ -53,7 +53,8 @@ func overpressure_active() -> bool:
 
 
 func attack_range() -> float:
-	return super() * (ember.overpressure_range_multiplier if overpressure_active() else 1.0)
+	return super() * ember.cone_length_multiplier \
+			* (ember.overpressure_range_multiplier if overpressure_active() else 1.0)
 
 
 ## Full width of the cone, in degrees.
