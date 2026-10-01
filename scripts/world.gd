@@ -28,6 +28,8 @@ const OUTSIDE_MAP_COLOR := Color(0.07, 0.1, 0.07)
 
 var hero: Hero
 var kills := 0
+## Kills this run by enemy type, for the end-of-run summary.
+var kills_by_type: Dictionary[EnemyDefinition, int] = {}
 
 var _elapsed := 0.0
 var _respawn_left := 0.0
@@ -131,6 +133,7 @@ func _place_heaps(map: Rect2, type: StringName, count: int, min_distance: float,
 
 func _on_enemy_killed(enemy: Enemy) -> void:
 	kills += 1
+	kills_by_type[enemy.definition] = kills_by_type.get(enemy.definition, 0) + 1
 	var at := enemy.global_position
 	var drops := enemy.definition.drops
 	for type in drops:
@@ -166,12 +169,43 @@ func _on_hero_died() -> void:
 
 func _on_core_destroyed() -> void:
 	run_cards.end_run()
-	game_over.show_defeat(_elapsed, kills, waves.wave_index)
+	game_over.show_summary(run_summary(false))
 
 
 func _on_run_won() -> void:
 	run_cards.end_run()
-	game_over.show_victory(_elapsed, kills)
+	game_over.show_summary(run_summary(true))
+
+
+## Everything the end screen shows about this run.
+func run_summary(victory: bool) -> Dictionary:
+	var kill_rows := []
+	for enemy in kills_by_type:
+		kill_rows.append([enemy, kills_by_type[enemy]])
+	kill_rows.sort_custom(func(a: Array, b: Array) -> bool: return a[1] > b[1])
+	var cards := []
+	for card in run_cards.pool:
+		var rank := run_cards.rank_of(card)
+		if rank > 0:
+			cards.append([card.title, rank])
+	var towers := []
+	for slot: BuildSlot in find_children("*", "BuildSlot", true, false):
+		if slot.built and not slot.built.health.is_dead:
+			towers.append([slot.built.definition, slot.built.level])
+	return {
+		"victory": victory,
+		"seconds": _elapsed,
+		"waves_cleared": waves.wave_index,
+		"wave_count": waves.wave_count(),
+		"core_health": core.health.current,
+		"core_max": core.health.max_health,
+		"kills": kill_rows,
+		"kills_total": kills,
+		"level": run_cards.level,
+		"cards": cards,
+		"towers": towers,
+		"gathered": core.gathered.duplicate(),
+	}
 
 
 func _map_rect() -> Rect2:

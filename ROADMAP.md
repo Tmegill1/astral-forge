@@ -180,7 +180,7 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 - [ ] **[AI]** Hero-specific ability cards (each hero gets its own cards that only appear in its offers) — prototype later
 - [ ] **[AI]** One evolution per tower (e.g. Gearshot → Gatling Engine or Rune Cannon) — needs a new unlock now Mastery is gone (e.g. a card or Aether)
 - [ ] **[AI]** 10 waves, a mini-boss around wave 6, final boss
-- [ ] **[AI]** Win screen
+- [x] **[AI]** Win screen: one end screen for victory and defeat — time, waves, kills by type, level and cards, towers standing, Scrap/Aether gathered; Play Again (R) / Main Menu; a win plays a 2 s slow-motion "The Core holds!" banner first
 - [ ] **[You]** Is a run 12–15 minutes? Do different runs feel different?
 
 Proposal for evolutions, the 10-wave run and the Win screen: `docs/proposals/2026-09-30-phase-10-proposal.md`.

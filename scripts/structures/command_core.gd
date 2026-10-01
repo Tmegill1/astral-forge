@@ -24,6 +24,9 @@ var stored := ResourceBag.new()
 
 var _regen_left := 0.0
 
+## Everything deposited here this run, by type (for the end-of-run summary).
+var gathered: Dictionary[StringName, int] = {}
+
 @onready var sprite: Sprite2D = $Sprite
 @onready var health: Health = $Health
 
@@ -52,7 +55,10 @@ func nav_footprint() -> Rect2:
 
 
 func interact(hero: Hero) -> void:
-	stored.add_all(hero.carried.take_all())
+	var deposit := hero.carried.take_all()
+	for type in deposit:
+		gathered[type] = gathered.get(type, 0) + deposit[type]
+	stored.add_all(deposit)
 
 
 func get_interact_prompt(hero: Hero) -> String:

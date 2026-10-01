@@ -20,6 +20,7 @@ const MAIN_MENU := "res://scenes/ui/main_menu.tscn"
 
 
 func _ready() -> void:
+	add_to_group(&"pause_menu")
 	visible = false
 	resume_button.pressed.connect(close)
 	options_button.pressed.connect(_open_options)
