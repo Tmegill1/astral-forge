@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://uljp6rcpk25a" path="res://assets/sprites/towers/gearshot_lv2_head.png" id="7_head2"]
 [ext_resource type="Texture2D" uid="uid://bex65kpkkx36q" path="res://assets/sprites/towers/gearshot_lv3_base.png" id="8_base3"]
 [ext_resource type="Texture2D" uid="uid://bih5xmgtanvjg" path="res://assets/sprites/towers/gearshot_lv3_head.png" id="9_head3"]
+[ext_resource type="Resource" path="res://data/towers/gatling_engine.tres" id="10_gatling"]
 
 [sub_resource type="Resource" id="TurretHead_lv1"]
 script = ExtResource("5_head")
@@ -55,5 +56,6 @@ lv3_cost = Dictionary[StringName, int]({
 &"scrap": 25
 })
 heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv1"), SubResource("TurretHead_lv2"), SubResource("TurretHead_lv3")])
+evolutions = Array[ExtResource("1_def")]([ExtResource("10_gatling")])
 muzzle_height = 50.0
 barrel_length = 30.0

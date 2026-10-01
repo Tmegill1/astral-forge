@@ -8,6 +8,7 @@ extends SceneTree
 ## Base tower id -> its two branch ids, in menu order. Each branch task adds
 ## its pair here.
 const EXPECTED := {
+	&"gearshot": [&"gatling_engine"],
 }
 ## Stats an evolution copies unchanged from its base tower, so it starts at
 ## exactly the base tower's Lv3 numbers.
@@ -54,6 +55,17 @@ func _init() -> void:
 		check("%s help mentions evolutions" % base_id, help.contains("Evolutions"), not ids.is_empty())
 		for branch in base.evolutions:
 			check_branch(base, branch, help, help_text)
+
+	var gatling = load("res://data/towers/gatling_engine.tres")
+	if gatling:
+		check("spin up half", gatling.spin_after(0.0, 1.0, true), 0.5)
+		check("spin up capped", gatling.spin_after(0.9, 1.0, true), 1.0)
+		check("spin down", gatling.spin_after(1.0, 0.5, false), 0.5)
+		check("spin floor", gatling.spin_after(0.2, 1.0, false), 0.0)
+		check("spin x1", gatling.spin_multiplier(0.0), 1.0)
+		check("spin x4", gatling.spin_multiplier(1.0), 4.0)
+	else:
+		check("gatling data exists", false, true)
 
 	print("evolutions: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)

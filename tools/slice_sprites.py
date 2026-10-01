@@ -14,6 +14,8 @@ sometimes bridge neighbouring frames. For each sheet this:
 3. Writes assets/sprites/<name>.png (one animation per row, equal cells) and
    assets/sprites/<name>.tres (a SpriteFrames resource with named animations).
 
+Evolved towers that borrow a spare sheet: run tools/alias_frames.py afterwards.
+
 Static objects (Core, slots, walls, pickups) are trimmed and written as
 individual PNGs under assets/sprites/<name>/.
 

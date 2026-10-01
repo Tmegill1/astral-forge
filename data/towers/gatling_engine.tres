@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="GatlingDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/gatling_definition.gd" id="1_def"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/gatling_engine.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/towers/gatling_tower.tscn" id="3_scene"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"gatling_engine"
+display_name = "Gatling Engine"
+description = "Spins up while firing until it pours out bullets. Shreds swarms."
+evolved = true
+evolve_cost = Dictionary[StringName, int]({
+&"aether": 6
+})
+help_line = "Spins up while it keeps firing: up to 4× fire rate, 65% damage per shot. Shreds swarms."
+damage_type_label = "Physical"
+good_against = "Big swarms that keep it firing"
+weak_against = "Armour; short fights (it has to spin up)"
+ability_name = "Overspin"
+ability_text = "Instantly at full spin, and it won't slow down for 4 s."
+ability_duration = 4.0
+ability_cooldown = 12.0
+ability_fire_rate_multiplier = 1.0
+sprite_frames = ExtResource("2_frames")
+sprite_scale = 0.5
+scene = ExtResource("3_scene")
+barrel_length = 0.0
+muzzle_offset = Vector2(53, -43)

@@ -366,11 +366,16 @@ func _aim_at(point: Vector2) -> void:
 
 
 func _fire_at(point: Vector2) -> void:
+	_launch_bolt(BOLT_SCENE.instantiate(), point)
+
+
+## Fires `bolt` from the muzzle toward `point` with this tower's damage and
+## reach, and shows the shot (flash and recoil, or the fire frame).
+func _launch_bolt(bolt: Projectile, point: Vector2) -> void:
 	var base := _muzzle_base()
 	var direction := (point - base).normalized()
 	if direction == Vector2.ZERO:
 		direction = Vector2.UP
-	var bolt: Projectile = BOLT_SCENE.instantiate()
 	bolt.global_position = base + direction * _barrel_length()
 	bolt.direction = direction
 	bolt.speed = definition.projectile_speed
