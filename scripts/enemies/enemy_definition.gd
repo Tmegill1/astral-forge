@@ -74,6 +74,8 @@ extends Resource
 @export_group("Boss")
 ## Shows the boss health bar and joins the "bosses" group.
 @export var is_boss := false
+## Head-and-shoulders picture for the boss bar; null = name only.
+@export var portrait: Texture2D
 ## Killing it wins the run (every other enemy flees).
 @export var ends_run := false
 ## Multiplies the sprite's colour (white = none). Placeholder bosses use it.

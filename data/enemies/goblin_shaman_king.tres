@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/goblin_shaman_king.tres" id="2_frames"]
+[ext_resource type="Texture2D" path="res://assets/sprites/portraits/goblin_shaman_king.png" id="9_portrait"]
 [ext_resource type="PackedScene" path="res://scenes/projectiles/king_orb.tscn" id="3_orb"]
 [ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="4_goblin"]
 
@@ -34,6 +35,7 @@ pulse_radius = 300.0
 pulse_duration = 4.0
 pulse_animation = &"buff"
 is_boss = true
+portrait = ExtResource("9_portrait")
 ends_run = true
 projectile_count = 5
 projectile_spread_deg = 40.0

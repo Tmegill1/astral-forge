@@ -1,12 +1,14 @@
 class_name BossBar
 extends Control
 ## A wide health bar across the top while a boss is alive (the first one
-## found in the "bosses" group), with its name above.
+## found in the "bosses" group), with its name above and its portrait (if
+## it has one) to the left.
 
 var boss: Enemy
 
 @onready var name_label: Label = %BossName
 @onready var bar: ProgressBar = %BossHealth
+@onready var portrait: TextureRect = %BossPortrait
 
 
 func _ready() -> void:
@@ -25,5 +27,7 @@ func _process(_delta: float) -> void:
 	visible = boss != null
 	if boss:
 		name_label.text = boss.definition.display_name
+		portrait.texture = boss.definition.portrait
+		portrait.visible = boss.definition.portrait != null
 		bar.max_value = boss.health.max_health
 		bar.value = boss.health.current

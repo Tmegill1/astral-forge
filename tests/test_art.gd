@@ -21,6 +21,9 @@ func _init() -> void:
 	check("king attack anim", king.attack_animation, &"cast")
 	check("king no aura", king.aura.a, 0.0)
 	check("king orb", king.projectile_scene.resource_path, "res://scenes/projectiles/king_orb.tscn")
+	for def in [warchief, king]:
+		check("%s portrait" % def.id, def.get("portrait") != null and def.portrait.resource_path
+				== "res://assets/sprites/portraits/%s.png" % def.id, true)
 	print("art: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 
