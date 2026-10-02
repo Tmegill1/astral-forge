@@ -6,13 +6,14 @@ frame (the head), removes them from the frame (the base), and patches the
 stone behind the old barrel with the mirrored stone from the other side.
 
 Measurements are in the sliced sheet's cell pixels (see slice_sprites.py).
-Run from the project root:
-    python3 tools/split_turret.py
+Run from the project root (name turrets to cut only those):
+    python3 tools/split_turret.py [gatling_engine rune_cannon ...]
 
 Requires Pillow and NumPy.
 """
 import math
 import os
+import sys
 
 import numpy as np
 from PIL import Image
@@ -32,6 +33,14 @@ TURRETS = {
     "gearshot_lv3": dict(sheet="assets/sprites/gearshot.png", cell=(192, 288), frame=(6, 2),
                          pivot=(93, 182), radius=43, tip=(88, 97), barrel_half_width=30,
                          base_extent=(60, 50)),
+    # Evolutions: the gun sticks out past the body, so only air was behind
+    # it (no stone to patch: base_extent 1x1).
+    "gatling_engine": dict(sheet="assets/sprites/gatling_engine.png", cell=(512, 224), frame=(0, 0),
+                           pivot=(312, 122), radius=26, tip=(405, 122), barrel_half_width=28,
+                           base_extent=(1, 1)),
+    "rune_cannon": dict(sheet="assets/sprites/rune_cannon.png", cell=(544, 192), frame=(0, 0),
+                        pivot=(298, 90), radius=36, tip=(418, 90), barrel_half_width=40,
+                        base_extent=(1, 1)),
 }
 
 
@@ -81,8 +90,9 @@ def split(name, sheet, cell, frame, pivot, radius, tip, barrel_half_width, base_
 
 
 def main():
-    for name, cfg in TURRETS.items():
-        split(name, **cfg)
+    """Cuts the turrets named on the command line, or all of them."""
+    for name in sys.argv[1:] or list(TURRETS):
+        split(name, **TURRETS[name])
 
 
 if __name__ == "__main__":

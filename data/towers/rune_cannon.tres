@@ -1,39 +1,19 @@
 [gd_resource type="Resource" script_class="CannonDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/towers/cannon_definition.gd" id="1_def"]
-[ext_resource type="SpriteFrames" uid="uid://dj8ebqumbyqy1" path="res://assets/sprites/gearshot.tres" id="2_frames"]
-[ext_resource type="Texture2D" uid="uid://dmumlhqgydmsv" path="res://assets/sprites/towers/gearshot_lv1_base.png" id="3_base"]
-[ext_resource type="Texture2D" uid="uid://cwrbvms3irnka" path="res://assets/sprites/towers/gearshot_lv1_head.png" id="4_head"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/rune_cannon.tres" id="2_frames"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/rune_cannon_base.png" id="3_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/rune_cannon_head.png" id="4_head"]
 [ext_resource type="Script" uid="uid://xo0r3s72tg18" path="res://scripts/towers/turret_head.gd" id="5_head"]
-[ext_resource type="Texture2D" uid="uid://citnmpov32p1d" path="res://assets/sprites/towers/gearshot_lv2_base.png" id="6_base2"]
-[ext_resource type="Texture2D" uid="uid://uljp6rcpk25a" path="res://assets/sprites/towers/gearshot_lv2_head.png" id="7_head2"]
-[ext_resource type="Texture2D" uid="uid://bex65kpkkx36q" path="res://assets/sprites/towers/gearshot_lv3_base.png" id="8_base3"]
-[ext_resource type="Texture2D" uid="uid://bih5xmgtanvjg" path="res://assets/sprites/towers/gearshot_lv3_head.png" id="9_head3"]
 [ext_resource type="PackedScene" path="res://scenes/towers/rune_cannon_tower.tscn" id="10_scene"]
-
-[sub_resource type="Resource" id="TurretHead_lv1"]
-script = ExtResource("5_head")
-base_texture = ExtResource("3_base")
-head_texture = ExtResource("4_head")
-pivot = Vector2(-3, -77)
-drawn_angle = -111.0
-barrel_length = 63.0
-
-[sub_resource type="Resource" id="TurretHead_lv2"]
-script = ExtResource("5_head")
-base_texture = ExtResource("6_base2")
-head_texture = ExtResource("7_head2")
-pivot = Vector2(0, -97)
-drawn_angle = -97.0
-barrel_length = 64.0
 
 [sub_resource type="Resource" id="TurretHead_lv3"]
 script = ExtResource("5_head")
-base_texture = ExtResource("8_base3")
-head_texture = ExtResource("9_head3")
-pivot = Vector2(-3, -100)
-drawn_angle = -93.0
-barrel_length = 85.0
+base_texture = ExtResource("3_base")
+head_texture = ExtResource("4_head")
+pivot = Vector2(26, -96)
+drawn_angle = 0.0
+barrel_length = 120.0
 
 [resource]
 script = ExtResource("1_def")
@@ -52,11 +32,7 @@ ability_name = "Overcharge Round"
 ability_text = "One 4× round that pierces every enemy in its path and flies 1.5× as far."
 ability_cooldown = 12.0
 ability_fire_rate_multiplier = 1.0
-tint = Color(0.78, 0.55, 1, 1)
-glow = Color(0.78, 0.55, 1, 0.8)
 sprite_frames = ExtResource("2_frames")
-sprite_scale = 0.605
+sprite_scale = 0.55
 scene = ExtResource("10_scene")
-heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv1"), SubResource("TurretHead_lv2"), SubResource("TurretHead_lv3")])
-muzzle_height = 50.0
-barrel_length = 30.0
+heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv3"), SubResource("TurretHead_lv3"), SubResource("TurretHead_lv3")])

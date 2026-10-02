@@ -2,8 +2,8 @@ class_name GatlingTower
 extends Tower
 ## The Gatling Engine (an evolved Gearshot): spins up while it keeps firing,
 ## from 1× to 4× fire rate over 2 s, each shot weaker, and winds down over
-## 1 s once it stops. Faces left or right (mirrored art). Q = Overspin: full
-## spin at once, held for the ability's duration.
+## 1 s once it stops. Its gun turns to face any direction, like the Gearshot.
+## Q = Overspin: full spin at once, held for the ability's duration.
 
 ## Still counts as firing this long past the gap to its next shot.
 const SPIN_GRACE := 0.1
@@ -12,7 +12,6 @@ var gatling: GatlingDefinition
 ## 0 = still, 1 = full spin.
 var spin := 0.0
 var _since_shot := INF
-var _facing_left := false
 
 
 func _ready() -> void:
@@ -36,16 +35,6 @@ func damage() -> float:
 
 func fire_rate() -> float:
 	return super() * gatling.spin_multiplier(spin)
-
-
-func _aim_at(point: Vector2) -> void:
-	_facing_left = point.x < global_position.x
-	sprite.flip_h = _facing_left
-
-
-func _muzzle_base() -> Vector2:
-	var offset := gatling.muzzle_offset
-	return global_position + Vector2(-offset.x if _facing_left else offset.x, offset.y)
 
 
 func _fire_at(point: Vector2) -> void:

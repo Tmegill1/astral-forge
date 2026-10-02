@@ -2,7 +2,18 @@
 
 [ext_resource type="Script" path="res://scripts/towers/gatling_definition.gd" id="1_def"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/gatling_engine.tres" id="2_frames"]
-[ext_resource type="PackedScene" path="res://scenes/towers/gatling_tower.tscn" id="3_scene"]
+[ext_resource type="PackedScene" path="res://scenes/towers/gatling_tower.tscn" id="6_scene"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gatling_engine_base.png" id="3_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/gatling_engine_head.png" id="4_head"]
+[ext_resource type="Script" uid="uid://xo0r3s72tg18" path="res://scripts/towers/turret_head.gd" id="5_head"]
+
+[sub_resource type="Resource" id="TurretHead_lv3"]
+script = ExtResource("5_head")
+base_texture = ExtResource("3_base")
+head_texture = ExtResource("4_head")
+pivot = Vector2(56, -96)
+drawn_angle = 0.0
+barrel_length = 93.0
 
 [resource]
 script = ExtResource("1_def")
@@ -23,7 +34,6 @@ ability_duration = 4.0
 ability_cooldown = 12.0
 ability_fire_rate_multiplier = 1.0
 sprite_frames = ExtResource("2_frames")
-sprite_scale = 0.5
-scene = ExtResource("3_scene")
-barrel_length = 0.0
-muzzle_offset = Vector2(53, -43)
+sprite_scale = 0.55
+scene = ExtResource("6_scene")
+heads = Array[ExtResource("5_head")]([SubResource("TurretHead_lv3"), SubResource("TurretHead_lv3"), SubResource("TurretHead_lv3")])

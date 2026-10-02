@@ -24,6 +24,11 @@ func _init() -> void:
 	for def in [warchief, king]:
 		check("%s portrait" % def.id, def.get("portrait") != null and def.portrait.resource_path
 				== "res://assets/sprites/portraits/%s.png" % def.id, true)
+	for id in [&"gatling_engine", &"rune_cannon"]:
+		var def = check_evolution(id)
+		var head = def.head_for(3)
+		check("%s rotating head" % id, head != null
+				and head.head_texture.resource_path == "res://assets/sprites/towers/%s_head.png" % id, true)
 	print("art: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -40,6 +45,19 @@ func check_boss(def, anims: Array, channels: Array) -> void:
 	check("%s attack frame in range" % def.id,
 			frames.has_animation(def.attack_animation)
 			and def.attack_hit_frame < frames.get_frame_count(def.attack_animation), true)
+
+
+## An evolution with new art: its own frames (lv3_idle, lv3_fire, a wreck),
+## no placeholder tint or glow.
+func check_evolution(id: StringName):
+	var def = load("res://data/towers/%s.tres" % id)
+	var frames: SpriteFrames = def.sprite_frames
+	check("%s frames" % id, frames.resource_path, "res://assets/sprites/%s.tres" % id)
+	for anim in [&"lv3_idle", &"lv3_fire", &"destroyed"]:
+		check("%s has %s" % [id, anim], frames.has_animation(anim), true)
+	check("%s untinted" % id, def.tint, Color.WHITE)
+	check("%s no glow" % id, def.glow.a, 0.0)
+	return def
 
 
 func check(label: String, got: Variant, want: Variant) -> void:

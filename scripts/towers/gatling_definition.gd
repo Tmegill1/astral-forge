@@ -12,8 +12,6 @@ extends TowerDefinition
 @export var max_spin_multiplier := 4.0
 ## Share of the Gearshot's damage each shot deals.
 @export var shot_damage_multiplier := 0.65
-## Where shots leave from, relative to the base point, facing right.
-@export var muzzle_offset := Vector2(50, -55)
 
 
 ## Spin (0..1) after `delta` more seconds of firing or not firing.
