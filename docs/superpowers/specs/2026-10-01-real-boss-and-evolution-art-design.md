@@ -13,7 +13,7 @@ blaster_turret / aether_harvester sheets) for the evolved towers.
 
 | Question | Decision |
 |---|---|
-| Focus Lens | Its rows on `aether_spire_evolutions.png` came out jumbled (6 idle frames in two sizes, 3 fire, no wreck). It **keeps its placeholder look** for now; a fix-up prompt for a new `focus_lens.png` (idle 4, fire 4, destroyed 2) is on the Desktop (`astral_forge_focus_lens_prompt.txt`). When that sheet arrives it's sliced like the others (a small follow-up). |
+| Focus Lens | Its rows on `aether_spire_evolutions.png` came out jumbled (6 idle frames in two sizes, 3 fire, no wreck), so it was redrawn as its own sheet, `focus_lens.png` (idle 4, fire 4, destroyed 2; prompt: `~/Desktop/astral_forge_focus_lens_prompt.txt`). Its painted beam only points right, so like the Storm Array it keeps idle art when it fires and the game draws the beam. |
 | Gearshot pair | **Rotating heads**, cut from the idle frame with `tools/split_turret.py`, like the plain Gearshot. The Gatling Engine stops mirroring. |
 | Effects painted pointing right | Inferno / Oil Sprayer flames and Storm Array lightning only point right in the art, but the towers fire every way: they show **idle art while firing**, and the game keeps drawing the real flame cone / lightning. The Mortar pair use their fire frames (the shell arcs up either way, and they mirror). |
 | Boss tints / auras | Tints go. The Shaman-King's drawn aura goes (the art has its own rune circle); the Warchief keeps his red ground ring. |
@@ -24,7 +24,7 @@ blaster_turret / aether_harvester sheets) for the evolved towers.
 Copy the new sheets into `assets/source/` (originals, never edited):
 `goblin_warchief.png`, `goblin_shaman_king.png`, `boss_portraits.png`,
 `gearshot_evolutions.png`, `rune_mortar_evolutions.png`,
-`embercaster_evolutions.png`, `aether_spire_evolutions.png`.
+`embercaster_evolutions.png`, `aether_spire_evolutions.png`, `focus_lens.png`.
 
 ## Slicing (`tools/slice_sprites.py`)
 
@@ -45,7 +45,8 @@ evolution always runs at Lv3), written as `assets/sprites/<evolution id>.png/.tr
 | gearshot_evolutions | `gatling_engine` | `rune_cannon` |
 | rune_mortar_evolutions | `siege_battery` | `frost_mortar` |
 | embercaster_evolutions | `inferno` | `oil_sprayer` |
-| aether_spire_evolutions | `storm_array` (rows 1–2, wreck = the 2 frames at the left of row 4) | — (Focus Lens skipped; see Decisions) |
+| aether_spire_evolutions | `storm_array` (rows 1–2, wreck = the 2 frames at the left of row 4) | — (the Focus Lens rows here are unused) |
+| focus_lens (its own sheet) | `focus_lens` (rows 1–3) | — |
 
 The slicer gains the small support this needs: `--only name,name` to build
 just the named outputs (a full re-run rewrites the other `.tres` files in a
@@ -84,7 +85,7 @@ Boss portraits: `boss_portraits.png` → two static images,
 
 ## Evolutions
 
-For the seven with new art, each data file: `sprite_frames` → its new
+For all eight, each data file: `sprite_frames` → its new
 SpriteFrames, `tint` white, `glow` transparent, `sprite_scale` back to the
 base tower's (0.55) unless tuning needs otherwise, muzzle / bolt positions
 re-measured.
@@ -104,7 +105,7 @@ re-measured.
 - **Storm Array:** shows `lv3_idle` when it fires (a data flag on
   SpireDefinition, e.g. `show_fire_frame := true`, false here); `bolt_heights`
   re-measured to the top crystal.
-- **Focus Lens:** unchanged (placeholder) until `focus_lens.png` arrives.
+- **Focus Lens:** shows `lv3_idle` when it fires (the same `show_fire_frame = false` flag; `LensTower` checks it too); `bolt_heights[2]` re-measured to the lens centre so the drawn beam leaves the lens.
 
 ## Testing
 
@@ -114,11 +115,10 @@ re-measured.
   every channel animation its data names; both bosses have a portrait.
 - In the game (Godot MCP): screenshots of each boss walking, attacking and
   using each ability (war cry, cast, summon, phase shift) and its death; the
-  boss bar with portrait; each of the seven towers idle, firing (in two
+  boss bar with portrait; each of the eight towers idle, firing (in two
   directions for the mirrored and rotating ones) and wrecked; sizes and
   muzzle points tuned from the screenshots.
 - Existing tests keep passing; the web build loads without errors.
 
 ## Out of scope
-- The Focus Lens art (follow-up when its sheet arrives).
 - New boss behaviour (e.g. a hurt reaction) — art only.

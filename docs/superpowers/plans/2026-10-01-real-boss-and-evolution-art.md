@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the placeholder looks of the two bosses and seven tower evolutions with the new art sheets, and show boss portraits on the boss bar.
+**Goal:** Replace the placeholder looks of the two bosses and all eight tower evolutions with the new art sheets, and show boss portraits on the boss bar.
 
 **Architecture:** The new sheets are copied into `assets/source/` and sliced by `tools/slice_sprites.py` (new `--only` filter, `_`-discarded animations, same-name joining) into SpriteFrames; data files switch to them. The Gearshot pair gets rotating heads from `tools/split_turret.py`. Small data flags let the Embercaster and Spire evolutions keep idle art while their (direction-fixed) effects are drawn by the game. Portraits are a new `EnemyDefinition.portrait` shown by `BossBar`.
 
@@ -15,10 +15,10 @@
 - Work on branch `real-boss-and-evolution-art` (already created; the spec is committed). One commit per task, ending with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Stage only the task's files.
 - Never edit files in `assets/source/` or the Desktop folder. Never run the slicer without `--only`: a full run rewrites the other sprite `.tres` files. After every slicer run, `git status --short assets/sprites/` must list only the outputs being built.
 - Evolution SpriteFrames animations: `lv3_idle`, `lv3_fire`, `destroyed`. Boss animations: Warchief idle 4 · walk 9 · attack 6 · war_cry 6 · hurt 4 · death 8; Shaman-King idle 4 · walk 8 · cast 6 · projectile 2 · summon 6 · buff 4 · phase_shift 7 · death 9. `war_cry`, `summon`, `phase_shift` don't loop.
-- Tints white and glow transparent for the seven evolutions with new art (Gatling Engine, Rune Cannon, Siege Battery, Frost Rune Mortar, Inferno, Oil Sprayer, Storm Array). The Focus Lens is untouched.
+- Tints white and glow transparent for all eight evolutions (Gatling Engine, Rune Cannon, Siege Battery, Frost Rune Mortar, Inferno, Oil Sprayer, Storm Array, Focus Lens). The Focus Lens art comes from its own sheet, `focus_lens.png`.
 - Boss looks: tints white; Shaman-King aura transparent; Warchief keeps `aura = Color(1, 0.3, 0.2, 0.35)`. Warchief ≈ 1.8× a goblin's height, Shaman-King ≈ 2.2× (tune `sprite_scale` from screenshots).
 - Portrait on the boss bar: 56×56, left of the name and bar, hidden when the boss has none.
-- Gearshot pair: rotating head cut from the `lv3_idle` frame; Inferno / Oil Sprayer keep `lv3_idle` while spraying; Storm Array keeps `lv3_idle` when it fires; Mortar pair use their fire frames.
+- Gearshot pair: rotating head cut from the `lv3_idle` frame; Inferno / Oil Sprayer keep `lv3_idle` while spraying; Storm Array and Focus Lens keep `lv3_idle` when they fire; Mortar pair use their fire frames.
 - Headless tests run with a timeout: `timeout 60 godot --headless --path . --script tests/<file>.gd` (a runtime error stops the script before `quit()` and it hangs otherwise). "Identifier not found" lines about autoloads are noise.
 - New `class_name` or new/changed PNGs need `timeout 200 godot --headless --editor --path . --import` before tests or the game see them.
 - MCP checks: `run_project`; the first `game_eval` usually says "Not connected" (retry). The game starts at the main menu: `get_tree().change_scene_to_file("res://scenes/world.tscn")`, await 5 process frames, `var world = get_tree().current_scene`, set `world.run_cards.ended = true`. Resources: `var d: Dictionary[StringName, int] = {&"scrap": 800, &"aether": 60}; core.stored.add_all(d)`. Spawn: `world.get_node("WaveDirector").spawn_at(load("res://data/enemies/<id>.tres"), pos)`. A script error in an eval freezes the game: check `get_debug_output`, then `stop_project` + `run_project`. Never use a ternary on a void method in an eval. After `stop_project`, `git checkout project.godot`. The camera follows the hero: move the hero next to what you screenshot (`hero.global_position = ...; hero.reset_physics_interpolation()`); the HUD covers the top ~180 px.
@@ -38,8 +38,8 @@
 **Files:**
 - Modify: `tools/slice_sprites.py`
 - Delete: `tools/alias_frames.py`
-- Create (copies): `assets/source/goblin_warchief.png`, `goblin_shaman_king.png`, `boss_portraits.png`, `gearshot_evolutions.png`, `rune_mortar_evolutions.png`, `embercaster_evolutions.png`, `aether_spire_evolutions.png`
-- Create (generated): `assets/sprites/goblin_warchief.png/.tres`, `goblin_shaman_king.png/.tres`, `gatling_engine.png/.tres` (overwrites the alias), `rune_cannon.png/.tres`, `siege_battery.png/.tres`, `frost_mortar.png/.tres`, `inferno.png/.tres`, `oil_sprayer.png/.tres`, `storm_array.png/.tres` (overwrites the alias), `assets/sprites/portraits/goblin_warchief.png`, `goblin_shaman_king.png`
+- Create (copies): `assets/source/goblin_warchief.png`, `goblin_shaman_king.png`, `boss_portraits.png`, `gearshot_evolutions.png`, `rune_mortar_evolutions.png`, `embercaster_evolutions.png`, `aether_spire_evolutions.png`, `focus_lens.png`
+- Create (generated): `assets/sprites/goblin_warchief.png/.tres`, `goblin_shaman_king.png/.tres`, `gatling_engine.png/.tres` (overwrites the alias), `rune_cannon.png/.tres`, `siege_battery.png/.tres`, `frost_mortar.png/.tres`, `inferno.png/.tres`, `oil_sprayer.png/.tres`, `storm_array.png/.tres` (overwrites the alias), `focus_lens.png/.tres`, `assets/sprites/portraits/goblin_warchief.png`, `goblin_shaman_king.png`
 
 **Interfaces:**
 - Produces: SpriteFrames at `res://assets/sprites/<id>.tres` with the animations listed in Global Constraints; portrait PNGs at `res://assets/sprites/portraits/<boss id>.png`; `python3 tools/slice_sprites.py --only a,b [PREVIEW_PNG]`.
@@ -49,7 +49,7 @@
 - [ ] **Step 2: Copy the sources.**
 
 ```bash
-for f in goblin_warchief goblin_shaman_king boss_portraits gearshot_evolutions rune_mortar_evolutions embercaster_evolutions aether_spire_evolutions; do cp ~/Desktop/"Astral forge assests"/$f.png assets/source/; done
+for f in goblin_warchief goblin_shaman_king boss_portraits gearshot_evolutions rune_mortar_evolutions embercaster_evolutions aether_spire_evolutions focus_lens; do cp ~/Desktop/"Astral forge assests"/$f.png assets/source/; done
 ```
 
 - [ ] **Step 3: `--only`, discarding and joining.** In `tools/slice_sprites.py`:
@@ -141,11 +141,12 @@ def evolution_pair(first):
     "frost_mortar": ("rune_mortar_evolutions.png", evolution_pair(False)),
     "inferno": ("embercaster_evolutions.png", evolution_pair(True)),
     "oil_sprayer": ("embercaster_evolutions.png", evolution_pair(False)),
-    # The Focus Lens rows came out jumbled (row 3: 6 lens frames; row 4: the
-    # Storm Array's 2 wreck frames, then 3 lens beam frames). Lens art: see
-    # ~/Desktop/astral_forge_focus_lens_prompt.txt.
+    # The Focus Lens rows here came out jumbled (row 3: 6 lens frames; row 4:
+    # the Storm Array's 2 wreck frames, then 3 lens beam frames); the Lens was
+    # redrawn as its own sheet (prompt: ~/Desktop/astral_forge_focus_lens_prompt.txt).
     "storm_array": ("aether_spire_evolutions.png", [
         [("lv3_idle", 4)], [("lv3_fire", 4)], [("_lens", 6)], [("destroyed", 2), ("_lens_fire", 3)]]),
+    "focus_lens": ("focus_lens.png", [[("lv3_idle", 4)], [("lv3_fire", 4)], [("destroyed", 2)]]),
 ```
 
   `BODY_ALIGNED` gains `"goblin_warchief": {"walk"}, "goblin_shaman_king": {"walk"}`. Add to `STATICS`:
@@ -157,10 +158,10 @@ def evolution_pair(first):
 - [ ] **Step 6: Slice and look.** Run:
 
 ```bash
-python3 tools/slice_sprites.py --only goblin_warchief,goblin_shaman_king,gatling_engine,rune_cannon,siege_battery,frost_mortar,inferno,oil_sprayer,storm_array,portraits /tmp/claude-1000/-home-tylermegill-astral-forge/328258b9-3171-4dce-be05-60316129fd28/scratchpad/art_preview.png
+python3 tools/slice_sprites.py --only goblin_warchief,goblin_shaman_king,gatling_engine,rune_cannon,siege_battery,frost_mortar,inferno,oil_sprayer,storm_array,focus_lens,portraits /tmp/claude-1000/-home-tylermegill-astral-forge/328258b9-3171-4dce-be05-60316129fd28/scratchpad/art_preview.png
 ```
 
-  Expected printout: the animation counts from Global Constraints. Open the preview image (Read tool) and check every frame: one whole character/tower per cell, nothing cut in half, no stray piece of a neighbour, feet/base on the red line. In particular: the King's `cast` row has 6 figures and no orb fan, `projectile` is 2 orbs; the Storm Array wreck is the 2 rubble piles. If a row splits wrongly, adjust that row's counts (e.g. split `("_fan", 1)` differently) and re-run until right. `git status --short assets/sprites/` lists only the new outputs (plus `portraits/`).
+  Expected printout: the animation counts from Global Constraints. Open the preview image (Read tool) and check every frame: one whole character/tower per cell, nothing cut in half, no stray piece of a neighbour, feet/base on the red line. In particular: the King's `cast` row has 6 figures and no orb fan, `projectile` is 2 orbs; the Storm Array wreck is the 2 rubble piles; the Focus Lens fire frames keep their whole beam (the beam may be wide: that's fine). If a row splits wrongly, adjust that row's counts (e.g. split `("_fan", 1)` differently) and re-run until right. `git status --short assets/sprites/` lists only the new outputs (plus `portraits/`).
 
 - [ ] **Step 7: Delete the alias tool.** `git rm tools/alias_frames.py`. `grep -rn alias_frames .` (excluding `.git` and `docs/superpowers`) → nothing.
 
@@ -169,7 +170,7 @@ python3 tools/slice_sprites.py --only goblin_warchief,goblin_shaman_king,gatling
 - [ ] **Step 9: Commit**
 
 ```bash
-git add tools/slice_sprites.py assets/source/goblin_warchief.png assets/source/goblin_shaman_king.png assets/source/boss_portraits.png assets/source/gearshot_evolutions.png assets/source/rune_mortar_evolutions.png assets/source/embercaster_evolutions.png assets/source/aether_spire_evolutions.png assets/sprites/goblin_warchief.* assets/sprites/goblin_shaman_king.* assets/sprites/gatling_engine.* assets/sprites/rune_cannon.* assets/sprites/siege_battery.* assets/sprites/frost_mortar.* assets/sprites/inferno.* assets/sprites/oil_sprayer.* assets/sprites/storm_array.* assets/sprites/portraits/
+git add tools/slice_sprites.py assets/source/goblin_warchief.png assets/source/goblin_shaman_king.png assets/source/boss_portraits.png assets/source/gearshot_evolutions.png assets/source/rune_mortar_evolutions.png assets/source/embercaster_evolutions.png assets/source/aether_spire_evolutions.png assets/source/focus_lens.png assets/sprites/goblin_warchief.* assets/sprites/goblin_shaman_king.* assets/sprites/gatling_engine.* assets/sprites/rune_cannon.* assets/sprites/siege_battery.* assets/sprites/frost_mortar.* assets/sprites/inferno.* assets/sprites/oil_sprayer.* assets/sprites/storm_array.* assets/sprites/focus_lens.* assets/sprites/portraits/
 git commit -m "Slice the real boss, portrait and evolution art
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
@@ -534,10 +535,10 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 7: Storm Array
+### Task 7: Storm Array and Focus Lens
 
 **Files:**
-- Modify: `scripts/towers/spire_definition.gd`, `scripts/towers/spire_tower.gd` (`_strike`), `data/towers/storm_array.tres`, `tests/test_art.gd`
+- Modify: `scripts/towers/spire_definition.gd`, `scripts/towers/spire_tower.gd` (`_strike`), `scripts/towers/lens_tower.gd` (`_fire_at`), `data/towers/storm_array.tres`, `data/towers/focus_lens.tres`, `tests/test_art.gd`
 
 **Interfaces:**
 - Produces: `SpireDefinition.show_fire_frame: bool` (default true).
@@ -545,8 +546,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 - [ ] **Step 1: Failing test.** In `_init`:
 
 ```gdscript
-	var storm = check_evolution(&"storm_array")
-	check("storm idle art when firing", storm.show_fire_frame, false)
+	for id in [&"storm_array", &"focus_lens"]:
+		var def = check_evolution(id)
+		check("%s idle art when firing" % id, def.show_fire_frame, false)
 	check("spire keeps fire frame", load("res://data/towers/aether_spire.tres").show_fire_frame, true)
 ```
 
@@ -572,15 +574,17 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 		_fire_frame_left = CHARGE_FRAME_TIME
 ```
 
-- [ ] **Step 3: Measure and data.** On `lv3_idle` frame 0, the height of the top of the tallest crystal above the feet × 0.9 (in on-screen pixels after `sprite_scale`) → `bolt_heights[2]`. `storm_array.tres`: `show_fire_frame = false`; `sprite_scale = 0.55` (tune); `bolt_heights = PackedFloat32Array(90, 100, <h>)`.
+  In `lens_tower.gd` `_fire_at()`, wrap its four fire-frame lines the same way (`if spire.show_fire_frame:`).
 
-- [ ] **Step 4: Test and look.** Import; tests → 0 failed. In game, bolts at goblins left and right leave the crystal tips; idle art stays; Thunderstorm works; kill → `destroyed`. Screenshot beside a Lv3 Spire and tune scale.
+- [ ] **Step 3: Measure and data.** Storm Array: on `lv3_idle` frame 0, the height of the top of the tallest crystal above the feet × 0.9 (in on-screen pixels after `sprite_scale`) → `bolt_heights[2]`. `storm_array.tres`: `show_fire_frame = false`; `sprite_scale = 0.55` (tune); `bolt_heights = PackedFloat32Array(90, 100, <h>)`. Focus Lens: the beam leaves from `_muzzle_base()` = straight above the base point by `bolt_heights[2]`, so set it to the height of the lens centre above the feet (on screen); `focus_lens.tres`: `sprite_frames` → `res://assets/sprites/focus_lens.tres`, delete `tint` and `glow`, `sprite_scale = 0.55` (tune), `show_fire_frame = false`, `bolt_heights = PackedFloat32Array(90, 100, <h>)`.
+
+- [ ] **Step 4: Test and look.** Import; tests → 0 failed. In game, Storm Array bolts at goblins left and right leave the crystal tips; idle art stays; Thunderstorm works. Focus Lens beam on a goblin left, right and below starts at the lens; idle art stays; Overload works. Kill each → `destroyed`. Screenshot both beside a Lv3 Spire and tune scale.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add scripts/towers/spire_definition.gd scripts/towers/spire_tower.gd data/towers/storm_array.tres tests/test_art.gd
-git commit -m "Give the Storm Array its real art
+git add scripts/towers/spire_definition.gd scripts/towers/spire_tower.gd scripts/towers/lens_tower.gd data/towers/storm_array.tres data/towers/focus_lens.tres tests/test_art.gd
+git commit -m "Give the Storm Array and Focus Lens their real art
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
@@ -594,11 +598,11 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 - [ ] **Step 1: Every test.** All six headless test files (`test_art`, `test_evolutions`, `test_help_text`, `test_cards`, `test_waves`, `test_run_summary`) → `0 failed`.
 
-- [ ] **Step 2: Full in-game pass.** Build and evolve all eight towers (the Focus Lens stays a tinted Spire), start waves 1–3 at 3× speed (`Engine.time_scale = 3.0`, reset to 1 after) — no errors, all fire. Spawn both bosses near the towers and let them fight for ~20 s: no errors; screenshot. Help screen and Codex: the bosses' Codex pictures use the new idle art (unlock with `Codex.mark_seen(definition)` if needed and delete `user://codex.cfg` after).
+- [ ] **Step 2: Full in-game pass.** Build and evolve all eight towers, start waves 1–3 at 3× speed (`Engine.time_scale = 3.0`, reset to 1 after) — no errors, all fire. Spawn both bosses near the towers and let them fight for ~20 s: no errors; screenshot. Help screen and Codex: the bosses' Codex pictures use the new idle art (unlock with `Codex.mark_seen(definition)` if needed and delete `user://codex.cfg` after).
 
 - [ ] **Step 3: Web build.** Export (`timeout 300 godot --headless --path . --export-release "Web" export/web/index.html`), serve, load in Playwright (Play at y≈321), wait 8 s: no console errors.
 
-- [ ] **Step 4: Roadmap.** In `ROADMAP.md`: Phase 10's 10-wave line — replace "Real boss art: see `docs/art/...`" with "Real boss art and portraits (2026-10-01)"; the evolutions line — replace "Placeholder look (tint + glow, or the spare blaster/harvester sheets); real art: ..." with "Real art for all but the Focus Lens (its sheet is being redone: `~/Desktop/astral_forge_focus_lens_prompt.txt`)". In "What each art file is", add rows:
+- [ ] **Step 4: Roadmap.** In `ROADMAP.md`: Phase 10's 10-wave line — replace "Real boss art: see `docs/art/...`" with "Real boss art and portraits (2026-10-01)"; the evolutions line — replace "Placeholder look (tint + glow, or the spare blaster/harvester sheets); real art: ..." with "Real art for all eight (the Focus Lens from its own sheet, `focus_lens.png`)". In "What each art file is", add rows:
 
 ```markdown
 | `goblin_warchief.png` | `goblin_warchief` — **Goblin Warchief** (mini-boss) | idle, walk, attack, war_cry, hurt, death | 10 |
@@ -607,10 +611,11 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 | `gearshot_evolutions.png` | `gatling_engine`, `rune_cannon` | lv3_idle, lv3_fire, destroyed (+ rotating heads) | 10 |
 | `rune_mortar_evolutions.png` | `siege_battery`, `frost_mortar` | lv3_idle, lv3_fire, destroyed | 10 |
 | `embercaster_evolutions.png` | `inferno`, `oil_sprayer` | lv3_idle, lv3_fire, destroyed | 10 |
-| `aether_spire_evolutions.png` | `storm_array` (Focus Lens rows unusable) | lv3_idle, lv3_fire, destroyed | 10 |
+| `aether_spire_evolutions.png` | `storm_array` (its Focus Lens rows are unused) | lv3_idle, lv3_fire, destroyed | 10 |
+| `focus_lens.png` | `focus_lens` | lv3_idle, lv3_fire, destroyed | 10 |
 ```
 
-  and under "Art still needed": "Focus Lens (`focus_lens.png`, prompt on the Desktop)"; remove "Elite enemy, final boss".
+  and under "Art still needed" remove "Elite enemy, final boss".
 
 - [ ] **Step 5: Commit**
 
