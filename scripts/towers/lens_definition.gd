@@ -11,6 +11,9 @@ extends SpireDefinition
 ## Damage multiplier at full ramp (1 at the start).
 @export var max_ramp := 5.0
 @export var beam_color := Color(1.0, 0.95, 0.75)
+## Where the beam leaves from (the lens), relative to the base point, facing
+## right; the tower mirrors to face left.
+@export var lens_offset := Vector2(55, -110)
 
 @export_group("Overload")
 ## Extra multiplier on top of full ramp while Overload lasts (ability_duration).

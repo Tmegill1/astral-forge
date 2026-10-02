@@ -14,6 +14,9 @@ extends TowerDefinition
 ## How high above the base point bolts leave from (the crystal tip), per
 ## level (index 0 = Lv1), in on-screen pixels.
 @export var bolt_heights: PackedFloat32Array = [90.0, 100.0, 125.0]
+## Show the charge frame when a bolt fires. Off for art whose painted
+## lightning only points one way.
+@export var show_fire_frame := true
 
 @export_group("Resonance Burst")
 @export var burst_damage_multiplier := 2.0

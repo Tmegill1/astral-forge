@@ -31,4 +31,5 @@ attack_range = 280.0
 operated_fire_rate_multiplier = 1.0
 jump_count = 8
 jump_falloff = 0.0
-bolt_heights = PackedFloat32Array(90, 100, 120)
+bolt_heights = PackedFloat32Array(90, 100, 124)
+show_fire_frame = false

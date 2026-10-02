@@ -5,7 +5,8 @@ extends SpireTower
 ## 5× over 3 s and resets when it changes target. On its own it picks the
 ## enemy with the most health in range and stays on it; operated, the enemy
 ## in range nearest the mouse. Q = Overload: full ramp at once and 1.5× on
-## top for 4 s.
+## top for 4 s. Its art faces right and mirrors to face left; the beam
+## leaves from the lens.
 
 ## The beam stays drawn, and the ramp kept, this long after its last tick.
 const BEAM_HOLD := 0.15
@@ -15,6 +16,8 @@ var beam_target: Enemy
 ## 0..1 toward full ramp on beam_target.
 var ramp := 0.0
 var _beam_left := 0.0
+## Which way the lens faces (the art faces right).
+var _facing_left := false
 
 
 func _ready() -> void:
@@ -34,6 +37,17 @@ func _physics_process(delta: float) -> void:
 	else:
 		ramp = minf(ramp + delta / lens.ramp_time, 1.0)
 	queue_redraw()
+
+
+func _aim_at(point: Vector2) -> void:
+	_facing_left = point.x < global_position.x
+	sprite.flip_h = _facing_left
+
+
+## The beam leaves from the lens.
+func _muzzle_base() -> Vector2:
+	var offset := lens.lens_offset
+	return global_position + Vector2(-offset.x if _facing_left else offset.x, offset.y)
 
 
 ## Beam ticks per second (not the Spire's bolt rate).
@@ -82,10 +96,11 @@ func _fire_at(point: Vector2) -> void:
 		ramp = 0.0
 	target.health.take_damage(tick_damage(), Health.DamageType.MAGIC)
 	_beam_left = BEAM_HOLD
-	sprite.animation = StringName("lv%d_fire" % level)
-	sprite.stop()
-	sprite.frame = 0
-	_fire_frame_left = CHARGE_FRAME_TIME
+	if spire.show_fire_frame:
+		sprite.animation = StringName("lv%d_fire" % level)
+		sprite.stop()
+		sprite.frame = 0
+		_fire_frame_left = CHARGE_FRAME_TIME
 
 
 ## Starts Overload if it's recharged.

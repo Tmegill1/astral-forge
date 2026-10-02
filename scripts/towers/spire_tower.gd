@@ -114,10 +114,11 @@ func _strike(chain: Array[Enemy], bolt_damage: float, falloff: float, stun: floa
 	projectile_parent.add_child(arc)
 	# The first fire frame is the swirling charge; the later ones' beams are
 	# clipped at the frame edge.
-	sprite.animation = StringName("lv%d_fire" % level)
-	sprite.stop()
-	sprite.frame = 0
-	_fire_frame_left = CHARGE_FRAME_TIME
+	if spire.show_fire_frame:
+		sprite.animation = StringName("lv%d_fire" % level)
+		sprite.stop()
+		sprite.frame = 0
+		_fire_frame_left = CHARGE_FRAME_TIME
 
 
 ## While operated: the range ring, and a ring on the enemy the next bolt

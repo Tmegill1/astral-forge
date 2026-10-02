@@ -36,6 +36,13 @@ func _init() -> void:
 		check("%s idle art while spraying" % id, def.get("fire_frame_while_spraying"), false)
 	check("embercaster keeps fire frame",
 			load("res://data/towers/embercaster.tres").get("fire_frame_while_spraying"), true)
+	for id in [&"storm_array", &"focus_lens"]:
+		var def = check_evolution(id)
+		check("%s idle art when firing" % id, def.get("show_fire_frame"), false)
+	check("spire keeps fire frame", load("res://data/towers/aether_spire.tres").get("show_fire_frame"), true)
+	# The Lens's art faces right with the lens off to one side: it mirrors and
+	# its beam leaves from the lens.
+	check("lens offset", load("res://data/towers/focus_lens.tres").get("lens_offset"), Vector2(55, -110))
 	print("art: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 

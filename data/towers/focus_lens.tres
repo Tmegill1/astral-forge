@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="LensDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/towers/lens_definition.gd" id="1_def"]
-[ext_resource type="SpriteFrames" uid="uid://crg8tchpdh1n5" path="res://assets/sprites/aether_spire.tres" id="2_frames"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/focus_lens.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/towers/lens_tower.tscn" id="3_scene"]
 
 [resource]
@@ -22,11 +22,11 @@ ability_text = "The beam jumps to full power and deals 1.5× on top for 4 s."
 ability_duration = 4.0
 ability_cooldown = 12.0
 ability_fire_rate_multiplier = 1.0
-tint = Color(1, 0.95, 0.75, 1)
-glow = Color(1, 0.95, 0.75, 0.8)
 sprite_frames = ExtResource("2_frames")
-sprite_scale = 0.605
+sprite_scale = 0.55
 scene = ExtResource("3_scene")
+show_fire_frame = false
+lens_offset = Vector2(55, -110)
 attack_damage = 10.0
 attacks_per_second = 0.8
 attack_range = 280.0
