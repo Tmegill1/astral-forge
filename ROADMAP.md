@@ -178,9 +178,9 @@ Order: 1) slots + Aether ✅ 2) levels ✅ 3) Mortar ✅ 4) Embercaster ✅ 5) S
 - [x] **[AI]** Player XP: enemies drop XP orbs (Goblin 1, Shaman 3, Armored 3) you pick up; levels cost 8 × 1.5^(level−1); a rare Lodestone (3%) pulls every orb on the map to you
 - [x] **[AI]** Power-up cards: each level-up pauses and offers 3 of 14 run-long cards (hero / tower / fortress stats; Arc Bolts, Split Shot, Ember Rounds hero mods); data in `data/cards/`
 - [ ] **[AI]** Hero-specific ability cards (each hero gets its own cards that only appear in its offers) — prototype later
-- [x] **[AI]** Tower evolutions: at Lv3, the F menu offers **Evolve — 6 Aether** and a choice of two branches per tower, each with its own Q ability: Gearshot → Gatling Engine (spins up to 4× fire rate) / Rune Cannon (piercing magic rounds); Rune Mortar → Siege Battery (3-shell salvos) / Frost Rune Mortar (frost circles + freeze); Embercaster → Inferno (longer cone, 10 burn stacks) / Oil Sprayer (oil: slower, +50% fire damage taken); Aether Spire → Storm Array (8 jumps, stuns) / Focus Lens (ramping beam). Placeholder look (tint + glow, or the spare blaster/harvester sheets); real art: `docs/art/2026-09-30-boss-and-evolution-art-brief.md`
+- [x] **[AI]** Tower evolutions: at Lv3, the F menu offers **Evolve — 6 Aether** and a choice of two branches per tower, each with its own Q ability: Gearshot → Gatling Engine (spins up to 4× fire rate) / Rune Cannon (piercing magic rounds); Rune Mortar → Siege Battery (3-shell salvos) / Frost Rune Mortar (frost circles + freeze); Embercaster → Inferno (longer cone, 10 burn stacks) / Oil Sprayer (oil: slower, +50% fire damage taken); Aether Spire → Storm Array (8 jumps, stuns) / Focus Lens (ramping beam). Real art for all eight (the Focus Lens from its own sheet, `focus_lens.png`)
 - [ ] **[Both]** Playtest evolutions: is 6 Aether right? Is each branch worth picking?
-- [x] **[AI]** 10 waves (≈ 510 XP): placeholder Goblin Warchief mini-boss (wave 6: smashes walls, war cry) and Goblin Shaman-King final boss (wave 10: orb fans, summons, phase-2 shield that drops while you operate a tower in range; its death wins the run); boss health bar and wave banners. Real boss art: see `docs/art/2026-09-30-boss-and-evolution-art-brief.md`
+- [x] **[AI]** 10 waves (≈ 510 XP): Goblin Warchief mini-boss (wave 6: smashes walls, war cry) and Goblin Shaman-King final boss (wave 10: orb fans, summons, phase-2 shield that drops while you operate a tower in range; its death wins the run); boss health bar and wave banners. Real boss art and portraits (2026-10-01)
 - [x] **[AI]** Win screen: one end screen for victory and defeat — time, waves, kills by type, level and cards, towers standing, Scrap/Aether gathered; Play Again (R) / Main Menu; a win plays a 2 s slow-motion "The Core holds!" banner first
 - [ ] **[You]** Is a run 12–15 minutes? Do different runs feel different?
 
@@ -221,11 +221,18 @@ My best guess from looking at them. Names marked **(placeholder)** are the ones 
 | `image-gen-8.png` | `aether_harvester` (placeholder) — swirling crystal tower | lv1–3: idle, pulse; destroyed | 8 |
 | `image-gen-9.png` | `goblin_brute` — **Armored Goblin** (brown goblin with cleaver) | idle, walk, attack, hurt, death | 9 |
 | `image-gen-10.png` | `goblin_shaman` — **Goblin Shaman** | idle, walk, cast, projectile, recover, buff, death | 9 |
+| `goblin_warchief.png` | `goblin_warchief` — **Goblin Warchief** (mini-boss) | idle, walk, attack, war_cry, hurt, death | 10 |
+| `goblin_shaman_king.png` | `goblin_shaman_king` — **Goblin Shaman-King** (final boss) | idle, walk, cast, projectile, summon, buff, phase_shift, death | 10 |
+| `boss_portraits.png` | `portraits/*.png` — boss bar portraits | single images | 10 |
+| `gearshot_evolutions.png` | `gatling_engine`, `rune_cannon` | lv3_idle, lv3_fire, destroyed (+ rotating heads) | 10 |
+| `rune_mortar_evolutions.png` | `siege_battery`, `frost_mortar` | lv3_idle, lv3_fire, destroyed | 10 |
+| `embercaster_evolutions.png` | `inferno`, `oil_sprayer` | lv3_idle, lv3_fire, destroyed | 10 |
+| `aether_spire_evolutions.png` | `storm_array` (its Focus Lens rows are unused) | lv3_idle, lv3_fire, destroyed | 10 |
+| `focus_lens.png` | `focus_lens` | lv3_idle, lv3_fire, destroyed | 10 |
 
 ### Art still needed ([You])
 
 - Ogre, Bat, Siege Troll, Burrower, Saboteur (if `image-gen-9` isn't it)
-- Elite enemy, final boss
 - Bullets / projectiles / hit effects (Claude can do simple placeholders)
 - HUD icons (Scrap, Aether, health, sector warnings)
 
