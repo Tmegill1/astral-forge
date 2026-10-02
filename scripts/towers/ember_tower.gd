@@ -174,11 +174,13 @@ func _on_died() -> void:
 
 
 ## Spraying holds the first fire frame (the glowing barrel; the drawn cone is
-## the flame, as the later frames' flames are clipped at the frame edge).
+## the flame, as the later frames' flames are clipped at the frame edge) —
+## unless the art's flame is painted in, then it stays on its idle art.
 func _show_spray() -> void:
-	var animation := StringName("lv%d_%s" % [level, "fire" if is_spraying() else "idle"])
+	var fire_art := is_spraying() and ember.fire_frame_while_spraying
+	var animation := StringName("lv%d_%s" % [level, "fire" if fire_art else "idle"])
 	if sprite.animation != animation:
-		if is_spraying():
+		if fire_art:
 			sprite.animation = animation
 			sprite.stop()
 			sprite.frame = 0

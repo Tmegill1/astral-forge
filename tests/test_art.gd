@@ -31,6 +31,11 @@ func _init() -> void:
 				and head.head_texture.resource_path == "res://assets/sprites/towers/%s_head.png" % id, true)
 	for id in [&"siege_battery", &"frost_mortar"]:
 		check_evolution(id)
+	for id in [&"inferno", &"oil_sprayer"]:
+		var def = check_evolution(id)
+		check("%s idle art while spraying" % id, def.get("fire_frame_while_spraying"), false)
+	check("embercaster keeps fire frame",
+			load("res://data/towers/embercaster.tres").get("fire_frame_while_spraying"), true)
 	print("art: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 

@@ -10,6 +10,9 @@ extends TowerDefinition
 @export var muzzle_offset := Vector2(44, -50)
 ## Multiplies how far the flame reaches (the Inferno's longer cone).
 @export var cone_length_multiplier := 1.0
+## Show the first fire frame while spraying. Off for art whose painted flame
+## only points one way: the drawn cone is the flame.
+@export var fire_frame_while_spraying := true
 
 @export_group("Fuel")
 ## Seconds of spraying a full tank holds.
