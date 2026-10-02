@@ -1,6 +1,6 @@
 [gd_resource type="SpriteFrames" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/gatling_engine.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/inferno.png" id="1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1"]
 atlas = ExtResource("1")
@@ -89,4 +89,4 @@ animations = [{
 "name": &"destroyed",
 "speed": 1.0
 }]
-metadata/foot_offset = Vector2(0.0, 106.0)
+metadata/foot_offset = Vector2(0.0, 105.0)

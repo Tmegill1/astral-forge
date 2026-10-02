@@ -1,46 +1,46 @@
 [gd_resource type="SpriteFrames" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/gatling_engine.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/oil_sprayer.png" id="1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1"]
 atlas = ExtResource("1")
-region = Rect2(0, 0, 512, 224)
+region = Rect2(0, 0, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2"]
 atlas = ExtResource("1")
-region = Rect2(512, 0, 512, 224)
+region = Rect2(544, 0, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3"]
 atlas = ExtResource("1")
-region = Rect2(1024, 0, 512, 224)
+region = Rect2(1088, 0, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4"]
 atlas = ExtResource("1")
-region = Rect2(1536, 0, 512, 224)
+region = Rect2(1632, 0, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5"]
 atlas = ExtResource("1")
-region = Rect2(0, 224, 512, 224)
+region = Rect2(0, 224, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6"]
 atlas = ExtResource("1")
-region = Rect2(512, 224, 512, 224)
+region = Rect2(544, 224, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7"]
 atlas = ExtResource("1")
-region = Rect2(1024, 224, 512, 224)
+region = Rect2(1088, 224, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8"]
 atlas = ExtResource("1")
-region = Rect2(1536, 224, 512, 224)
+region = Rect2(1632, 224, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_9"]
 atlas = ExtResource("1")
-region = Rect2(0, 448, 512, 224)
+region = Rect2(0, 448, 544, 224)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_10"]
 atlas = ExtResource("1")
-region = Rect2(512, 448, 512, 224)
+region = Rect2(544, 448, 544, 224)
 
 [resource]
 animations = [{
@@ -89,4 +89,4 @@ animations = [{
 "name": &"destroyed",
 "speed": 1.0
 }]
-metadata/foot_offset = Vector2(0.0, 106.0)
+metadata/foot_offset = Vector2(0.0, 105.0)

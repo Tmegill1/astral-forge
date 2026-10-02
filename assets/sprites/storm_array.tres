@@ -1,46 +1,46 @@
 [gd_resource type="SpriteFrames" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/aether_harvester.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/storm_array.png" id="1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1"]
 atlas = ExtResource("1")
-region = Rect2(0, 1152, 256, 288)
+region = Rect2(0, 0, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2"]
 atlas = ExtResource("1")
-region = Rect2(256, 1152, 256, 288)
+region = Rect2(576, 0, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3"]
 atlas = ExtResource("1")
-region = Rect2(512, 1152, 256, 288)
+region = Rect2(1152, 0, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4"]
 atlas = ExtResource("1")
-region = Rect2(768, 1152, 256, 288)
+region = Rect2(1728, 0, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5"]
 atlas = ExtResource("1")
-region = Rect2(0, 1440, 256, 288)
+region = Rect2(0, 288, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6"]
 atlas = ExtResource("1")
-region = Rect2(256, 1440, 256, 288)
+region = Rect2(576, 288, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7"]
 atlas = ExtResource("1")
-region = Rect2(512, 1440, 256, 288)
+region = Rect2(1152, 288, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8"]
 atlas = ExtResource("1")
-region = Rect2(768, 1440, 256, 288)
+region = Rect2(1728, 288, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_9"]
 atlas = ExtResource("1")
-region = Rect2(0, 1728, 256, 288)
+region = Rect2(0, 576, 576, 288)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_10"]
 atlas = ExtResource("1")
-region = Rect2(256, 1728, 256, 288)
+region = Rect2(576, 576, 576, 288)
 
 [resource]
 animations = [{
@@ -74,7 +74,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_8")
 }],
-"loop": true,
+"loop": false,
 "name": &"lv3_fire",
 "speed": 8.0
 }, {

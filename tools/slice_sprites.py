@@ -14,13 +14,16 @@ sometimes bridge neighbouring frames. For each sheet this:
 3. Writes assets/sprites/<name>.png (one animation per row, equal cells) and
    assets/sprites/<name>.tres (a SpriteFrames resource with named animations).
 
-Evolved towers that borrow a spare sheet: run tools/alias_frames.py afterwards.
-
 Static objects (Core, slots, walls, pickups) are trimmed and written as
 individual PNGs under assets/sprites/<name>/.
 
-Run from the project root:
-    python3 tools/slice_sprites.py [PREVIEW_PNG]
+Run from the project root (always name the outputs to build; a full run
+rewrites every sprite .tres in a different but equivalent format):
+    python3 tools/slice_sprites.py --only goblin,gearshot [PREVIEW_PNG]
+
+In a row list, animation names starting with "_" are sliced (so the frame
+count still splits the row right) and then thrown away, and a name used twice
+is joined into one animation.
 
 Requires Pillow and NumPy.
 """
@@ -54,6 +57,13 @@ def tower_levels(idle, active, destroyed_per_level):
     return rows
 
 
+def evolution_pair(first):
+    """Rows for a two-evolution sheet; `first` picks which half to keep."""
+    keep = [[("lv3_idle", 4)], [("lv3_fire", 4)], [("destroyed", 2)]]
+    drop = [[("_idle", 4)], [("_fire", 4)], [("_destroyed", 2)]]
+    return keep + drop if first else drop + keep
+
+
 # Each row is a list of (animation_name, frame_count) read left to right.
 # Names ending in "?" in the roadmap table are placeholders until confirmed.
 SHEETS = {
@@ -74,6 +84,44 @@ SHEETS = {
     "embercaster": ("image-gen-6.png", tower_levels("idle", "fire", False)),
     "aether_spire": ("image-gen-7.png", tower_levels("idle", "fire", False)),
     "aether_harvester": ("image-gen-8.png", tower_levels("idle", "pulse", False)),
+    "goblin_warchief": ("goblin_warchief.png", [
+        [("idle", 4)], [("walk", 9)], [("attack", 6)], [("war_cry", 6)], [("hurt", 4)], [("death", 8)]]),
+    # Row 3: cast frames 1-4, the loose orb fan (dropped), cast 5-6, then the orb.
+    "goblin_shaman_king": ("goblin_shaman_king.png", [
+        [("idle", 4)], [("walk", 8)],
+        [("cast", 4), ("_fan", 1), ("cast", 2), ("projectile", 2)],
+        [("summon", 6)], [("buff", 4)], [("phase_shift", 7)], [("death", 9)]]),
+    "gatling_engine": ("gearshot_evolutions.png", evolution_pair(True)),
+    "rune_cannon": ("gearshot_evolutions.png", evolution_pair(False)),
+    "siege_battery": ("rune_mortar_evolutions.png", evolution_pair(True)),
+    "frost_mortar": ("rune_mortar_evolutions.png", evolution_pair(False)),
+    "inferno": ("embercaster_evolutions.png", evolution_pair(True)),
+    "oil_sprayer": ("embercaster_evolutions.png", evolution_pair(False)),
+    # The Focus Lens rows here came out jumbled (row 3: 6 lens frames; row 4:
+    # the Storm Array's 2 wreck frames, then 3 lens beam frames); the Lens was
+    # redrawn as its own sheet (prompt: ~/Desktop/astral_forge_focus_lens_prompt.txt).
+    "storm_array": ("aether_spire_evolutions.png", [
+        [("lv3_idle", 4)], [("lv3_fire", 4)], [("_lens", 6)], [("destroyed", 2), ("_lens_fire", 3)]]),
+    "focus_lens": ("focus_lens.png", [[("lv3_idle", 4)], [("lv3_fire", 4)], [("destroyed", 2)]]),
+}
+
+# Hand-picked column boundaries (x positions, left edge to right edge) for
+# rows whose effects join the frames so the gaps can't be found: output name
+# -> {row index: [x0, x1, ..., xN]} for N frames.
+CUTS = {
+    # Magic trails join the cast frames, and stray sparkles start the buff and
+    # phase-shift rows.
+    "goblin_shaman_king": {
+        2: [0, 177, 298, 485, 587, 752, 917, 1086, 1275, 1448],
+        4: [308, 483, 652, 905, 1161],
+        5: [131, 320, 475, 631, 792, 953, 1114, 1305],
+    },
+    # A stray fragment starts the hurt row.
+    "goblin_warchief": {4: [190, 410, 693, 927, 1142]},
+    # Flames from the row above reach into the wreck row.
+    "inferno": {2: [240, 490, 700]},
+    # The lightning joins the firing frames.
+    "storm_array": {1: [0, 223, 439, 631, 1020]},
 }
 
 # Individual static images: sheet -> rows of image names.
@@ -100,14 +148,17 @@ STATICS = {
         ["scrap_1", "scrap_2", "scrap_3", "scrap_4",
          "aether_1", "aether_2", "aether_3", "aether_4"],
     ]),
+    "portraits": ("boss_portraits.png", [["goblin_warchief", "goblin_shaman_king"]]),
 }
 
 FPS = {"idle": 6, "walk": 10, "death": 8, "destroyed": 1, "destroy": 10}
 # Per sheet: animations whose frames line up by the upper body (see body_x), not the feet.
 BODY_ALIGNED = {"artificer": {"walk", "walk_down", "walk_down_right", "walk_right",
                               "walk_up_right", "walk_up"},
-                "goblin": {"walk"}, "goblin_shaman": {"walk"}, "goblin_brute": {"walk"}}
-NO_LOOP = ("death", "destroy", "destroyed", "hurt", "attack", "cast", "fire", "build", "buff")
+                "goblin": {"walk"}, "goblin_shaman": {"walk"}, "goblin_brute": {"walk"},
+                "goblin_warchief": {"walk"}, "goblin_shaman_king": {"walk"}}
+NO_LOOP = ("death", "destroy", "destroyed", "hurt", "attack", "cast", "fire", "build", "buff",
+           "war_cry", "summon", "phase_shift")
 
 
 def runs(profile):
@@ -163,8 +214,9 @@ def segment(profile, count):
     return [(spans[k][1] + spans[k + 1][0]) // 2 for k in range(len(spans) - 1)]
 
 
-def slice_sheet(path, rows):
-    """Return a list of rows, each a list of RGBA frame images (untrimmed)."""
+def slice_sheet(path, rows, cuts=None):
+    """Return a list of rows, each a list of RGBA frame images (untrimmed).
+    `cuts` maps a row index to hand-picked column boundaries (see CUTS)."""
     img = Image.open(path).convert("RGBA")
     pixels = np.array(img)
     pixels[pixels[..., 3] < NOISE] = 0
@@ -177,9 +229,13 @@ def slice_sheet(path, rows):
     for r, row in enumerate(rows):
         y0, y1 = row_cuts[r], row_cuts[r + 1]
         count = sum(n for _, n in row)
-        xs = np.nonzero(solid[y0:y1].any(0))[0]
-        col_cuts = ([max(0, xs[0] - EDGE_PAD)] + segment(solid[y0:y1].sum(0), count)
-                    + [min(img.width, xs[-1] + 1 + EDGE_PAD)])
+        if cuts and r in cuts:
+            col_cuts = cuts[r]
+            assert len(col_cuts) == count + 1, f"row {r}: {count} frames need {count + 1} cuts"
+        else:
+            xs = np.nonzero(solid[y0:y1].any(0))[0]
+            col_cuts = ([max(0, xs[0] - EDGE_PAD)] + segment(solid[y0:y1].sum(0), count)
+                        + [min(img.width, xs[-1] + 1 + EDGE_PAD)])
         out.append([drop_intruders(img.crop((col_cuts[c], y0, col_cuts[c + 1], y1)))
                     for c in range(count)])
     return out
@@ -266,16 +322,24 @@ def build_animated(name, src, rows):
         if not os.path.exists(path):
             print(f"{name}: skipping {sheet_src} (not in {SRC_DIR}/ yet)")
             continue
-        grid = slice_sheet(path, sheet_rows)
+        grid = slice_sheet(path, sheet_rows, CUTS.get(name) if sheet_src == src else None)
         for row, frames in zip(sheet_rows, grid):
             i = 0
             for anim, n in row:
                 fs = [trim(f) for f in frames[i:i + n]]
+                i += n
+                if anim.startswith("_"):
+                    continue
                 if scale != 1.0:
                     fs = [f.resize((round(f.width * scale), round(f.height * scale)),
                                    Image.LANCZOS) for f in fs]
-                anims.append((anim, [(f, anchor(f)) for f in fs]))
-                i += n
+                frames_with_anchors = [(f, anchor(f)) for f in fs]
+                for k, (existing, existing_fs) in enumerate(anims):
+                    if existing == anim:
+                        anims[k] = (anim, existing_fs + frames_with_anchors)
+                        break
+                else:
+                    anims.append((anim, frames_with_anchors))
     body_anims = BODY_ALIGNED.get(name, ())
     if body_anims:
         idle = dict(anims).get("idle")
@@ -389,16 +453,28 @@ def preview(results, statics, path):
 
 
 def main():
+    args = sys.argv[1:]
+    only = None
+    if args and args[0] == "--only":
+        only = set(args[1].split(","))
+        args = args[2:]
+    if only is None:
+        sys.exit("Name the outputs to build: --only name,name (see the docstring).")
     os.makedirs(OUT_DIR, exist_ok=True)
-    results = {name: build_animated(name, src, rows) for name, (src, rows) in SHEETS.items()}
-    statics = {name: build_static(name, src, rows) for name, (src, rows) in STATICS.items()}
+    unknown = only - set(SHEETS) - set(STATICS)
+    if unknown:
+        sys.exit("Unknown outputs: " + ", ".join(sorted(unknown)))
+    results = {name: build_animated(name, src, rows)
+               for name, (src, rows) in SHEETS.items() if name in only}
+    statics = {name: build_static(name, src, rows)
+               for name, (src, rows) in STATICS.items() if name in only}
     for name, (_s, cell, anims, _f) in results.items():
         print(f"{name:18s} cell {cell[0]}x{cell[1]}  " + ", ".join(f"{a}:{n}" for a, n in anims))
     for name, images in statics.items():
         print(f"{name}/ " + ", ".join(n for n, _ in images))
-    if len(sys.argv) > 1:
-        preview(results, statics, sys.argv[1])
-        print("preview:", sys.argv[1])
+    if args:
+        preview(results, statics, args[0])
+        print("preview:", args[0])
 
 
 if __name__ == "__main__":
