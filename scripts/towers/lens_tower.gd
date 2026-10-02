@@ -103,6 +103,14 @@ func _fire_at(point: Vector2) -> void:
 		_fire_frame_left = CHARGE_FRAME_TIME
 
 
+## The wreck draws no beam and faces right like its art.
+func _on_died() -> void:
+	beam_target = null
+	ramp = 0.0
+	_facing_left = false
+	super()
+
+
 ## Starts Overload if it's recharged.
 func use_ability() -> void:
 	if operator == null or _ability_cooldown_left > 0.0:
