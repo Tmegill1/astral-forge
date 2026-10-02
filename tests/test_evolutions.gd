@@ -35,8 +35,10 @@ func _init() -> void:
 		return
 
 	check("base not evolved", gearshot.evolved, false)
-	check("default tint", gearshot.tint, Color.WHITE)
-	check("default glow", gearshot.glow.a, 0.0)
+	# The placeholder look (tint + glow) is gone now every evolution has art.
+	check("no tint field", gearshot.get("tint"), null)
+	check("no glow field", gearshot.get("glow"), null)
+	check("no glow script", ResourceLoader.exists("res://scripts/towers/tower_glow.gd"), false)
 	check("base icon", gearshot.icon() != null, true)
 
 	# Selling refunds half of everything invested, Aether from evolving included.

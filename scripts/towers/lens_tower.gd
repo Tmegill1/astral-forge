@@ -10,6 +10,9 @@ extends SpireTower
 
 ## The beam stays drawn, and the ramp kept, this long after its last tick.
 const BEAM_HOLD := 0.15
+## A target must be this far past the centre, sideways, to turn the lens
+## round, in pixels.
+const FLIP_MARGIN := 40.0
 
 var lens: LensDefinition
 var beam_target: Enemy
@@ -39,8 +42,14 @@ func _physics_process(delta: float) -> void:
 	queue_redraw()
 
 
+## Turns round only once the target is clearly on the other side, so an
+## enemy passing close above or below doesn't flip it back and forth.
 func _aim_at(point: Vector2) -> void:
-	_facing_left = point.x < global_position.x
+	var across := point.x - global_position.x
+	if _facing_left and across > FLIP_MARGIN:
+		_facing_left = false
+	elif not _facing_left and across < -FLIP_MARGIN:
+		_facing_left = true
 	sprite.flip_h = _facing_left
 
 

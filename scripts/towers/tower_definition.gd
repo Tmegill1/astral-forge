@@ -107,10 +107,6 @@ func max_health_at(tower_level: int) -> float:
 @export var evolve_cost: Dictionary[StringName, int] = {}
 ## One line for the evolve choice and the Help screen.
 @export var help_line := ""
-## Placeholder look until evolution art exists: colours the tower's art...
-@export var tint := Color.WHITE
-## ...and draws a glow ring of this colour underneath (transparent = none).
-@export var glow := Color(0, 0, 0, 0)
 
 @export_group("Rotating head")
 ## Optional, per level (index 0 = Lv1): a static base plus a head that turns

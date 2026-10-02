@@ -18,6 +18,8 @@ import sys
 import numpy as np
 from PIL import Image
 
+from slice_sprites import components
+
 OUT_DIR = "assets/sprites/towers"
 
 # name: sheet, cell size, (row, col) of the frame to cut, housing centre and
@@ -36,10 +38,10 @@ TURRETS = {
     # Evolutions: the gun sticks out past the body, so only air was behind
     # it (no stone to patch: base_extent 1x1).
     "gatling_engine": dict(sheet="assets/sprites/gatling_engine.png", cell=(512, 224), frame=(0, 0),
-                           pivot=(312, 122), radius=26, tip=(405, 122), barrel_half_width=28,
+                           pivot=(312, 122), radius=26, tip=(405, 122), barrel_half_width=34,
                            base_extent=(1, 1)),
     "rune_cannon": dict(sheet="assets/sprites/rune_cannon.png", cell=(544, 192), frame=(0, 0),
-                        pivot=(298, 90), radius=36, tip=(418, 90), barrel_half_width=40,
+                        pivot=(298, 90), radius=36, tip=(418, 90), barrel_half_width=48,
                         base_extent=(1, 1)),
 }
 
@@ -77,6 +79,8 @@ def split(name, sheet, cell, frame, pivot, radius, tip, barrel_half_width, base_
     fill = hole & ~head_mask[ys, mirror_x] & (borrowed[..., 3] > 0)
     base[fill] = borrowed[fill]
 
+    base = drop_loose(base)
+
     # Head image is a square centred on the pivot so it rotates in place.
     size = int(math.ceil(length + 8)) * 2
     head_img = Image.new("RGBA", (size, size))
@@ -87,6 +91,18 @@ def split(name, sheet, cell, frame, pivot, radius, tip, barrel_half_width, base_
     drawn = math.degrees(math.atan2(ay, ax))
     print(f"{name}: pivot {pivot} in a {cw}x{ch} cell, barrel drawn at {drawn:.0f} deg, "
           f"length {length:.0f}px, head {size}x{size}")
+
+
+def drop_loose(pixels, smallest=60):
+    """Clears specks left floating on the base after the cut: any piece of
+    visible pixels smaller than `smallest` that isn't the main body."""
+    labels = components(pixels[..., 3] > 0)
+    ids, sizes = np.unique(labels[labels > 0], return_counts=True)
+    main = ids[np.argmax(sizes)]
+    loose = [i for i, n in zip(ids, sizes) if i != main and n < smallest]
+    out = pixels.copy()
+    out[np.isin(labels, loose)] = 0
+    return out
 
 
 def main():

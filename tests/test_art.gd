@@ -61,16 +61,13 @@ func check_boss(def, anims: Array, channels: Array) -> void:
 			and def.attack_hit_frame < frames.get_frame_count(def.attack_animation), true)
 
 
-## An evolution with new art: its own frames (lv3_idle, lv3_fire, a wreck),
-## no placeholder tint or glow.
+## An evolution with new art: its own frames (lv3_idle, lv3_fire, a wreck).
 func check_evolution(id: StringName):
 	var def = load("res://data/towers/%s.tres" % id)
 	var frames: SpriteFrames = def.sprite_frames
 	check("%s frames" % id, frames.resource_path, "res://assets/sprites/%s.tres" % id)
 	for anim in [&"lv3_idle", &"lv3_fire", &"destroyed"]:
 		check("%s has %s" % [id, anim], frames.has_animation(anim), true)
-	check("%s untinted" % id, def.tint, Color.WHITE)
-	check("%s no glow" % id, def.glow.a, 0.0)
 	return def
 
 

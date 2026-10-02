@@ -23,7 +23,6 @@ func _ready() -> void:
 func show_branch(branch: TowerDefinition, stored: ResourceBag) -> void:
 	_branch = branch
 	icon.texture = branch.icon()
-	icon.modulate = branch.tint
 	name_label.text = branch.display_name
 	description.text = branch.help_line
 	ability.text = "Q: %s — %s" % [branch.ability_name, branch.ability_text]
