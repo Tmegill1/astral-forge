@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="FrostDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/towers/frost_definition.gd" id="1_def"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/rune_mortar.tres" id="2_frames"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/frost_mortar.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/towers/frost_tower.tscn" id="3_scene"]
 
 [resource]
@@ -20,11 +20,10 @@ weak_against = "Raw damage (80% per shell); anything right next to it"
 ability_name = "Glacial Shell"
 ability_text = "A double-size blast that freezes everything in it for 2 s."
 ability_cooldown = 14.0
-tint = Color(0.65, 0.9, 1, 1)
-glow = Color(0.65, 0.9, 1, 0.8)
 sprite_frames = ExtResource("2_frames")
-sprite_scale = 0.605
+sprite_scale = 0.55
 scene = ExtResource("3_scene")
+muzzle_offset = Vector2(14, -83)
 max_health = 150.0
 attack_damage = 14.0
 attacks_per_second = 0.5

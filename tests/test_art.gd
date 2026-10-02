@@ -29,6 +29,8 @@ func _init() -> void:
 		var head = def.head_for(3)
 		check("%s rotating head" % id, head != null
 				and head.head_texture.resource_path == "res://assets/sprites/towers/%s_head.png" % id, true)
+	for id in [&"siege_battery", &"frost_mortar"]:
+		check_evolution(id)
 	print("art: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 
