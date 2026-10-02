@@ -47,10 +47,13 @@ evolution always runs at Lv3), written as `assets/sprites/<evolution id>.png/.tr
 | embercaster_evolutions | `inferno` | `oil_sprayer` |
 | aether_spire_evolutions | `storm_array` (rows 1–2, wreck = the 2 frames at the left of row 4) | — (Focus Lens skipped; see Decisions) |
 
-The slicer gains whatever small support this needs (e.g. splitting one sheet
-into two outputs, discarding a frame, taking frames from part of a row);
-existing outputs must come out byte-identical (re-running it must not change
-any committed sheet).
+The slicer gains the small support this needs: `--only name,name` to build
+just the named outputs (a full re-run rewrites the other `.tres` files in a
+different but equivalent format, so existing sprite files are left alone),
+animation names starting with `_` are discarded (for rows that belong to the
+other output, or the loose orb fan), and a name used twice in a row is joined
+into one animation. `war_cry`, `summon` and `phase_shift` don't loop (channels
+wait for them to finish).
 
 Boss portraits: `boss_portraits.png` → two static images,
 `assets/sprites/portraits/goblin_warchief.png` and
