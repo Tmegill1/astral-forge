@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="EnemyDefinition" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_definition.gd" id="1_def"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/goblin_shaman.tres" id="2_frames"]
-[ext_resource type="PackedScene" path="res://scenes/projectiles/enemy_orb.tscn" id="3_orb"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/goblin_shaman_king.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/king_orb.tscn" id="3_orb"]
 [ext_resource type="Resource" path="res://data/enemies/goblin.tres" id="4_goblin"]
 
 [resource]
@@ -35,13 +35,11 @@ pulse_duration = 4.0
 pulse_animation = &"buff"
 is_boss = true
 ends_run = true
-tint = Color(0.8, 0.6, 1, 1)
-aura = Color(0.6, 0.3, 1, 0.4)
 projectile_count = 5
 projectile_spread_deg = 40.0
 summon_interval = 12.0
 summon_count = 4
 summon_enemy = ExtResource("4_goblin")
-summon_animation = &"buff"
+summon_animation = &"summon"
 phase2_at = 0.5
-phase_shift_animation = &"buff"
+phase_shift_animation = &"phase_shift"

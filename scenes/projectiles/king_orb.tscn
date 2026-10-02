@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/projectiles/projectile.gd" id="1_projectile"]
+[ext_resource type="Texture2D" path="res://assets/sprites/goblin_shaman_king.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_orb"]
+atlas = ExtResource("2_sheet")
+region = Rect2(30, 704, 171, 57)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_orb"]
+radius = 7.0
+
+[node name="KingOrb" type="Area2D"]
+collision_layer = 0
+collision_mask = 10
+script = ExtResource("1_projectile")
+draw_streak = false
+
+[node name="Sprite" type="Sprite2D" parent="."]
+scale = Vector2(0.45, 0.45)
+texture = SubResource("AtlasTexture_orb")
+offset = Vector2(-62, 0)
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_orb")
