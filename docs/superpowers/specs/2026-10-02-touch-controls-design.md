@@ -19,6 +19,7 @@ cards, pause. Desktop play doesn't change.
 | UI size | **Zoom UI only**: `content_scale_factor = 1.4`, hero camera zoom × 1/1.4 so the map view is unchanged |
 | How input reaches the game | **Inject the existing actions** (`move_*`, `interact`, `manage`, `tower_ability`, `start_wave`, `ui_cancel`); towers read a new `Hero.aim_position()` instead of the mouse |
 | Auto-fire | Always on in touch mode; its Options toggle is hidden |
+| Hero shots on touch | Auto-aim at the nearest living enemy within the hero's range; no enemy in range → no shot (desktop still shoots at the mouse) |
 | Portrait | "Rotate your device" overlay, game paused while shown |
 | Button art | Placeholder (circle + glyph) for now |
 
@@ -28,7 +29,8 @@ cards, pause. Desktop play doesn't change.
   true when `OS.has_feature("web_android")`, `OS.has_feature("web_ios")` or
   `OS.has_feature("mobile")`, or when `OS.get_cmdline_user_args()` contains
   `--touch`.
-- In touch mode `_ready()` also sets
+- `set_touch_mode(on)` (called from `_ready()` when detected; tests call it
+  from an eval because the MCP runner can't pass `--touch`) sets
   `get_tree().root.content_scale_factor = TOUCH_UI_SCALE` (`1.4`) and forces
   `auto_fire = true` (not saved over the player's desktop choice).
 - `const TOUCH_UI_SCALE := 1.4` is public so the hero camera can undo it.
@@ -71,12 +73,11 @@ to show/hide buttons.
 
 - Pure logic lives in `scripts/ui/touch_stick.gd` (`class_name TouchStick`,
   `RefCounted`) so it can be tested headless:
-  - `radius := 60.0`, `dead_zone := 0.15` (fraction of radius).
+  - `radius := 60.0`. No dead zone of its own: the move actions' existing
+    `0.2` deadzone, applied by `Input.get_vector`, is the stick's dead zone.
   - `begin(index: int, at: Vector2)`, `drag(index, at)`, `end(index)`;
     ignores events from any other finger index while one is held.
-  - `vector() -> Vector2`: offset / radius, length clamped to 1, zero inside
-    the dead zone, and rescaled so it ramps from 0 at the dead zone to 1 at
-    the rim.
+  - `vector() -> Vector2`: offset / radius, length clamped to 1.
   - `knob_offset() -> Vector2`: offset clamped to `radius` (for drawing).
 - `touch_controls.gd` handles `InputEventScreenTouch` /
   `InputEventScreenDrag` in `_input()`:
@@ -110,6 +111,8 @@ run unchanged. `visibility_mode = ALWAYS`; `passby_press = false`.
 
 - Anchored to screen corners by placing them relative to
   `get_viewport().get_visible_rect()` on `size_changed`.
+- The Manage button asks the target: `BuildSlot.can_manage(hero)` and
+  `CommandCore.can_manage(hero)` (true when Manage would open a menu).
 - Textures: `assets/ui/touch/{use,manage,ability,wave,pause,stick_base,stick_knob}.png`,
   simple placeholder circles with a glyph, ~96 px. Real art later.
 - Hero needs a small public read so the layer can decide visibility:
@@ -160,8 +163,12 @@ run unchanged. `visibility_mode = ALWAYS`; `passby_press = false`.
 - **Build menu**: add a Close button (all modes) that calls `close()`.
 - **Options**: in touch mode hide the key-binding rows and the auto-fire
   toggle.
-- **Help**: the controls text has a touch version (joystick, Use, Manage,
-  Q, ▶ Wave, ⏸, touch to aim) chosen by `Settings.touch_mode`.
+- **Key names in menus** (Help has no controls page, so this replaces the
+  planned touch Help text): in touch mode "Close (Esc)" / "Back (Esc)" /
+  "Play Again (R)" drop the key, power cards say "Choose" without "[1]",
+  the build menu hint drops "[1–4] build · [Esc] close", the Codex toast
+  says "⏸ → Help", and the HUD's "[Q]" / "[Enter]" come from `key_hint`
+  ("tap ▶ to start now" on touch).
 - **Fit check at 1.4×**: every menu (main, pause, options, help, build,
   tower + evolve view, hero upgrade, card, game over, win) is screenshotted
   in touch mode at 1152×648 and at a phone-shaped window (e.g. 2340×1080).
