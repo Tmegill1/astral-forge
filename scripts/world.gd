@@ -69,6 +69,9 @@ func _ready() -> void:
 	waves.break_started.connect(func(_number: int) -> void: _scatter_heaps(map))
 	waves.run_won.connect(_on_run_won)
 	hud.bind_waves(waves)
+	var touch := get_node_or_null("UI/TouchControls") as TouchControls
+	if touch and not touch.is_queued_for_deletion():
+		touch.bind(hero, waves)
 	waves.start()
 
 

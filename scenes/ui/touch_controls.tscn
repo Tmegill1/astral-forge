@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="1_touch"]
+[ext_resource type="Texture2D" path="res://assets/ui/touch/use.png" id="2_use"]
+[ext_resource type="Texture2D" path="res://assets/ui/touch/manage.png" id="3_manage"]
+[ext_resource type="Texture2D" path="res://assets/ui/touch/ability.png" id="4_ability"]
+[ext_resource type="Texture2D" path="res://assets/ui/touch/wave.png" id="5_wave"]
+[ext_resource type="Texture2D" path="res://assets/ui/touch/pause.png" id="6_pause"]
+
+[node name="TouchControls" type="CanvasLayer"]
+process_mode = 3
+layer = 3
+script = ExtResource("1_touch")
+
+[node name="Controls" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="StickView" type="Node2D" parent="Controls"]
+unique_name_in_owner = true
+
+[node name="Use" type="TouchScreenButton" parent="Controls"]
+unique_name_in_owner = true
+texture_normal = ExtResource("2_use")
+action = "interact"
+
+[node name="Manage" type="TouchScreenButton" parent="Controls"]
+unique_name_in_owner = true
+texture_normal = ExtResource("3_manage")
+action = "manage"
+
+[node name="Ability" type="TouchScreenButton" parent="Controls"]
+unique_name_in_owner = true
+texture_normal = ExtResource("4_ability")
+action = "tower_ability"
+
+[node name="Wave" type="TouchScreenButton" parent="Controls"]
+unique_name_in_owner = true
+texture_normal = ExtResource("5_wave")
+action = "start_wave"
+
+[node name="Pause" type="TouchScreenButton" parent="Controls"]
+unique_name_in_owner = true
+texture_normal = ExtResource("6_pause")
+action = "ui_cancel"

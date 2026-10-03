@@ -59,6 +59,10 @@ func _init() -> void:
 	for menu in ["build_menu", "tower_menu", "hero_upgrade_menu", "game_over", "pause_menu"]:
 		check("toast below %s" % menu, toast_layer < _layer("res://scenes/ui/%s.tscn" % menu), true)
 	check("toast above hud", toast_layer > 1, true)
+	# Touch controls sit above the HUD, below the Codex notice and every menu.
+	var touch_layer := _layer("res://scenes/ui/touch_controls.tscn")
+	check("touch above hud", touch_layer > 1, true)
+	check("touch below toast", touch_layer < toast_layer, true)
 	print("help_text: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 
