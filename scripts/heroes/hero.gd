@@ -35,7 +35,7 @@ const WALK_BY_DIRECTION: Array[StringName] = [
 	&"walk_up", &"walk_up_right", &"walk_right", &"walk_down_right", &"walk_down"]
 
 ## When false, the hero only shoots while the "fire" action is held. Set from
-## Settings (Options → Auto-fire).
+## Settings (Options › Auto-fire).
 @export var auto_fire := true
 ## How far from the hero's feet enemies can hit it from, in pixels.
 @export var hit_radius := 12.0

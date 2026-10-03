@@ -49,7 +49,7 @@ func _refresh() -> void:
 		_show_row(row, upgrade)
 
 
-## One upgrade: "Damage — Rank 2/5 · 12 → 14" and its buy button.
+## One upgrade: "Damage — Rank 2/5 · 12 › 14" and its buy button.
 func _show_row(row: UpgradeRow, upgrade: HeroUpgrade) -> void:
 	var rank := _hero.rank_of(upgrade)
 	var now := _value(upgrade, rank)
@@ -59,7 +59,7 @@ func _show_row(row: UpgradeRow, upgrade: HeroUpgrade) -> void:
 		return
 	var cost := upgrade.cost_for(rank + 1)
 	var missing := _core.stored.shortfall(cost)
-	row.show_upgrade("%s — Rank %d/%d · %s → %s" % [
+	row.show_upgrade("%s — Rank %d/%d · %s › %s" % [
 			upgrade.display_name, rank, upgrade.max_rank(), now, _value(upgrade, rank + 1)],
 			"Upgrade — %s" % Loot.describe(cost) if missing.is_empty() else "Need %s more" % Loot.describe(missing),
 			missing.is_empty())

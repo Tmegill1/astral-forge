@@ -103,7 +103,7 @@ func _refresh_upgrade(tower: Tower) -> void:
 	var rate := RunCards.multiplier(self, &"tower_fire_rate")
 	var reach := RunCards.multiplier(self, &"tower_range")
 	var toughness := RunCards.multiplier(self, &"structure_health")
-	info.text += "\nNext: damage %.0f → %.0f · %.1f → %.1f shots/s · range %.0f → %.0f · health %.0f → %.0f" % [
+	info.text += "\nNext: damage %.0f › %.0f · %.1f › %.1f shots/s · range %.0f › %.0f · health %.0f › %.0f" % [
 		def.damage_at(tower.level) * damage, def.damage_at(next) * damage,
 		def.fire_rate_at(tower.level) * rate, def.fire_rate_at(next) * rate,
 		def.range_at(tower.level) * reach, def.range_at(next) * reach,

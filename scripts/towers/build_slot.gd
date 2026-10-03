@@ -288,8 +288,36 @@ func _raise_walls() -> void:
 		wall.max_health = WALL_HEALTH[wall_level - 1]
 		wall.position = piece.position
 		get_parent().add_child(wall)
+		wall.hide_art_within(_pad_area())
 		walls[i] = wall
 	get_tree().call_group(&"nav_grid", &"mark_dirty")
+	_move_hero_clear()
+
+
+## The pad's picture in world space.
+func _pad_area() -> Rect2:
+	var rect := pad.get_rect()
+	return Rect2(pad.global_position + rect.position * pad.global_scale, rect.size * pad.global_scale)
+
+
+## A tower or wall that just appeared on top of the hero would trap it, so
+## the hero steps out to the tower's exit spot (beside it, toward the Core).
+func _move_hero_clear() -> void:
+	var hero := get_tree().get_first_node_in_group(&"hero") as Hero
+	if hero == null or built == null or hero.operating:
+		return
+	var feet := hero.get_node("Body") as CollisionShape2D
+	var centre := hero.global_position + feet.position
+	var reach := (feet.shape as CircleShape2D).radius
+	var solids: Array[Rect2] = [built.nav_footprint()]
+	for wall in walls:
+		if is_instance_valid(wall):
+			solids.append(wall.nav_footprint())
+	for solid in solids:
+		if solid.grow(reach).has_point(centre):
+			hero.global_position = built.exit_position()
+			hero.reset_physics_interpolation()
+			return
 
 
 ## Where each wall piece goes (world positions): two runs out from the
