@@ -5,7 +5,9 @@ extends CharacterBody2D
 ##
 ## Controls: WASD to move (the hero faces the way it walks), or right-click
 ## to walk to a spot (hold it to keep following the cursor); mouse to aim;
-## E to interact. Shooting is automatic toward the mouse unless auto_fire is
+## E to interact. On touch (Settings.touch_mode) the on-screen controls press the
+## same actions, shots auto-aim at the nearest enemy in range, and operated
+## towers aim at touch_aim. Shooting is automatic toward the mouse unless auto_fire is
 ## off, then hold left mouse to shoot. Picked-up resources go into `carried`
 ## until deposited at the Core.
 ##
@@ -69,6 +71,9 @@ var operating: Tower
 ## The area the camera may show (the map). When the zoomed-out view is
 ## bigger than this, the map is centred instead.
 var camera_bounds := Rect2()
+## Touch mode: where operated towers aim, set by touching the map
+## (TouchControls). Unused with a mouse.
+var touch_aim := Vector2.ZERO
 
 var _cooldown := 0.0
 var _prompt := ""
@@ -77,6 +82,9 @@ var _move_target: Variant = null
 var _facing_left := false
 ## Horizontal sprite scale sign: 1 = facing right, -1 = left, between while turning.
 var _facing := 1.0
+## Camera zoom with no tower operated: 1, or smaller in touch mode to undo
+## the bigger UI scale so the map view matches desktop.
+var _base_zoom := 1.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var muzzle: Marker2D = $Muzzle
@@ -105,6 +113,9 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	auto_fire = Settings.auto_fire
 	Settings.changed.connect(_on_settings_changed)
+	if Settings.touch_mode:
+		_base_zoom = 1.0 / Settings.TOUCH_UI_SCALE
+	camera.zoom = Vector2.ONE * _base_zoom
 	var cards := get_tree().get_first_node_in_group(&"run_cards") as RunCards
 	if cards:
 		cards.changed.connect(rebuild_stats)
@@ -123,7 +134,7 @@ func _physics_process(delta: float) -> void:
 	if health.is_dead:
 		return
 	if operating:
-		_facing_left = get_global_mouse_position().x < global_position.x
+		_facing_left = aim_position().x < global_position.x
 		sprite.play(&"idle")
 		_animate_body(Vector2.ZERO, delta)
 		_update_prompt()
@@ -139,12 +150,14 @@ func _physics_process(delta: float) -> void:
 		_move_target = null
 	queue_redraw()
 
-	# Face where you're walking; when standing still, face the mouse.
+	# Face where you're walking; when standing still, face where you'd shoot.
 	# Walking straight up/down keeps the current facing.
 	if input.x != 0.0:
 		_facing_left = input.x < 0.0
 	elif input == Vector2.ZERO:
-		_facing_left = get_global_mouse_position().x < global_position.x
+		var look: Variant = _shot_target()
+		if look != null:
+			_facing_left = look.x < global_position.x
 	muzzle.position.x = -absf(muzzle.position.x) if _facing_left else absf(muzzle.position.x)
 	if input:
 		_play_walk(_walk_animation(input))
@@ -158,8 +171,10 @@ func _physics_process(delta: float) -> void:
 
 	_cooldown -= delta
 	if _cooldown <= 0.0 and (auto_fire or Input.is_action_pressed(&"fire")):
-		_fire()
-		_cooldown = 1.0 / stats.attacks_per_second
+		var target: Variant = _shot_target()
+		if target != null:
+			_fire(target)
+			_cooldown = 1.0 / stats.attacks_per_second
 
 
 ## The walk animation for moving along `move`, or plain "walk" if the art
@@ -255,7 +270,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		interact()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"manage"):
-		var target := _nearest_interactable()
+		var target := nearest_interactable()
 		if target and target.has_method(&"manage"):
 			target.manage(self)
 		get_viewport().set_input_as_handled()
@@ -272,6 +287,8 @@ func start_operating(tower: Tower) -> void:
 	queue_redraw()
 	tower.set_operator(self)
 	global_position = tower.operator_position()
+	# Touch: aim just in front of the tower until the player touches the map.
+	touch_aim = tower.global_position + (Vector2.LEFT if _facing_left else Vector2.RIGHT) * 120.0
 	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	_zoom_to(operating_zoom)
@@ -291,7 +308,7 @@ func stop_operating() -> void:
 
 
 func _zoom_to(zoom: float) -> void:
-	create_tween().tween_property(camera, "zoom", Vector2.ONE * zoom, 0.25) \
+	create_tween().tween_property(camera, "zoom", Vector2.ONE * zoom * _base_zoom, 0.25) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 
@@ -314,7 +331,7 @@ func _update_camera_limits() -> void:
 
 ## Uses the nearest interactable in reach (towers, build slots, the Core...).
 func interact() -> void:
-	var target := _nearest_interactable()
+	var target := nearest_interactable()
 	if target:
 		target.interact(self)
 		_update_prompt()
@@ -322,7 +339,7 @@ func interact() -> void:
 
 ## Anything in reach with an interact(hero) method counts. It may also have
 ## get_interact_prompt(hero) -> String to show a hint on screen.
-func _nearest_interactable() -> Node:
+func nearest_interactable() -> Node:
 	var nearest: Node = null
 	var nearest_distance := INF
 	for area in interact_area.get_overlapping_areas():
@@ -338,7 +355,7 @@ func _nearest_interactable() -> Node:
 
 func _update_prompt() -> void:
 	var text := ""
-	var target := _nearest_interactable()
+	var target := nearest_interactable()
 	if target and not health.is_dead and target.has_method(&"get_interact_prompt"):
 		text = target.get_interact_prompt(self)
 	if text != _prompt:
@@ -386,8 +403,8 @@ func revive(at: Vector2) -> void:
 	sprite.play(&"idle")
 
 
-func _fire() -> void:
-	var aim := get_global_mouse_position() - muzzle.global_position
+func _fire(target: Vector2) -> void:
+	var aim := target - muzzle.global_position
 	if aim.is_zero_approx():
 		aim = Vector2.LEFT if _facing_left else Vector2.RIGHT
 	var split := _mod_rank(&"split_shot")
@@ -400,6 +417,31 @@ func _fire() -> void:
 		bolt.max_distance = stats.attack_range
 		bolt.struck.connect(_on_bolt_struck.bind(bolt.damage))
 		get_parent().add_child(bolt)
+
+
+## Where the hero's shots go: the mouse; in touch mode the body of the
+## nearest living enemy in range, or null when there is none (no shot).
+func _shot_target() -> Variant:
+	if not Settings.touch_mode:
+		return get_global_mouse_position()
+	var best: Enemy = null
+	var best_distance := stats.attack_range
+	for node in get_tree().get_nodes_in_group(&"enemies"):
+		var enemy := node as Enemy
+		if enemy.health.is_dead:
+			continue
+		var distance := global_position.distance_to(enemy.global_position)
+		if distance <= best_distance:
+			best = enemy
+			best_distance = distance
+	if best == null:
+		return null
+	return best.hurtbox_shape.global_position
+
+
+## Where an operated tower aims: touch_aim in touch mode, else the mouse.
+func aim_position() -> Vector2:
+	return touch_aim if Settings.touch_mode else get_global_mouse_position()
 
 
 func _mod_rank(mod: StringName) -> int:

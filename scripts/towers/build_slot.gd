@@ -96,6 +96,11 @@ func manage(_hero: Hero) -> void:
 		get_tree().call_group(&"tower_menu", &"open", self)
 
 
+## True when Manage would open something (the touch Manage button shows then).
+func can_manage(hero: Hero) -> bool:
+	return built != null and not built.is_destroyed() and hero.operating != built
+
+
 func get_interact_prompt(hero: Hero) -> String:
 	if locked:
 		var missing := core().stored.shortfall(unlock_cost)

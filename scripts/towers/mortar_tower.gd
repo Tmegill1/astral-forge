@@ -63,9 +63,9 @@ func _aim_point(enemy: Enemy) -> Vector2:
 	return enemy.global_position + enemy.velocity * mortar.shell_flight_time
 
 
-## The mouse, pulled in or out to lie between min range and range.
+## The operator's aim, pulled in or out to lie between min range and range.
 func _operated_aim_point() -> Vector2:
-	var offset := operator.get_global_mouse_position() - global_position
+	var offset := operator.aim_position() - global_position
 	if offset.length() < 0.001:
 		offset = Vector2.RIGHT if not _facing_left else Vector2.LEFT
 	return global_position + offset.normalized() * clampf(offset.length(), min_range(), attack_range())

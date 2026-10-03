@@ -244,9 +244,10 @@ func ability_cooldown_left() -> float:
 
 # --- Targeting and firing ---
 
-## Where an operated tower aims: the mouse. Tower types can clamp it.
+## Where an operated tower aims: the operator's aim (mouse, or touch aim
+## point on phones). Tower types can clamp it.
 func _operated_aim_point() -> Vector2:
-	return operator.get_global_mouse_position()
+	return operator.aim_position()
 
 
 ## False blocks firing (e.g. an Embercaster whose tank ran dry).

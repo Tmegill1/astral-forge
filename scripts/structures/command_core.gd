@@ -75,6 +75,11 @@ func manage(hero: Hero) -> void:
 		get_tree().call_group(&"hero_upgrade_menu", &"open", self, hero)
 
 
+## True when Manage would open something (the touch Manage button shows then).
+func can_manage(hero: Hero) -> bool:
+	return not hero.definition.upgrades.is_empty()
+
+
 ## Pays for the next rank of `upgrade` from stored resources and gives it to
 ## the hero. False if it's maxed or unaffordable (nothing is spent then).
 func buy_upgrade(hero: Hero, upgrade: HeroUpgrade) -> bool:
