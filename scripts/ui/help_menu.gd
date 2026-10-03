@@ -12,6 +12,10 @@ const TOWERS: Array[String] = [
 ## Enemy ratings are words relative to this one.
 const BASE_ENEMY := "res://data/enemies/goblin.tres"
 const SELECTED := Color(1.0, 0.85, 0.5)
+## The panel's size when the screen has room (desktop); smaller screens
+## (a phone's bigger UI) get a panel this far inside the screen edges.
+const PANEL_SIZE := Vector2(900, 560)
+const SCREEN_MARGIN := 12.0
 
 var _entries: Array[Button] = []
 var _preview: AnimatedSprite2D
@@ -24,6 +28,7 @@ var _preview: AnimatedSprite2D
 @onready var entry_name: Label = %EntryName
 @onready var body: RichTextLabel = %Body
 @onready var back_button: Button = %Back
+@onready var panel: PanelContainer = $Center/Panel
 
 
 func _ready() -> void:
@@ -36,6 +41,8 @@ func _ready() -> void:
 ## Opens on the Towers tab; the lists are rebuilt each time, so new Codex
 ## entries appear.
 func open() -> void:
+	var room := get_viewport().get_visible_rect().size - Vector2.ONE * 2.0 * SCREEN_MARGIN
+	panel.custom_minimum_size = PANEL_SIZE.min(room)
 	visible = true
 	show_tab(&"towers")
 	back_button.grab_focus()

@@ -12,9 +12,14 @@ const DEFEAT_COLOR := Color(1, 0.45, 0.35)
 const BANNER_TIME := 2.0
 const SLOW_MOTION := 0.3
 const CHIP_COLOR := Color(0.2, 0.22, 0.28)
+## Gap kept between the panel and the top and bottom of the screen.
+const SCREEN_MARGIN := 8.0
 
 @onready var dim: ColorRect = $Dim
 @onready var center: CenterContainer = $Center
+@onready var panel: PanelContainer = $Center/Panel
+@onready var body: ScrollContainer = %Body
+@onready var body_rows: VBoxContainer = %BodyRows
 @onready var banner: Label = %Banner
 @onready var title: Label = %Title
 @onready var run_line: Label = %RunLine
@@ -142,6 +147,20 @@ func _show() -> void:
 	get_tree().call_group(&"pause_menu", &"close")
 	get_tree().paused = true
 	play_again_button.grab_focus()
+	_fit_body()
+
+
+## Caps the summary's height so the whole panel fits on screen (a long run,
+## or a phone's bigger UI): the summary scrolls instead of pushing the
+## buttons off the bottom. Hidden for the frame the rows take to wrap.
+func _fit_body() -> void:
+	center.modulate.a = 0.0
+	body.custom_minimum_size.y = 0.0
+	await get_tree().process_frame
+	var fixed := panel.get_combined_minimum_size().y
+	var room := get_viewport().get_visible_rect().size.y - 2.0 * SCREEN_MARGIN - fixed
+	body.custom_minimum_size.y = minf(body_rows.get_combined_minimum_size().y, maxf(room, 0.0))
+	center.modulate.a = 1.0
 
 
 func _unhandled_input(event: InputEvent) -> void:

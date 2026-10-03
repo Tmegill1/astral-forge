@@ -198,6 +198,8 @@ Proposal for evolutions, the 10-wave run and the Win screen: `docs/proposals/202
 - [x] **[AI]** Help (main and pause menus): tower guide (what each does, damage type, ability, operated bonus, upgrade path with costs) and an enemy Codex (unlocks when first seen on screen, "???" until then, number-free strengths / weaknesses / tip; saved in `user://codex.cfg`)
 - [ ] **[AI]** Hero select screen
 - [ ] **[AI]** Controller support
+- [x] **[AI]** Touch controls for phone/tablet browsers (joystick, on-screen buttons, touch aim, 1.4× UI) — `docs/superpowers/specs/2026-10-02-touch-controls-design.md`
+- [ ] **[You]** Play a full run on your phone; is the joystick zone/button size right? Real button art wanted
 - [ ] **[Both]** Juice: screen shake, hit flashes, particles
 
 ---

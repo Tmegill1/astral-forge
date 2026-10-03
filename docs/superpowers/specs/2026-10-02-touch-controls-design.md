@@ -172,8 +172,13 @@ run unchanged. `visibility_mode = ALWAYS`; `passby_press = false`.
 - **Fit check at 1.4×**: every menu (main, pause, options, help, build,
   tower + evolve view, hero upgrade, card, game over, win) is screenshotted
   in touch mode at 1152×648 and at a phone-shaped window (e.g. 2340×1080).
-  Anything clipped gets a `ScrollContainer` or tighter spacing. Likely:
-  build menu, evolve view, help, options.
+  Anything clipped gets a `ScrollContainer` or tighter spacing. Result:
+  Help's 900×560 panel shrinks to the screen minus a 12 px margin when it
+  doesn't fit (its list and text already scroll); the game-over/win summary
+  sits in a `ScrollContainer` capped at the room left beside the title and
+  buttons (desktop never needs to scroll); the evolve view's spacing is
+  tighter (view 10→6, card rows 6→4). Build, options, pause, tower, hero
+  upgrade, card and main menus fit as they are.
 - **Fullscreen**: on `web_android`, pressing Play on the main menu calls
   `DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)` (it
   runs inside the tap's user gesture). Skipped on iOS, where Safari doesn't
@@ -216,6 +221,6 @@ run unchanged. `visibility_mode = ALWAYS`; `passby_press = false`.
 - Changed: `scripts/settings.gd`, `scripts/heroes/hero.gd`,
   `scripts/towers/{tower,mortar_tower,siege_tower,rune_cannon_tower,spire_tower,lens_tower,ember_tower}.gd`,
   `scripts/towers/build_slot.gd`, `scripts/loot/resource_heap.gd`,
-  `scripts/structures/command_core.gd`, `scripts/ui/{build_menu,options_menu,help_text,main_menu}.gd`
-  and their scenes, `scenes/world.tscn`, `scenes/ui/main_menu.tscn`,
+  `scripts/structures/command_core.gd`, `scripts/ui/{build_menu,options_menu,help_text,main_menu,help_menu,game_over}.gd`
+  and their scenes, `scenes/world.tscn`, `scenes/ui/{main_menu,tower_menu,evolve_card}.tscn`,
   `ROADMAP.md`.
