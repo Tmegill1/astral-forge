@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/rotate_overlay.gd" id="1_rotate"]
+
+[node name="RotateOverlay" type="CanvasLayer"]
+process_mode = 3
+layer = 30
+script = ExtResource("1_rotate")
+
+[node name="Cover" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.06, 0.96)
+
+[node name="Label" type="Label" parent="Cover"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 28
+text = "Rotate your device to landscape"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

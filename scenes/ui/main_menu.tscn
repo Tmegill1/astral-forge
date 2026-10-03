@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Texture2D" path="res://assets/ui/menu_background.png" id="2_bg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/options_menu.tscn" id="3_options"]
 [ext_resource type="PackedScene" path="res://scenes/ui/help_menu.tscn" id="4_help"]
+[ext_resource type="PackedScene" path="res://scenes/ui/rotate_overlay.tscn" id="5_rotate"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -92,3 +93,6 @@ text = "Quit"
 [node name="OptionsMenu" parent="." instance=ExtResource("3_options")]
 
 [node name="HelpMenu" parent="." instance=ExtResource("4_help")]
+
+[node name="RotateOverlay" parent="." instance=ExtResource("5_rotate")]
+pauses = false

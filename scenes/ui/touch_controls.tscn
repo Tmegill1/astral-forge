@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="1_touch"]
 [ext_resource type="Texture2D" path="res://assets/ui/touch/use.png" id="2_use"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/touch/ability.png" id="4_ability"]
 [ext_resource type="Texture2D" path="res://assets/ui/touch/wave.png" id="5_wave"]
 [ext_resource type="Texture2D" path="res://assets/ui/touch/pause.png" id="6_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/rotate_overlay.tscn" id="7_rotate"]
 
 [node name="TouchControls" type="CanvasLayer"]
 process_mode = 3
@@ -42,3 +43,5 @@ action = "start_wave"
 unique_name_in_owner = true
 texture_normal = ExtResource("6_pause")
 action = "ui_cancel"
+
+[node name="RotateOverlay" parent="." instance=ExtResource("7_rotate")]

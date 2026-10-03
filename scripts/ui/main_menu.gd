@@ -25,6 +25,10 @@ func _ready() -> void:
 
 
 func _play() -> void:
+	# Phones: hide the browser bars. Browsers only allow it from a tap, and
+	# iPhone Safari never does, so only Android asks.
+	if Settings.touch_mode and OS.has_feature("web_android"):
+		Settings.set_fullscreen(true)
 	get_tree().change_scene_to_file(WORLD)
 
 
