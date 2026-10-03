@@ -1,5 +1,5 @@
 extends Node
-## Player settings: key bindings, fullscreen, auto-fire and volume
+## Player settings: key bindings, fullscreen, auto-fire, volume and touch
 ## (autoloaded as "Settings"). Loaded from user://settings.cfg at startup,
 ## applied, and saved again on every change. Anything missing or unreadable
 ## in the file falls back to its default.
@@ -29,9 +29,17 @@ const MOUSE_NAMES := {
 const KEY_NAMES := {KEY_UP: "Up Arrow", KEY_DOWN: "Down Arrow",
 		KEY_LEFT: "Left Arrow", KEY_RIGHT: "Right Arrow"}
 
+## How much bigger the HUD and menus are in touch mode. The hero camera
+## divides its zoom by this so the map view stays the same.
+const TOUCH_UI_SCALE := 1.4
+
 var fullscreen := false
 var auto_fire := true
 var volumes: Dictionary[StringName, float] = {&"Master": 1.0, &"Music": 1.0, &"Effects": 1.0}
+
+## True on phones and tablets (or with the --touch user arg): on-screen
+## controls, bigger UI, auto-fire always on, no key names in prompts.
+var touch_mode := false
 
 ## Action -> [event or null, event or null].
 var _bindings: Dictionary[StringName, Array] = {}
@@ -53,6 +61,9 @@ func _ready() -> void:
 		fullscreen = false
 	_apply_all()
 	get_tree().root.size_changed.connect(_sync_fullscreen)
+	if OS.has_feature("web_android") or OS.has_feature("web_ios") \
+			or OS.has_feature("mobile") or OS.get_cmdline_user_args().has("--touch"):
+		set_touch_mode(true)
 
 
 ## Binds `event` to `slot` (0 = primary, 1 = secondary) of `action`.
@@ -89,9 +100,31 @@ func set_fullscreen(on: bool) -> void:
 
 
 func set_auto_fire(on: bool) -> void:
-	auto_fire = on
+	auto_fire = on or touch_mode
 	_save()
 	changed.emit()
+
+
+## Switches touch mode on or off (detected at startup; tests switch it by
+## hand). Auto-fire is forced on without saving over the desktop choice.
+func set_touch_mode(on: bool) -> void:
+	touch_mode = on
+	get_tree().root.content_scale_factor = TOUCH_UI_SCALE if on else 1.0
+	if on:
+		auto_fire = true
+	changed.emit()
+
+
+## "[E] " for the first key or button bound to `action`, to put in front of
+## a prompt; "" in touch mode (the on-screen buttons replace keys) or when
+## nothing is bound.
+func key_hint(action: StringName) -> String:
+	if touch_mode or not _bindings.has(action):
+		return ""
+	for event in _bindings[action]:
+		if event:
+			return "[%s] " % event_label(event)
+	return ""
 
 
 ## `value` 0–1; 0 mutes the bus.
