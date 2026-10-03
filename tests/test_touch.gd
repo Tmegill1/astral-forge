@@ -13,6 +13,7 @@ func _init() -> void:
 	_test_stick()
 	_test_key_hint()
 	_test_no_hard_coded_keys()
+	_test_touch_glyphs()
 	print("touch: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -82,6 +83,25 @@ func _test_no_hard_coded_keys() -> void:
 		var text := FileAccess.get_file_as_string(file)
 		for key in ["\"[E]", "\"[F]", "\"[Q]", "[Enter]"]:
 			check("%s has no %s" % [file.get_file(), key], text.contains(key), false)
+
+
+## Touch-only strings must use characters the default (web) font has.
+func _test_touch_glyphs() -> void:
+	var wants := {
+		"res://scripts/ui/hud.gd": "tap WAVE to start now",
+		"res://scripts/ui/codex_toast.gd": "Pause (II), then Help, to read it",
+	}
+	for file: String in wants:
+		var src := FileAccess.get_file_as_string(file)
+		check("source has '%s'" % wants[file], src.contains(wants[file]), true)
+		for c: String in wants[file]:
+			if not ThemeDB.fallback_font.has_char(c.unicode_at(0)):
+				failed += 1
+				print("FAIL glyph %s (U+%04X) missing from fallback font" % [c, c.unicode_at(0)])
+			else:
+				passed += 1
+		for bad in ["\u25B6", "\u23F8", "\u2192"]:
+			check("%s has no %04X" % [file, bad.unicode_at(0)], src.contains(bad), false)
 
 
 func check(label: String, got: Variant, want: Variant) -> void:

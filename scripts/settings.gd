@@ -62,7 +62,8 @@ func _ready() -> void:
 	_apply_all()
 	get_tree().root.size_changed.connect(_sync_fullscreen)
 	if OS.has_feature("web_android") or OS.has_feature("web_ios") \
-			or OS.has_feature("mobile") or OS.get_cmdline_user_args().has("--touch"):
+			or OS.has_feature("mobile") or OS.get_cmdline_user_args().has("--touch") \
+			or (OS.has_feature("web_macos") and DisplayServer.is_touchscreen_available()):
 		set_touch_mode(true)
 
 
@@ -83,7 +84,9 @@ func clear(action: StringName, slot: int) -> void:
 func reset_to_defaults() -> void:
 	for action in ACTIONS:
 		_bindings[action] = _defaults[action].duplicate()
-	fullscreen = false
+	# Touch play keeps its fullscreen; desktop goes back to windowed.
+	if not touch_mode:
+		fullscreen = false
 	auto_fire = true
 	for bus in BUSES:
 		volumes[bus] = 1.0

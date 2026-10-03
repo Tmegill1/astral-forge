@@ -108,7 +108,9 @@ func _update_buttons() -> void:
 		return
 	var alive := not _hero.health.is_dead
 	var target := _hero.nearest_interactable() if alive else null
-	use_button.visible = alive and (_hero.operating != null or target != null)
+	var can_use: bool = target != null and target.has_method(&"get_interact_prompt") \
+			and target.get_interact_prompt(_hero) != ""
+	use_button.visible = alive and (_hero.operating != null or can_use)
 	manage_button.visible = alive and _hero.operating == null and target != null \
 			and target.has_method(&"can_manage") and target.can_manage(_hero)
 	ability_button.visible = alive and _hero.operating != null

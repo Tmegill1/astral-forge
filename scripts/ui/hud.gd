@@ -69,7 +69,7 @@ func _update_wave_panel() -> void:
 		WaveDirector.State.BREAK:
 			var left := ceili(_director.break_left)
 			wave_title.text = "Wave %d / %d" % [_director.wave_index + 1, total]
-			var start := "tap ▶ to start now" if Settings.touch_mode \
+			var start := "tap WAVE to start now" if Settings.touch_mode \
 					else Settings.key_hint(&"start_wave") + "start now"
 			wave_status.text = "Arrives in %d:%02d  ·  %s" % [left / 60, left % 60, start]
 		WaveDirector.State.WAVE:

@@ -13,7 +13,7 @@ cards, pause. Desktop play doesn't change.
 | Question | Decision |
 |---|---|
 | Scope | **Fully playable** on a phone in landscape, start to finish |
-| Detection | `OS.has_feature("web_android") or OS.has_feature("web_ios")` (also native `"mobile"`); `--touch` user arg forces it on desktop |
+| Detection | `OS.has_feature("web_android") or OS.has_feature("web_ios")`, or `web_macos` with `DisplayServer.is_touchscreen_available()` (iPadOS Safari sends a Mac user agent) (also native `"mobile"`); `--touch` user arg forces it on desktop |
 | Movement | **Floating joystick**: touch anywhere on the left 45% of the screen |
 | Tower aim | **Touch to aim**: while operating, any map touch (not on a button) sets the aim point; dragging moves it |
 | UI size | **Zoom UI only**: `content_scale_factor = 1.4`, hero camera zoom × 1/1.4 so the map view is unchanged |
@@ -26,8 +26,9 @@ cards, pause. Desktop play doesn't change.
 ## Detection — `Settings`
 
 - `var touch_mode: bool`, set once in `_ready()` (before anything reads it):
-  true when `OS.has_feature("web_android")`, `OS.has_feature("web_ios")` or
-  `OS.has_feature("mobile")`, or when `OS.get_cmdline_user_args()` contains
+  true when `OS.has_feature("web_android")`, `OS.has_feature("web_ios")`,
+  `OS.has_feature("mobile")`, `OS.has_feature("web_macos")` with
+  `DisplayServer.is_touchscreen_available()` (iPadOS), or when `OS.get_cmdline_user_args()` contains
   `--touch`.
 - `set_touch_mode(on)` (called from `_ready()` when detected; tests call it
   from an eval because the MCP runner can't pass `--touch`) sets

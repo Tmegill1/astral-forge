@@ -19,7 +19,7 @@ func _ready() -> void:
 	panel.modulate.a = 0.0
 	Codex.discovered.connect(_on_discovered)
 	if Settings.touch_mode:
-		hint.text = "⏸ → Help to read it"
+		hint.text = "Pause (II), then Help, to read it"
 
 
 func is_showing() -> bool:

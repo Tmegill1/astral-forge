@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Desktop (touch mode off) must behave exactly as before, apart from prompts now showing the real bound key and the build menu gaining a Close button.
-- Touch mode turns on when `OS.has_feature("web_android") or OS.has_feature("web_ios") or OS.has_feature("mobile")`, or when `OS.get_cmdline_user_args()` contains `--touch`. Evals switch it on with `Settings.set_touch_mode(true)`.
+- Touch mode turns on when `OS.has_feature("web_android") or OS.has_feature("web_ios") or OS.has_feature("mobile")` or `(OS.has_feature("web_macos") and DisplayServer.is_touchscreen_available())` (iPadOS), or when `OS.get_cmdline_user_args()` contains `--touch`. Evals switch it on with `Settings.set_touch_mode(true)`.
 - `Settings.TOUCH_UI_SCALE := 1.4`. In touch mode: `get_tree().root.content_scale_factor = 1.4`, hero camera zoom = desktop zoom ÷ 1.4, auto-fire forced on (not saved).
 - Joystick: starts on a touch in the left `0.45` of the visible width; knob radius `60.0` px; the dead zone is the move actions' existing `0.2` deadzone (applied by `Input.get_vector`), so `TouchStick` adds none.
 - Buttons are `TouchScreenButton` (multi-touch), never `Button`, on CanvasLayer **3** (HUD 1, CodexToast 4, menus 5+). Portrait overlay on its own CanvasLayer **30**.
