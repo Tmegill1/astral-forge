@@ -48,9 +48,9 @@ func _process(_delta: float) -> void:
 	if tower.ability_active_left() > 0.0:
 		ability_text.text = "%s active: %.1fs" % [def.ability_name, tower.ability_active_left()]
 	elif tower.ability_cooldown_left() > 0.0:
-		ability_text.text = "[Q] %s recharging: %ds" % [def.ability_name, ceili(tower.ability_cooldown_left())]
+		ability_text.text = "%s%s recharging: %ds" % [Settings.key_hint(&"tower_ability"), def.ability_name, ceili(tower.ability_cooldown_left())]
 	else:
-		ability_text.text = "[Q] %s ready" % def.ability_name
+		ability_text.text = "%s%s ready" % [Settings.key_hint(&"tower_ability"), def.ability_name]
 
 
 func bind_waves(director: WaveDirector) -> void:
@@ -69,7 +69,9 @@ func _update_wave_panel() -> void:
 		WaveDirector.State.BREAK:
 			var left := ceili(_director.break_left)
 			wave_title.text = "Wave %d / %d" % [_director.wave_index + 1, total]
-			wave_status.text = "Arrives in %d:%02d  ·  [Enter] start now" % [left / 60, left % 60]
+			var start := "tap ▶ to start now" if Settings.touch_mode \
+					else Settings.key_hint(&"start_wave") + "start now"
+			wave_status.text = "Arrives in %d:%02d  ·  %s" % [left / 60, left % 60, start]
 		WaveDirector.State.WAVE:
 			wave_title.text = "Wave %d / %d" % [_director.wave_index + 1, total]
 			wave_status.text = "Goblins left: %d" % _director.enemies_left()

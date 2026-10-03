@@ -105,16 +105,16 @@ func get_interact_prompt(hero: Hero) -> String:
 	if locked:
 		var missing := core().stored.shortfall(unlock_cost)
 		if missing.is_empty():
-			return "[E] Unlock slot (%s)" % Loot.describe(unlock_cost)
+			return "%sUnlock slot (%s)" % [_key_hint(&"interact"), Loot.describe(unlock_cost)]
 		return "Unlock slot: need %s more" % Loot.describe(missing)
 	if built == null:
-		return "[E] Build"
+		return _key_hint(&"interact") + "Build"
 	if built.is_destroyed():
 		return "%s destroyed — clearing in %ds" % [built.definition.display_name, ceili(_wreckage_left)]
 	var text := built.get_interact_prompt(hero)
 	if hero.operating == built:
 		return text
-	return text + "    [F] Repair / Upgrade / Sell"
+	return text + "    %sRepair / Upgrade / Sell" % _key_hint(&"manage")
 
 
 # --- Building, selling, repairing ---
@@ -344,3 +344,9 @@ func _post_texture(texture: Texture2D, width: int) -> Texture2D:
 	post.atlas = texture
 	post.region = Rect2(0, 0, width, texture.get_height())
 	return post
+
+
+## Looked up by path: tests load this script standalone, where the Settings
+## autoload is not a known identifier.
+func _key_hint(action: StringName) -> String:
+	return get_node("/root/Settings").key_hint(action)

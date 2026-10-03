@@ -64,9 +64,9 @@ func interact(hero: Hero) -> void:
 func get_interact_prompt(hero: Hero) -> String:
 	var parts: PackedStringArray = []
 	if not hero.carried.is_empty():
-		parts.append("[E] Deposit %s" % hero.carried.describe())
+		parts.append("%sDeposit %s" % [Settings.key_hint(&"interact"), hero.carried.describe()])
 	if not hero.definition.upgrades.is_empty():
-		parts.append("[F] Upgrade hero")
+		parts.append(Settings.key_hint(&"manage") + "Upgrade hero")
 	return "    ".join(parts)
 
 

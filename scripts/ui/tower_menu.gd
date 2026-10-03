@@ -30,6 +30,9 @@ func _ready() -> void:
 	sell_button.pressed.connect(_on_sell)
 	close_button.pressed.connect(close)
 	back_button.pressed.connect(_show_evolve.bind(false))
+	if Settings.touch_mode:
+		close_button.text = "Close"
+		back_button.text = "Back"
 
 
 func open(slot: BuildSlot) -> void:

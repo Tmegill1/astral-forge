@@ -19,6 +19,8 @@ func _ready() -> void:
 	add_to_group(&"hero_upgrade_menu")
 	visible = false
 	close_button.pressed.connect(close)
+	if Settings.touch_mode:
+		close_button.text = "Close"
 
 
 func open(core: CommandCore, hero: Hero) -> void:

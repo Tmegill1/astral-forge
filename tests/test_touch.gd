@@ -12,6 +12,7 @@ var failed := 0
 func _init() -> void:
 	_test_stick()
 	_test_key_hint()
+	_test_no_hard_coded_keys()
 	print("touch: %d passed, %d failed" % [passed, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -69,6 +70,18 @@ func _test_key_hint() -> void:
 	settings.touch_mode = true
 	check("hint touch", settings.key_hint(&"interact"), "")
 	settings.free()
+
+
+## Prompts and hints get their key from Settings.key_hint, so none may
+## spell out "[E]", "[F]", "[Q]" or "[Enter]" themselves.
+func _test_no_hard_coded_keys() -> void:
+	var files := ["res://scripts/loot/resource_heap.gd", "res://scripts/towers/build_slot.gd",
+			"res://scripts/towers/tower.gd", "res://scripts/structures/command_core.gd",
+			"res://scripts/ui/hud.gd"]
+	for file in files:
+		var text := FileAccess.get_file_as_string(file)
+		for key in ["\"[E]", "\"[F]", "\"[Q]", "[Enter]"]:
+			check("%s has no %s" % [file.get_file(), key], text.contains(key), false)
 
 
 func check(label: String, got: Variant, want: Variant) -> void:

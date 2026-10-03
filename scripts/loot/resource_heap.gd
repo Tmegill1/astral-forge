@@ -24,4 +24,4 @@ func interact(_hero: Hero) -> void:
 
 func get_interact_prompt(_hero: Hero) -> String:
 	var action := "Break crystal" if type == Loot.AETHER else "Salvage heap"
-	return "[E] %s (%d %s)" % [action, amount, Loot.display_name(type)]
+	return "%s%s (%d %s)" % [Settings.key_hint(&"interact"), action, amount, Loot.display_name(type)]

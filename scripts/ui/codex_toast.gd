@@ -11,12 +11,15 @@ var _busy := false
 
 @onready var panel: Control = %Panel
 @onready var title: Label = %Title
+@onready var hint: Label = %Hint
 
 
 func _ready() -> void:
 	panel.visible = false
 	panel.modulate.a = 0.0
 	Codex.discovered.connect(_on_discovered)
+	if Settings.touch_mode:
+		hint.text = "⏸ → Help to read it"
 
 
 func is_showing() -> bool:

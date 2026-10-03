@@ -1,12 +1,14 @@
 class_name BuildMenu
 extends CanvasLayer
 ## Pop-up for choosing what to build on a pad. Pauses the game while open.
-## Click a card's Build button or press its number; Esc (or E) closes.
+## Click a card's Build button or press its number; Esc, E or Close closes.
 
 const CARD_SCENE := preload("res://scenes/ui/build_card.tscn")
 
 @onready var title: Label = %Title
 @onready var cards: HBoxContainer = %Cards
+@onready var close_button: Button = %CloseButton
+@onready var hint: Label = $Center/Panel/Margin/Rows/Hint
 
 var _slot: BuildSlot
 var _opened_frame := -1
@@ -15,6 +17,10 @@ var _opened_frame := -1
 func _ready() -> void:
 	add_to_group(&"build_menu")
 	visible = false
+	close_button.pressed.connect(close)
+	if Settings.touch_mode:
+		close_button.text = "Close"
+		hint.text = "Game paused  ·  Walls are raised on both sides of every tower"
 
 
 func open(slot: BuildSlot) -> void:

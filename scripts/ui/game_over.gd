@@ -33,6 +33,10 @@ func _ready() -> void:
 	banner.visible = false
 	play_again_button.pressed.connect(restart)
 	main_menu_button.pressed.connect(to_main_menu)
+	# Looked up by path: tests load this script standalone, where the Settings
+	# autoload is not a known identifier.
+	if get_node("/root/Settings").touch_mode:
+		play_again_button.text = "Play Again"
 
 
 ## Shows `summary` (from World.run_summary()). A victory plays the banner first.

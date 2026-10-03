@@ -16,7 +16,7 @@ extends CharacterBody2D
 ## ability, and the camera zooms out. E again leaves instantly.
 
 signal died
-## Text for the nearest interactable ("[E] Deposit ..."), or "" for none.
+## Text for the nearest interactable ("[E] Deposit ...", or "Deposit ..." on touch), or "" for none.
 signal interact_prompt_changed(text: String)
 ## The tower now being operated, or null after leaving one.
 signal operating_changed(tower: Tower)

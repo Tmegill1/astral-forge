@@ -175,9 +175,9 @@ func get_interact_prompt(hero: Hero) -> String:
 	if is_destroyed():
 		return ""
 	if operator == hero:
-		return "[E] Leave %s" % definition.display_name
+		return "%sLeave %s" % [_key_hint(&"interact"), definition.display_name]
 	if operator == null:
-		return "[E] Operate %s" % definition.display_name
+		return "%sOperate %s" % [_key_hint(&"interact"), definition.display_name]
 	return ""
 
 
@@ -393,3 +393,9 @@ func _draw() -> void:
 	var centre := _muzzle_base() - global_position
 	draw_circle(centre, attack_range(), Color(0.45, 0.85, 1.0, 0.05))
 	draw_arc(centre, attack_range(), 0.0, TAU, 96, Color(0.45, 0.85, 1.0, 0.35), 2.0)
+
+
+## Looked up by path: tests load this script standalone, where the Settings
+## autoload is not a known identifier.
+func _key_hint(action: StringName) -> String:
+	return get_node("/root/Settings").key_hint(action)

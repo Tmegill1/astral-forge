@@ -30,7 +30,7 @@ func show_card(card_definition: CardDefinition, next_rank: int, key: int) -> voi
 	title_label.text = card.title
 	description_label.text = card.description
 	rank_label.text = "Rank %d / %d" % [next_rank, card.max_rank]
-	choose_button.text = "Choose  [%d]" % key
+	choose_button.text = "Choose" if Settings.touch_mode else "Choose  [%d]" % key
 
 
 func _gui_input(event: InputEvent) -> void:
