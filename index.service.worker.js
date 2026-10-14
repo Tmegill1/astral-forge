@@ -1,4 +1,4 @@
-// Astral Forge moved to https://astral-forge.netlify.app/. Players who
+// Astral Forge moved to https://astralforge.project-tgames.com/. Players who
 // installed the game from this address still have the old offline service
 // worker; browsers fetch this file to update it, and this version deletes the
 // game's offline cache, unregisters itself and reloads open windows, which
